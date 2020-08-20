@@ -1,0 +1,160 @@
+type synchronizationCluster = {xTime: Int, fulfilledStreams: Map[Int, Bool]}
+
+def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[Bool]:= {
+            
+    def List_attachsynchronizationCluster(ListLeft: List[synchronizationCluster], ListRight: List[synchronizationCluster]): List[synchronizationCluster] :=
+        List_attach(ListLeft, ListRight);
+
+    def SynchronizationCluster(aTime: Int, aFulfilledStreams: Map[Int, Bool]): synchronizationCluster :=
+        {xTime = aTime, fulfilledStreams = aFulfilledStreams}
+        
+    def buildSynchronizationCluster(time: Int, streamCount: Int): synchronizationCluster :=
+        {xTime = time, fulfilledStreams = buildMap(streamCount, false)}
+        
+    def getFulfilledStreamMap(cluster: synchronizationCluster):  Map[Int, Bool] :=
+        cluster.fulfilledStreams
+        
+    def getFulfilledStreamMapLifted(cluster: Events[synchronizationCluster]): Events[Map[Int, Bool]] :=
+        slift1(cluster, getFulfilledStreamMap)
+        
+    def getXTime(cluster: synchronizationCluster): Int :=
+        cluster.xTime
+        
+    def getXTimeLifted(cluster: Events[synchronizationCluster]): Events[Int] :=
+        slift1(cluster, getXTime)
+
+    #checks if a cluster exists, where the event would fit
+    def existsMatchingCluster(
+            activeClusters: List[synchronizationCluster],   # List of actice clusters
+            eventStreamIndex: Int): Bool:=                        # the index of the stream, where the event has occurred
+        # list empty-> no matching cluster found
+        static if (List_size(activeClusters) == 0) then
+            false
+        else
+            # var in map is true-> stream has already event in stream
+            if (Map_get(List_head(activeClusters).fulfilledStreams, eventStreamIndex)) then
+                existsMatchingCluster(List_tail(activeClusters), eventStreamIndex)
+            # var in map is false-> event does fit in this cluster
+            else
+                true
+
+    def clusterFulfilled(fulfilledStreams: Map[Int, Bool], keys: List[Int]): Bool :=
+        # list is empty
+        static if (Map_size(fulfilledStreams) == 0 || List_size(keys) == 0) then
+            true
+        else
+            # now checked stream is fulfilled
+            static if Map_get(fulfilledStreams, List_head(keys)) then
+                # all following streams are fulfilled
+                clusterFulfilled(fulfilledStreams, List_tail(keys))
+            else
+                false
+            
+    def removeFulfilled(activeClustersLeft: List[synchronizationCluster], activeClustersRight: List[synchronizationCluster]):
+            List[synchronizationCluster] :=
+        #activeClustersRight
+        static if List_size(activeClustersRight) == 0 then
+            activeClustersLeft
+        else
+            # head of right list is fulfilled-> remove it
+            if clusterFulfilled(List_head(activeClustersRight).fulfilledStreams,
+                    Map_keys(List_head(activeClustersRight).fulfilledStreams)) then
+                removeFulfilled(activeClustersLeft, List_tail(activeClustersRight))
+            else
+                removeFulfilled(List_append(activeClustersLeft, List_head(activeClustersRight)), List_tail(activeClustersRight))
+            
+    def addEventToClusterList(
+            activeClustersLeft: List[synchronizationCluster],      # List of actice clusters (left side)
+            activeClustersRight: List[synchronizationCluster],     # List of actice clusters (right side, head is used)
+            eventStreamIndex: Int): List[synchronizationCluster] :=# the index of the stream, where the event has occurred
+        # streamIndex in head of right list is fulfilled-> check in tail
+        #activeClustersRight
+        static if Map_get(List_head(activeClustersRight).fulfilledStreams, eventStreamIndex) then
+            addEventToClusterList(
+                List_append(activeClustersLeft, List_head(activeClustersRight)),
+                List_tail(activeClustersRight),
+                eventStreamIndex)
+        # streamIndex in head of right list is not fulfilled-> set to true
+        else
+            List_attach(activeClustersLeft, 
+                List_prepend(SynchronizationCluster(List_head(activeClustersRight).xTime, 
+                        Map_add(List_head(activeClustersRight).fulfilledStreams, eventStreamIndex, true)),
+                   List_tail(activeClustersRight)))
+                
+    def addEventsToClusters(activeClusters: List[synchronizationCluster], eventIndices: List[Int], time: Int, streamCount: Int) : List[synchronizationCluster]:=
+        static if (List_size(eventIndices) == 0) then
+            activeClusters
+        else
+            # recursive call-> do for all events in list
+            addEventsToClusters(
+                # remove clusters, that don't take more events
+                    addEventToClusterList(List_empty[synchronizationCluster], 
+                        List_attach(activeClusters, if existsMatchingCluster(activeClusters, List_head(eventIndices))
+                                                        then List_empty[synchronizationCluster]
+                                                        else List_append(List_empty[synchronizationCluster],
+                                                            buildSynchronizationCluster(time, streamCount))),
+                    List_head(eventIndices)), 
+                List_tail(eventIndices), time, streamCount)
+
+    def timeNow: Events[Int] := time(eventIndices);
+    #active clusters with new events
+    def activeClustersNewEvent : Events[List[synchronizationCluster]] :=
+        slift4(last(activeClusters, eventIndices), eventIndices, timeNow, streamCount, addEventsToClusters)
+    # active clusters after removing of full clusters
+    def activeClusters: Events[List[synchronizationCluster]] := merge(
+        slift(List_empty[synchronizationCluster], activeClustersNewEvent, removeFulfilled), 
+        List_empty[synchronizationCluster])
+    List_size(activeClustersNewEvent) == 0 || getXTimeLifted(List_head(activeClustersNewEvent)) + tolerance >= timeNow
+}
+
+def StrongSynchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(events1, events2))
+
+    StrongSynchronizationConstraint(
+        slift(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+              if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int],
+              List_attachInt),
+        2, tolerance)
+}
+
+def StrongSynchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
+        Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+        3, tolerance)
+}
+
+def StrongSynchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C],
+        events4: Events[D], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+        4, tolerance)
+}
+
+def StrongSynchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C],
+        events4: Events[D], events5: Events[E], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4), events5))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+        5, tolerance)
+}
