@@ -1,0 +1,11 @@
+include "../main/t2uConstraints.tessla"
+
+in x: Events[Unit]
+def lower = 40
+def upper = 50
+def jitter = 10
+def span = 2
+
+
+
+out repetitionConstraint(x, lower, upper, span, jitter)

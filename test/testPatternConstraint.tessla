@@ -1,0 +1,10 @@
+include "../main/t2uConstraints.tessla"
+
+in x: Events[Unit]
+
+def periodX : Int := 50
+def offset: List[Int] := List_append(List_append(List_empty[Int], 10), 30)
+def jitter: Int = 5
+def mini: Int = 10
+
+out patternConstraint(x, periodX, offset, jitter, mini)
