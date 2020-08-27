@@ -1,0 +1,175 @@
+#include "t2uConstraints.tessla"
+
+def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
+        Events[Bool]:= {
+        
+    def timeNow = time(eventStreamIndices)
+    
+    # Help functions
+    def buildEmptylatestEventTimes(stimulusStreamCount: Int): Map[Int, Map[Int, Int]] :=
+        static if (stimulusStreamCount == 0) then
+            Map_empty[Int, Map[Int, Int]]
+        else
+            Map_add(buildEmptylatestEventTimes(stimulusStreamCount-1), stimulusStreamCount, Map_empty[Int, Int]);
+
+    # adds stimulus events to stored events    
+    def addEventsToEmptylatestEventTimes(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
+            eventStreamIndices: Map[Int, Int]): Map[Int, Map[Int, Int]] :=
+        static if (Map_size(eventStreamIndices) == 0) then
+            latestEventTimes
+        else
+            # if resoponse stream -> don't insert
+            static if (Map_headKey(eventStreamIndices) == 0) then
+                addEventsToEmptylatestEventTimes(latestEventTimes, timeNow, Map_tail(eventStreamIndices))
+            else
+                # insert head of map and recursive call
+                addEventsToEmptylatestEventTimes(
+                    Map_add(latestEventTimes, Map_headKey(eventStreamIndices), 
+                        Map_add(Map_get(latestEventTimes, Map_headKey(eventStreamIndices)), Map_headValue(eventStreamIndices), timeNow)), 
+                    timeNow, Map_tail(eventStreamIndices))
+    # time of the oldest event of the given color
+    def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
+        static if (Map_size(latestEvents) == 0) then
+            infty
+        else
+            if (Map_contains(Map_headValue(latestEvents), color)) then
+                min(Map_get(Map_headValue(latestEvents), color), timeOldestEvent(Map_tail(latestEvents), color))
+            else
+                -infty
+
+    # time of the youngest event of the given color
+    def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
+        static if (Map_size(latestEvents) == 0) then
+            -infty
+        else
+            if (Map_contains(Map_headValue(latestEvents), color)) then
+                max(Map_get(Map_headValue(latestEvents), color), timeYoungestEvent(Map_tail(latestEvents), color))
+            else
+                infty
+
+
+    # checks, if the synchronization cluster for the given color is fulfilled
+    def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int, timeNow: Int) : Bool =
+        static if (Map_size(latestEventTimes) == 0) then
+            true
+        else
+            clusterFulfilled(Map_tail(latestEventTimes), color, tolerance, timeNow) && 
+            timeOldestEvent(latestEventTimes, color) + tolerance >= timeYoungestEvent(latestEventTimes, color)
+        
+    #stored information
+    
+    # time of last stimulus events with given color
+    #   streamIndex -> (color -> time)
+    def latestEventTimes: Events[Map[Int, Map[Int, Int]]] := 
+        merge(slift3(last(latestEventTimes, timeNow), timeNow, eventStreamIndices, addEventsToEmptylatestEventTimes),
+            buildEmptylatestEventTimes(stimulusStreamCount))
+    
+    #evaluation
+    allPreviousTrue(
+        if Map_contains(eventStreamIndices, 0) then
+            slift4(latestEventTimes, Map_get(eventStreamIndices, 0), tolerance, timeNow, clusterFulfilled)
+        else
+            true
+    )
+
+}
+
+def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[Int], response: Events[Int],
+        tolerance: Int): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus1),
+        merge(time(stimulus2),
+            time(response)))
+
+    def eventStreamIndices: Events[Map[Int, Int]]:=
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(response)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, response), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(stimulus1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, stimulus1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, stimulus2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    inputSynchronizationConstraint(eventStreamIndices, 2, tolerance)
+}
+
+def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+        response: Events[Int], tolerance: Int): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus1),
+        merge(time(stimulus2),
+        merge(time(stimulus3),
+            time(response))))
+
+    def eventStreamIndices: Events[Map[Int, Int]]:=
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(response)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, response), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(stimulus1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, stimulus1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, stimulus2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, stimulus3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    inputSynchronizationConstraint(eventStreamIndices, 3, tolerance)
+}
+
+def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+        stimulus4: Events[Int], response: Events[Int], tolerance: Int): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus1),
+        merge(time(stimulus2),
+        merge(time(stimulus3),
+        merge(time(stimulus4),
+            time(response)))))
+
+    def eventStreamIndices: Events[Map[Int, Int]]:=
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(response)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, response), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(stimulus1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, stimulus1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, stimulus2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, stimulus3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, stimulus4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    inputSynchronizationConstraint(eventStreamIndices, 4, tolerance)
+}
+
+def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+        stimulus4: Events[Int], stimulus5: Events[Int], response: Events[Int], tolerance: Int): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus1),
+        merge(time(stimulus2),
+        merge(time(stimulus3),
+        merge(time(stimulus4),
+        merge(time(stimulus5),
+            time(response))))))
+
+    def eventStreamIndices: Events[Map[Int, Int]]:=
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(response)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, response), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(stimulus1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, stimulus1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, stimulus2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, stimulus3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, stimulus4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(stimulus5) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 5, stimulus5), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    inputSynchronizationConstraint(eventStreamIndices, 5, tolerance)
+}
