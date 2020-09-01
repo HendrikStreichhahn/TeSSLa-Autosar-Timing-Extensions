@@ -1,0 +1,7 @@
+# lower = 5
+# upper = 6
+# span = 1
+
+5: x
+#fail at 12
+20: x

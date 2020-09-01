@@ -6,6 +6,10 @@ def nLastTime[A](e: Events[A], n: Int): Events[Int] :=
         time(e)
     else
         last(nLastTime(e, n-1), e)
+        
+# returns the time of the n-last event
+def nLastTimeOrFirstTime[A](e: Events[A], n: Int): Events[Int] :=
+    merge(nLastTime(e, n), firstEvent(time(e)))
 
 # time of the event, or 0, if there wasn't an event before
 def defaultTime[T](stream: Events[T]): Events[Int]:=
@@ -138,3 +142,7 @@ def buildMap[A](size: Int, init: A): Map[Int, A] :=
         def recBuildMap = buildMap(size-1, init)
         Map_add(recBuildMap, Map_size(recBuildMap)+1, init)
     }
+
+# delay, but delay is infty, if delay value is negative
+def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
+    delay(if(delays > 0) then delays else infty, resets)

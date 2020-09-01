@@ -62,16 +62,17 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
 }
 
 def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[Bool] := {
-    def evaluateTimes = mergeUnit(e, delay(const(upper+1, e), e))
-    default(
-        if (upper == infty) then
-            (count(e) <= span) || (lower <= time(evaluateTimes) - nLastTime(e, span))
+    def evaluateTimes = mergeUnit(e, 
+            safeDelay((nLastTimeOrFirstTime(e, span) + upper) - time(e)+1,e))
+    
+    allPreviousTrue(on(evaluateTimes,
+        if (count(e) <= span) then
+            firstEvent(time(e)) + upper > time(evaluateTimes)
         else
-            (count(e) <= span) ||
-            (lower <= (time(evaluateTimes) - nLastTime(e, span)) && time(evaluateTimes) - nLastTime(e, span) <= upper),
-        true)
+            default((lower <= (time(evaluateTimes) - nLastTime(e, span)) &&
+                        time(evaluateTimes) - nLastTime(e, span) <= upper),
+            true)))
 }
-
         
 def repetitionConstraint(e: Events[Unit], lower: Int, upper: Int, span: Int, jitter: Int): Events[Bool] := {
     # lower bound for current x
