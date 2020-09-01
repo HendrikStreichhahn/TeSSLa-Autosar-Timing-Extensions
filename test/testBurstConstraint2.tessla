@@ -1,0 +1,5 @@
+include "../main/t2uConstraints.tessla"
+
+in x: Events[Unit]
+
+out burstConstraint(x, 6, 3, 1)

@@ -2,7 +2,6 @@
 # length: 6
 # maxOccurences: 3
 # minimum: 1
-# supposed to have no error
 1:x 
 2:x
 3:x
@@ -15,3 +14,11 @@
 23: x
 24: x
 25: x
+35: x
+36: x
+37: x
+# fail-> too many items
+38: x
+63: x
+64: x
+65: x
