@@ -63,7 +63,7 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
 
 def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[Bool] := {
     def evaluateTimes = mergeUnit(e, 
-            safeDelay((nLastTimeOrFirstTime(e, span) + upper) - time(e)+1,e))
+            safeDelay((nLastTimeOrFirstTime(e, span-1) + upper) - time(e)+1,e))
     
     allPreviousTrue(on(evaluateTimes,
         if (count(e) <= span) then
