@@ -6,4 +6,4 @@ in target: Events[Int]
 def lower = 4
 def upper = 10
 
-out strongDelayConstraint(source, target, lower, upper)
+out delayConstraint(source, target, lower, upper)
