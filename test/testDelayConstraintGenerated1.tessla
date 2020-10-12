@@ -1,0 +1,9 @@
+include "../main/t2uConstraints.tessla"
+
+in source: Events[Int]
+in target: Events[Int]
+
+def lower = 4
+def upper = 10
+
+out strongDelayConstraint(source, target, lower, upper)
