@@ -15,16 +15,22 @@ def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, uppe
                 # List has source event without matching target
                 List_size(unfinishedSourceTimesNewSource) > 0 &&
                 # target event now matches with oldest source event
-                List_head(unfinishedSourceTimesNewSource) + lower <= time(target) &&
-                List_head(unfinishedSourceTimesNewSource) + upper >= time(target)) then
-            #remove head of list
-            merge(List_tail(unfinishedSourceTimesNewSource), List_empty[Int])
+                List_head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                List_head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+            #remove matched target events
+            merge(slift(unfinishedSourceTimesNewSource, defaultTime(target), 
+					removeItemsSmallerThanAFromListFront),
+				List_empty[Int])
         else
             merge(unfinishedSourceTimesNewSource, List_empty[Int])
-    
-    def evaluateTimes = mergeUnit(mergeUnit(source, target),
-        delay(const(upper+1, mergeUnit(source, target)), mergeUnit(source, target)))
-    
+      
+	def evaluateTimes = mergeUnit(mergeUnit(source, target),
+        safeDelay(if (List_size(unfinishedSourceTimes) == 0) then
+				infty
+			else
+				List_head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
+			mergeUnit(source, target)))
+
     # no unfinished source events
     (List_size(unfinishedSourceTimes) == 0) ||
     # oldest source event can still be finished
@@ -43,9 +49,14 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
         else # defaultTime(source) == defaultTime(target)
             merge(List_append(List_tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
                   List_empty[Int])
-    # evaluation of constraint
+    # delay
     def evaluateTimes = mergeUnit(mergeUnit(source, target),
-        delay(const(upper+1, mergeUnit(source, target)), mergeUnit(source, target)))
+        safeDelay(if (List_size(unfinishedSourceTimes) == 0) then
+				infty
+			else
+				List_head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
+			mergeUnit(source, target)))
+	# output
     allPreviousTrue(
         # Event now is source-event
         if (defaultTime(source) > defaultTime(target)) then

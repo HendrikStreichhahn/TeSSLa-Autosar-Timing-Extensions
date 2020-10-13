@@ -146,3 +146,12 @@ def buildMap[A](size: Int, init: A): Map[Int, A] :=
 # delay, but delay is infty, if delay value is negative
 def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
     delay(if(delays > 0) then delays else infty, resets)
+	
+def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
+	static if (List_size(list) == 0) then
+		list
+	else
+		if List_head(list) < A then
+			removeItemsSmallerThanAFromListFront(List_tail(list), A)
+		else
+			list
