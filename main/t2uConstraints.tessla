@@ -73,16 +73,18 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
 }
 
 def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[Bool] := {
+	#stored state
+	def latestSpanEventTimes := nLastTime(e, span)
+	def latestSpanButOneEventTimes := nLastTime(e, span-1)
+	# delay
     def evaluateTimes = mergeUnit(e, 
-            safeDelay((nLastTimeOrFirstTime(e, span-1) + upper) - time(e)+1,e))
-    
+            safeDelay((merge(latestSpanButOneEventTimes, firstEvent(time(e)))+ upper) - time(e)+1,e))
+
     allPreviousTrue(on(evaluateTimes,
-        if (count(e) <= span) then
-            firstEvent(time(e)) + upper > time(evaluateTimes)
-        else
-            default((lower <= (time(evaluateTimes) - nLastTime(e, span)) &&
-                        time(evaluateTimes) - nLastTime(e, span) <= upper),
-            true)))
+		merge(default((lower <= (time(evaluateTimes) - latestSpanEventTimes) &&
+                        time(evaluateTimes) - latestSpanEventTimes <= upper),
+				true),
+			firstEvent(time(e)) + upper > time(evaluateTimes))))
 }
         
 def repetitionConstraint(e: Events[Unit], lower: Int, upper: Int, span: Int, jitter: Int): Events[Bool] := {
@@ -116,11 +118,11 @@ def repetitionConstraint(e: Events[Unit], lower: Int, upper: Int, span: Int, jit
             List_append(last(List_tail(UpperBoundX), e), upperBoundXNow + upper),
         List_empty[Int]
     )
-    def evaluateTimes = mergeUnit(e, delay(const(upper+1, e), e))
+    def evaluateTimes = mergeUnit(e, safeDelay(List_head(UpperBoundX) + jitter - time(e)+1, e))
     # Evaluation
-    (List_size(LowerBoundX) == 0 && List_size(UpperBoundX) == 0) ||
+    allPreviousTrue((List_size(LowerBoundX) == 0 && List_size(UpperBoundX) == 0) ||
         lowerBoundXNow <= time(evaluateTimes) &&
-        upperBoundXNow + jitter >= time(evaluateTimes)
+        upperBoundXNow + jitter >= time(evaluateTimes))
 }
 
 #TODO: Delayed evaluation

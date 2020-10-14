@@ -1,3 +1,5 @@
+include "t2uHelpFunctions.tessla"
+
 type SynchronizationEventInfo = {streamIndex: Int, eventTime: Int, fulfilled: Bool}
 def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[Bool]:= {
     def buildSynchronizationEventInfo(streamInd: Int, evtTime: Int, flflld: Bool) : SynchronizationEventInfo:=
@@ -93,8 +95,20 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
     def storedEvents: Events[List[SynchronizationEventInfo]] := merge(
         slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents),
         List_empty[SynchronizationEventInfo])
+		
+	def timeOldestUnfulfilledEvent(storedEvents: List[SynchronizationEventInfo]): Int :=
+		static if (List_size(storedEvents) == 0) then
+			infty
+		else
+            if !List_head(storedEvents).fulfilled then
+                List_head(storedEvents).eventTime
+            else
+                timeOldestUnfulfilledEvent(List_tail(storedEvents))
+	
+	def evaluateTimes = mergeUnit(eventIndices,
+        safeDelay(slift1(storedEvents, timeOldestUnfulfilledEvent) + tolerance - time(eventIndices)+1, eventIndices))
     #Evaluation
-    slift1(slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, eventsToRemove), noUnfulfilledRemoved)
+    slift1(slift3(storedEventsBeforeRemove, time(evaluateTimes), tolerance, eventsToRemove), noUnfulfilledRemoved)
 }
 
 def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):

@@ -2,9 +2,9 @@
 # upper = 6
 # span = 2
 # supposed to have no error
-1: x
-3: x
-6: x
-9: x
-11: x
-15: x
+1: e
+3: e
+6: e
+9: e
+11: e
+15: e
