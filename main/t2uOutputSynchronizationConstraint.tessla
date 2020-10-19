@@ -7,11 +7,6 @@ type outputSynchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, 
 def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int,
         endOfStreams: Events[Unit]): Events[Bool]:= {
     ##### Help funtions #####
-    # set the given stream in cluster to true
-    def setStreamInSynchronizationCluster(cluster: outputSynchronizationCluster, stream: Int): outputSynchronizationCluster = {
-        startTime = cluster.startTime,
-        fulfilledStreams = Map_add(cluster.fulfilledStreams, stream, true)
-    }
 
     # add an empty cluster to storedClusters
     def addNewCluster(storedClusters: Map[Int, outputSynchronizationCluster], newColor: Int, time: Int, responseStreamCount: Int): 
@@ -100,7 +95,8 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
             true
         else
             constraintFulfilled(Map_tail(storedClustersBeforeRemove), tolerance, timeNow) &&
-                Map_headValue(storedClustersBeforeRemove).startTime + tolerance >= timeNow
+                (clusterFulfilled(Map_headValue(storedClustersBeforeRemove).fulfilledStreams) ||
+                Map_headValue(storedClustersBeforeRemove).startTime + tolerance >= timeNow)
     
     def startTimeOldestCluster(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster]): Int :=
         static if (Map_size(storedClustersBeforeRemove) == 0) then
@@ -108,6 +104,24 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
         else
             min(Map_headValue(storedClustersBeforeRemove).startTime,
                 startTimeOldestCluster(Map_tail(storedClustersBeforeRemove)))
+                
+    def addAllCurrentColorsToSet(eventStreamIndices: Map[Int, Int], colors: Set[Int], currentTime: Int): Set[Int] :=
+        static if (Map_size(eventStreamIndices) == 0) then
+            colors
+        else
+            addAllCurrentColorsToSet(Map_tail(eventStreamIndices),
+                if !(Set_contains(colors, Map_headValue(eventStreamIndices)) || Map_headKey(eventStreamIndices) == 0) then
+                    Set_add(colors, Map_headValue(eventStreamIndices))
+                else
+                    colors, 
+                currentTime)
+                
+    def responseColorsWereInStimulus(eventStreamIndices: Map[Int, Int], stimulusColors: List[Int]): Bool:=
+        static if (Map_size(eventStreamIndices) == 0) then
+            true
+        else
+            List_containsInt(stimulusColors, Map_headValue(eventStreamIndices)) && 
+            responseColorsWereInStimulus(Map_tail(eventStreamIndices), stimulusColors)
     
     # Stored Information #
     def stimulusColors: Events[List[Int]] := merge(
@@ -123,24 +137,36 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
             updateSynchronizationClusters),
         Map_empty[Int, outputSynchronizationCluster])
     
-    # colors of all clusters, that are fulfilled in this timestamp
-    def newFulfilled: Events[List[Int]] := slift1(storedClustersBeforeRemove, fulfilledClustersInMap)
-
-    # colors of all fulfilled cluster
-    def allFulfilled: Events[List[Int]] :=
-        merge(List_attachIntLifted(last(allFulfilled, time(eventStreamIndices)), newFulfilled), List_empty[Int])
-    
     # stored clusters after removing the clusters, which were fulfilled in this timestamp
     def storedClusters: Events[Map[Int, outputSynchronizationCluster]] := merge(
-        slift(storedClustersBeforeRemove, newFulfilled, removeClusters),
+        slift(storedClustersBeforeRemove, slift1(storedClustersBeforeRemove, fulfilledClustersInMap), removeClusters),
         Map_empty[Int, outputSynchronizationCluster])
         
+    # colors of all fulfilled cluster
+    def allFulfilled: Events[List[Int]] :=
+        merge(List_attachIntLifted(last(allFulfilled, time(eventStreamIndices)), slift1(storedClustersBeforeRemove, fulfilledClustersInMap)), List_empty[Int])
+    
+    #each color, that previosly were in response
+    def previousResponseColors: Events[Set[Int]] := merge(
+        slift3(eventStreamIndices, last(previousResponseColors, evalTimes), evalTimes, addAllCurrentColorsToSet),
+        Set_empty[Int])
+
+    # delay
     def evalTimes = time(mergeUnit(eventStreamIndices,
         delay(slift1(storedClusters, startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
 
     # Evaluation and output #
-    slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled) &&
-        merge(on(endOfStreams,  slift(stimulusColors, allFulfilled, aSublistEqBInt)), true)
+        # each started synchronization cluster is younger than tolerance or fulfilled
+    allPreviousTrue(slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled) &&
+        # on end of streams-> all stimulus colors had synchronization cluster
+        merge(on(endOfStreams,  slift(stimulusColors, allFulfilled, aSublistEqBInt)), true) &&
+        #current stimulus color were not in response before
+        if (Map_contains(eventStreamIndices, 0)) then
+            !Set_contains(prev(previousResponseColors), Map_get(eventStreamIndices, 0))
+        else
+            true &&
+        #current response color were in stimulus before (no seperation between stimulus and response needed in function call-> stimulus results in true anyway)
+        slift(eventStreamIndices, stimulusColors, responseColorsWereInStimulus))
 }
 
 def outputSynchronizationConstraint2(stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int,

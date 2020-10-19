@@ -19,4 +19,7 @@
 70: response = 7
 75: response = 1
 1000: stimulus = 9
+1010: stimulus = 10
+1025: response = 10
+#fail at 1031
 9999: a

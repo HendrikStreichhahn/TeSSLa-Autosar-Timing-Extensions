@@ -26,6 +26,7 @@
 19: response2 = 7
 19: response3 = 6
 20: response3 = 7
+#fail-> response color without stimulus
 50: response1 = 8
 50: response2 = 8
 50: response3 = 8

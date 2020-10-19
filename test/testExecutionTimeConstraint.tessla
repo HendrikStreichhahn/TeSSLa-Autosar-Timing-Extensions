@@ -5,4 +5,7 @@ in preempt: Events[Unit]
 in resume: Events[Unit]
 in end: Events[Unit]
 
-out executionTimeConstraint(start, end, preempt, resume, 3, 5)
+def lower = 3
+def upper = 5
+
+out executionTimeConstraint(start, end, preempt, resume, lower, upper)

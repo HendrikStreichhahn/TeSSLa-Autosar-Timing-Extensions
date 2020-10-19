@@ -1,0 +1,12 @@
+# no fail
+1: start
+2: preempt
+3: resume
+5: preempt
+6: resume
+7: end
+11: start
+12: preempt
+16: resume
+#fail -> run time too short
+17: end

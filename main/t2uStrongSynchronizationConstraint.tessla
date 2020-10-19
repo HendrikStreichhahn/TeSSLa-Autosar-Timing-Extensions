@@ -1,3 +1,5 @@
+include "t2uHelpFunctions.tessla"
+
 type synchronizationCluster = {xTime: Int, fulfilledStreams: Map[Int, Bool]}
 
 def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[Bool]:= {
@@ -96,15 +98,24 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
                     List_head(eventIndices)), 
                 List_tail(eventIndices), time, streamCount)
 
-    def timeNow: Events[Int] := time(eventIndices);
+    #def evaluateTimes: Events[Int] := time(eventIndices);
+    
+    def evaluateTimes: Events[Int] := time(mergeUnit(eventIndices,
+        safeDelay(if (List_size(activeClusters) != 0) then
+                     getXTimeLifted(List_head(activeClusters))+ tolerance - time(eventIndices)+1
+                 else
+                    infty, eventIndices)))
+                    
     #active clusters with new events
     def activeClustersNewEvent : Events[List[synchronizationCluster]] :=
-        slift4(last(activeClusters, eventIndices), eventIndices, timeNow, streamCount, addEventsToClusters)
+        slift4(last(activeClusters, eventIndices), eventIndices, evaluateTimes, streamCount, addEventsToClusters)
     # active clusters after removing of full clusters
     def activeClusters: Events[List[synchronizationCluster]] := merge(
         slift(List_empty[synchronizationCluster], activeClustersNewEvent, removeFulfilled), 
         List_empty[synchronizationCluster])
-    List_size(activeClustersNewEvent) == 0 || getXTimeLifted(List_head(activeClustersNewEvent)) + tolerance >= timeNow
+    allPreviousTrue(List_size(activeClustersNewEvent) == 0 ||
+        getXTimeLifted(List_head(activeClustersNewEvent)) +
+            tolerance >= evaluateTimes)
 }
 
 def StrongSynchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int): Events[Bool]:={

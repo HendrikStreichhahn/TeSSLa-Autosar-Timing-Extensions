@@ -1,10 +1,7 @@
-#include "t2uConstraints.tessla"
+include "t2uConstraints.tessla"
 
 def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
         Events[Bool]:= {
-        
-    def timeNow = time(eventStreamIndices)
-    
     # Help functions
     def buildEmptylatestEventTimes(stimulusStreamCount: Int): Map[Int, Map[Int, Int]] :=
         static if (stimulusStreamCount == 0) then
@@ -49,25 +46,45 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
 
 
     # checks, if the synchronization cluster for the given color is fulfilled
-    def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int, timeNow: Int) : Bool =
+    def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =
         static if (Map_size(latestEventTimes) == 0) then
             true
         else
-            clusterFulfilled(Map_tail(latestEventTimes), color, tolerance, timeNow) && 
+            clusterFulfilled(Map_tail(latestEventTimes), color, tolerance) && 
             timeOldestEvent(latestEventTimes, color) + tolerance >= timeYoungestEvent(latestEventTimes, color)
+            
+    def currentStimulusNotInPrevResponseColors(eventStreamIndices: Map[Int, Int], responseColors: Set[Int]): Bool:=
+        static if (Map_size(eventStreamIndices) == 0) then
+            true
+        else
+            # head is response                    or color is not in response set
+            (Map_headKey(eventStreamIndices) == 0 || !(Set_contains(responseColors, Map_headValue(eventStreamIndices)))) &&
+            currentStimulusNotInPrevResponseColors(Map_tail(eventStreamIndices), responseColors)
         
     #stored information
     
     # time of last stimulus events with given color
     #   streamIndex -> (color -> time)
     def latestEventTimes: Events[Map[Int, Map[Int, Int]]] := 
-        merge(slift3(last(latestEventTimes, timeNow), timeNow, eventStreamIndices, addEventsToEmptylatestEventTimes),
+        merge(slift3(last(latestEventTimes, time(eventStreamIndices)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes),
             buildEmptylatestEventTimes(stimulusStreamCount))
+            
+    # set of all colors, that occurred in response
+    def responseColors: Events[Set[Int]]:= merge(
+        if Map_contains(eventStreamIndices, 0) then
+            Set_add(last(responseColors, eventStreamIndices), Map_get(eventStreamIndices, 0))
+        else
+            last(responseColors, eventStreamIndices),
+        Set_empty[Int])
     
     #evaluation
     allPreviousTrue(
+        # no stimulus color previously were in response
+        slift(eventStreamIndices, responseColors, currentStimulusNotInPrevResponseColors) &&
+        # response event-> matching stimulus cluster exists
+        # 'now' has stimulus event
         if Map_contains(eventStreamIndices, 0) then
-            slift4(latestEventTimes, Map_get(eventStreamIndices, 0), tolerance, timeNow, clusterFulfilled)
+            slift4(latestEventTimes, Map_get(eventStreamIndices, 0), tolerance, time(eventStreamIndices), clusterFulfilled)
         else
             true
     )

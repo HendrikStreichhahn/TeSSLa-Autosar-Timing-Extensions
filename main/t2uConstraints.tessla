@@ -87,7 +87,7 @@ def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events
 			firstEvent(time(e)) + upper > time(evaluateTimes))))
 }
         
-def repetitionConstraint(e: Events[Unit], lower: Int, upper: Int, span: Int, jitter: Int): Events[Bool] := {
+def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[Bool] := {
     # lower bound for current x
     def lowerBoundXNow: Events[Int] =
         if (List_size(last(LowerBoundX, e)) < span) then
@@ -125,37 +125,38 @@ def repetitionConstraint(e: Events[Unit], lower: Int, upper: Int, span: Int, jit
         upperBoundXNow + jitter >= time(evaluateTimes))
 }
 
-#TODO: Delayed evaluation
 def executionTimeConstraint(start: Events[Unit], end: Events[Unit], preempt: Events[Unit], resume: Events[Unit],
-        lower: Int, upper: Int): Events[Bool] :=
-    (runtime(start, end) - last(resetSum(runtime(preempt, resume), start), end)) >= lower &&
-    ((upper == infty) || (runtime(start, end) - last(resetSum(runtime(preempt, resume), start), end)) <= upper)
+        lower: Int, upper: Int): Events[Bool] :={
+    # timestamps, when the constraint is evaluated
+    def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
+    def evaluateTimes: Events[Unit] := 
+        mergeUnit(inputTimes, safeDelay(if (time(evaluateTimes) != defaultTime(end)) then
+                                            upper - execTime + 1
+                                        else
+                                            infty, inputTimes))
 
-def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[Bool] :=
-    count(source) >= count(target)
+    # evaluation
+    def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
+    # 'now' is end event
+    allPreviousTrue(if (time(evaluateTimes) == defaultTime(end)) then
+        lower <= execTime && execTime <= upper
+    else
+        #ignore lower
+        execTime <= upper)
+}
 
-def orderConstraintFinite[A, B](source: Events[A], target: Events[B], finite: Events[Unit]): Events[Bool] :=
+def orderConstraint[A, B](source: Events[A], target: Events[B], finite: Events[Unit]): Events[Bool] :=
     # if end of streams
     if (defaultTime(finite) >= defaultTime(source) && defaultTime(finite) >= defaultTime(target)) then
         count(source) == count(target)
     else
         count(source) >= count(target)
 
-def sporadicConstraint(e: Events[Unit], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[Bool]:=
+def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[Bool]:=
     repetitionConstraint(e, lower, upper, 1, jitter) && repeatConstraint(e, minDist, infty, 1)
 
-def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int): Events[Bool] := {
-    # upper and lower bound for first period
-    def tRefLowerBound: Events[Int] := merge(slift(last(tRefLowerBound, events), 
-        time(events) - jitter - prev(count(events))*period, max), time(events) - jitter)
-    def tRefUpperBound: Events[Int] := merge(slift(last(tRefUpperBound,
-        events), time(events) - prev(count(events))*period, min), time(events))
-
-    def evaluateTimes =  delay(const(period+2*jitter, events), events)
-    
-    merge(tRefLowerBound <= tRefUpperBound && ((time(events) - prev(time(events))) >= minDist),
-        tRefLowerBound <= tRefUpperBound) && time(events) > defaultTime(evaluateTimes)
-}
+def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int): Events[Bool] :=
+    sporadicConstraint(events, period, period, jitter, minDist)
 
 def arbitraryConstraintRec(e: Events[Unit], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[Bool] :=
     static if (List_size(minDist) > 1 && List_size(maxDist) > 1) then
@@ -170,31 +171,34 @@ def arbitraryConstraint(e: Events[Unit], minDist: List[Int], maxDist: List[Int])
 def burstConstraint(e: Events[Unit], length: Int, maxOccurences: Int, minDist: Int): Events[Bool] :=
     repeatConstraint(e, length, infty, maxOccurences) && repeatConstraint(e, minDist, infty, 1)
 
-def patternConstraint[A](e: Events[A], periodX: Int, offset: List[Int], jitter: Int, minimum: Int) : Events[Bool] := {
+def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minimum: Int) : Events[Bool] := {
     # upper bound for latest e
     def lowerBoundX: Events[Int] :=  merge (
         # increase by period and adjust by offset and jitter
-        if (count(e) % List_size(offset) == 1 && !isFirst(e)) then
+        if (count(e) % Map_size(offset) == 1 && !isFirst(e)) then
             max(last(lowerBoundX, e) + periodX,
-                time(e) - List_get(offset, (count(e)-1) % List_size(offset))-jitter) 
+                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))-jitter) 
         #adjust by offset and jitter
         else
             max(last(lowerBoundX, e),
-                time(e) - List_get(offset, (count(e)-1) % List_size(offset))-jitter),
-        time(e) - List_get(offset, (count(e)-1) % List_size(offset)) - jitter)
+                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))-jitter),
+        time(e) - Map_get(offset, (count(e)-1) % Map_size(offset)) - jitter)
         
     def upperBoundX: Events[Int] :=  merge (
         # increase by period and adjust by offset and jitter
-        if (count(e) % List_size(offset) == 1 && !isFirst(e)) then
+        if (count(e) % Map_size(offset) == 1 && !isFirst(e)) then
             min(last(upperBoundX, e) + periodX,
-                time(e) - List_get(offset, (count(e)-1) % List_size(offset))) 
+                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))) 
         else
         # adjust by offset and jitter
             min(last(upperBoundX, e),
-                time(e) - List_get(offset, (count(e)-1) % List_size(offset))),
-        time(e) - List_get(offset, (count(e)-1) % List_size(offset)))
+                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))),
+        time(e) - Map_get(offset, (count(e)-1) % Map_size(offset)))
+    def evaluateTimes = mergeUnit(e, safeDelay(upperBoundX + 
+        Map_get(offset, (count(e)) % Map_size(offset)) + jitter - time(e) + 1, e))
     #evaluate
-    lowerBoundX <= upperBoundX &&
+    lowerBoundX + Map_get(offset, (count(e)-1) % Map_size(offset)) <= time(evaluateTimes) &&
+        time(evaluateTimes) <= upperBoundX + Map_get(offset, (count(e)-1) % Map_size(offset)) + jitter &&
         repeatConstraint(e, minimum, infty, 1)
 }
 
@@ -202,7 +206,8 @@ def patternConstraint[A](e: Events[A], periodX: Int, offset: List[Int], jitter: 
 def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[Bool] := {
     # Map with unmatched stimulus events after stimulus
     def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
-        if defaultTime(stimulus) >= defaultTime(response) then
+        if defaultTime(stimulus) >= defaultTime(response) &&
+                !Map_contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
             Map_add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, defaultTime(stimulus))
         else
             last(unmatchedStimulusEvents, merge(stimulus, response)),
@@ -217,23 +222,25 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
         else
             unmatchedStimulusEventsNewStimulus,
         unmatchedStimulusEventsNewStimulus)
-    #set with valid response event colors
-    def validResponseEvents: Events[Set[Int]] := merge(
+    #set with color, that were previosly in response
+    def previousResponseColors: Events[Set[Int]] := merge(
         # 'now' has response event
         if defaultTime(stimulus) <= defaultTime(response) then
-            Set_add(last(validResponseEvents, merge(stimulus, response)), response)
+            Set_add(last(previousResponseColors, merge(stimulus, response)), response)
         else
-            last(validResponseEvents, merge(stimulus, response)),
+            last(previousResponseColors, merge(stimulus, response)),
         Set_empty[Int])
-
-    #evaluation
+    
     def evaluateTimes = mergeUnit(mergeUnit(stimulus, response),
-        delay(const(maxTimeDiff+1, mergeUnit(stimulus, response)), mergeUnit(stimulus, response)))
-        # all unmatched stimulus events can still be matched
+            safeDelay(slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff -
+                time(mergeUnit(stimulus, response)) + 1,
+                mergeUnit(stimulus, response)))
+    #evaluation
     slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes) &&
+        # all unmatched stimulus events can still be matched
         # no stimulus with color, that was already in response
         ((!(defaultTime(stimulus) >= defaultTime(response))) ||
-            !(Set_contains(validResponseEvents, stimulus)))
+            !(Set_contains(previousResponseColors, stimulus)))
 }
 
 def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[Bool] := {
@@ -244,7 +251,14 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
             else
                 last(unmatchedStimulusEvents, merge(stimulus, response)),
         Map_empty[Int, Int])
-    # map with unmatched stimulus events after response
+        
+
+
+    
+    #def unmatchedStimulusEvents:= #unmatchedStimulusEventsNewStimulus
+     #   slift(unmatchedStimulusEventsNewStimulus, time(merge(stimulus, response) - maxTimeDiff),
+     #       removeEntrysValueSmallerThanAFromMap)
+     # map with unmatched stimulus events after response
     def unmatchedStimulusEvents : Events[Map[Int, Int]]= merge(
         if (defaultTime(stimulus) <= defaultTime(response) &&
                 Map_contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
@@ -256,10 +270,7 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
         unmatchedStimulusEventsNewStimulus)
     # set with colors that are no longer allowed on stimulus stream
     def invalidStimulusColors : Events[Set[Int]] := merge(
-        if (defaultTime(stimulus) <= defaultTime(response) &&
-                Map_contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
-                Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+        if (defaultTime(stimulus) <= defaultTime(response)) then
             Set_add(last(invalidStimulusColors, merge(stimulus, response)), response)
         else
             last(invalidStimulusColors, merge(stimulus, response)),

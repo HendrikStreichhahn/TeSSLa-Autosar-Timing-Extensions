@@ -1,0 +1,29 @@
+# no fail
+1: start
+2: preempt
+3: resume
+5: preempt
+6: resume
+7: end
+21: start
+22: preempt
+23: resume
+25: preempt
+26: resume
+27: end
+31: start
+32: preempt
+33: resume
+35: preempt
+36: resume
+37: end
+# fail at 47, delay required
+41: start
+50: end
+
+51: start
+52: preempt
+53: resume
+55: preempt
+56: resume
+57: end

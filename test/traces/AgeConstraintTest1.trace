@@ -13,5 +13,5 @@
 65: response = 6
 70: response = 7
 1000: stimulus = 10000
-#supposed to fail here
+#fail here
 1035: response = 10000

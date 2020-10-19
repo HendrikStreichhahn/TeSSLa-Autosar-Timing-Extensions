@@ -1,4 +1,5 @@
 include "../main/t2uOutputSynchronizationConstraint.tessla"
+#include "../main/t2uHelpFunctions.tessla"
 
 in stimulus: Events[Int]
 in response1: Events[Int]
@@ -6,7 +7,9 @@ in response2: Events[Int]
 in response3: Events[Int]
 in endOfStreams: Events[Unit]
 
-def test = outputSynchronizationConstraint3(stimulus, response1, response2, response3, 5, endOfStreams) 
-#def test = outputSynchronizationConstraint2(stimulus, response1, response2, 5, endOfStreams) 
+def tolerance = 5
+
+#def test = outputSynchronizationConstraint3(stimulus, response1, response2, response3, tolerance, endOfStreams) 
+def test = outputSynchronizationConstraint2(stimulus, response1, response2, tolerance, endOfStreams) 
 
 out test
