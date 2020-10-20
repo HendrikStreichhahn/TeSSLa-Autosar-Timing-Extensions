@@ -19,8 +19,10 @@ public class DelayConstraintGenerator extends TraceSet{
 			
 			// insert events
 			boolean inserted = true;
+            //insert source
 			inserted&= traces[0].insertEvent(new Event(timeNow, 0));
-			for (int i = 0; i <= rand.nextInt(minDistanceSource/5); i++)
+            //insert target
+			for (int i = 0; i <= rand.nextInt(minDistanceSource/5)+1; i++)
 				traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
 			if (!inserted)
 				System.out.println("Tried to insert multiple events in one timestamp!");
