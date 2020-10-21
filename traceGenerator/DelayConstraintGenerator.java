@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class DelayConstraintGenerator extends TraceSet{
-	public void initEvents(){
+	public DelayConstraintGenerator(){
 		// init Traces
 		traces = new Trace[2];
 		traces[0] = new Trace("source");

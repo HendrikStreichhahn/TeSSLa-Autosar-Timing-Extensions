@@ -4,9 +4,7 @@ import java.util.Random;
 
 public abstract class TraceSet{
 	
-	Trace[] traces;
-	
-	abstract public void initEvents();
+	protected Trace[] traces;
 	
 	private boolean finishedWriting(){
 		for (int i = 0; i < traces.length; i++)
@@ -21,7 +19,7 @@ public abstract class TraceSet{
 			if (traces[i].getNextEvent() != null && traces[i].getNextEvent().getTimeStamp() < min)
 				min = traces[i].getNextEvent().getTimeStamp();
 		return min;
-	}	
+	}
 	
 	public boolean saveToFile(String path){
 		for (int i = 0; i < traces.length; i++)
