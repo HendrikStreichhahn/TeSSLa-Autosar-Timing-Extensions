@@ -28,7 +28,7 @@ public class ExecutionTimeConstraintGenerator extends TraceSet{
             //preemptions
             int preemptNum = rand.nextInt(maxPreemptions);
             if (preemptNum != 0) {
-                int timeBetweenPreempts = ((lower + upper)/2)/(preemptNum+2);
+                int timeBetweenPreempts = ((lower + upper)/2)/(preemptNum+1);
                 if (!(lower <= 5 * timeBetweenPreempts && timeBetweenPreempts <= upper))
                     System.out.println("Fehler!");
                 for (int i = 0; i < preemptNum; i++){
