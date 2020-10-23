@@ -145,7 +145,7 @@ def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preemp
         execTime <= upper)
 }
 
-def orderConstraint[A, B](source: Events[A], target: Events[B], finite: Events[Unit]): Events[Bool] :=
+def orderConstraint[A, B, C](source: Events[A], target: Events[B], finite: Events[C]): Events[Bool] :=
     # if end of streams
     if (defaultTime(finite) >= defaultTime(source) && defaultTime(finite) >= defaultTime(target)) then
         count(source) == count(target)

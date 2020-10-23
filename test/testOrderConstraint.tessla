@@ -4,4 +4,4 @@ in source: Events[Unit]
 in target: Events[Unit]
 in end: Events[Unit]
 
-out orderConstraintFinite(source, target, end)
+out orderConstraint(source, target, end)
