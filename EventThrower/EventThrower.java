@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class EventThrower{
     public static void main(String [] args) throws InterruptedException{
-        System.out.println("Usage: java EventThrower startDelay(s) eventDelay(ms) traceFile");
+        System.out.println("#Usage: java EventThrower startDelay(s) eventDelay(ms) traceFile");
         // sleep for .. seconds
         int sleepDuration = Integer.parseInt(args[0])*1000;
         Thread.sleep(sleepDuration);
