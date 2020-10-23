@@ -1,0 +1,7 @@
+include "../main/t2uConstraints.tessla"
+
+in source: Events[Unit]
+in target: Events[Unit]
+in endOfObservation: Events[Unit]
+
+out orderConstraintFinite(source, target, endOfObservation)
