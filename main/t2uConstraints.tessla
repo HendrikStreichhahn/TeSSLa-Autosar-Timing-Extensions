@@ -125,12 +125,12 @@ def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jit
         upperBoundXNow + jitter >= time(evaluateTimes))
 }
 
-def executionTimeConstraint(start: Events[Unit], end: Events[Unit], preempt: Events[Unit], resume: Events[Unit],
+def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
         lower: Int, upper: Int): Events[Bool] :={
     # timestamps, when the constraint is evaluated
     def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
     def evaluateTimes: Events[Unit] := 
-        mergeUnit(inputTimes, safeDelay(if (time(evaluateTimes) != defaultTime(end)) then
+        mergeUnit(inputTimes, safeDelay(if (time(inputTimes) != defaultTime(end)) then
                                             upper - execTime + 1
                                         else
                                             infty, inputTimes))

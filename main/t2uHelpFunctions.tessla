@@ -59,7 +59,7 @@ def List_attachIntLifted(ListLeft: Events[List[Int]], ListRight: Events[List[Int
     slift(ListLeft, ListRight, List_attachInt)
 
 # FREMDQUELLTEXT => abgewandelte Form von resetCount
-def resetSum(events: Events[Int], reset: Events[Unit]): Events[Int] = sum where {
+def resetSum[A](events: Events[Int], reset: Events[A]): Events[Int] = sum where {
   def sum: Events[Int] = default(
     # `reset` contains the latest event
     if default(time(reset) > time(events), false) then
