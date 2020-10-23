@@ -1,0 +1,11 @@
+include "../main/t2uConstraints.tessla"
+
+in events: Events[Unit]
+
+def aPeriod = 30
+def jitter = 5
+def minDist = 1
+
+def constraint = periodicConstraint(events, aPeriod, jitter, minDist)
+
+out filter(constraint, !constraint)
