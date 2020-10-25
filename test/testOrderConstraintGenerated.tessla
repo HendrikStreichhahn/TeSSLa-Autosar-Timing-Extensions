@@ -1,7 +1,9 @@
 include "../main/t2uConstraints.tessla"
 
-in source: Events[Unit]
-in target: Events[Unit]
-in endOfObservation: Events[Unit]
+in source: Events[Int]
+in target: Events[Int]
+in endOfObservation: Events[Int]
 
-out orderConstraintFinite(source, target, endOfObservation)
+def constraint =  orderConstraint(source, target, endOfObservation)
+
+out filter(constraint, !constraint)
