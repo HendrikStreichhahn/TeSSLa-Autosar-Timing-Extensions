@@ -1,9 +1,0 @@
-include "../main/t2uStrongSynchronizationConstraint.tessla"
-
-in events1: Events[Unit]
-in events2: Events[Unit]
-in events3: Events[Unit]
-
-def constraint = StrongSynchronizationConstraint3(events1, events2, events3, 10)
-
-out filter(constraint, !constraint)
