@@ -3,8 +3,8 @@ include "../../main/t2uConstraints.tessla"
 in event: Events[Int]
 def lower = 100
 def upper = 150
-def jitter = 2
-def span = 10
+def jitter = 10
+def span = 2
 
 def constraint = repetitionConstraint(event, lower, upper, span, jitter)
 

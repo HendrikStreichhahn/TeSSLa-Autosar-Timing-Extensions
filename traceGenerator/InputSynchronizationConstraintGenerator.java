@@ -21,7 +21,7 @@ public class InputSynchronizationConstraintGenerator extends TraceSet{
             timeNow+= clusterDistance + rand.nextInt(clusterDistance);
             inserted1 &= traces[0].insertEvent(new Event(timeNow, clr));
             // response events
-            int clusterStart = timeNow - rand.nextInt(clusterDistance);
+            int clusterStart = timeNow - (rand.nextInt(clusterDistance)+1);
                 for (int i = 1; i < traces.length; i++){
                     boolean inserted = false;
                     for (int j = 0; j < 25 && !inserted; j++)
@@ -42,3 +42,4 @@ public class InputSynchronizationConstraintGenerator extends TraceSet{
         
 	}
 }
+//# 1000 5 8

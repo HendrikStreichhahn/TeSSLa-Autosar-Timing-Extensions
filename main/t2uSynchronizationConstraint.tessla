@@ -108,7 +108,7 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
 	def evaluateTimes = mergeUnit(eventIndices,
         safeDelay(slift1(storedEvents, timeOldestUnfulfilledEvent) + tolerance - time(eventIndices)+1, eventIndices))
     #Evaluation
-    slift1(slift3(storedEventsBeforeRemove, time(evaluateTimes), tolerance, eventsToRemove), noUnfulfilledRemoved)
+    allPreviousTrue(slift1(slift3(storedEventsBeforeRemove, time(evaluateTimes), tolerance, eventsToRemove), noUnfulfilledRemoved))
 }
 
 def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
