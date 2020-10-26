@@ -245,29 +245,17 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
 
 def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[Bool] := {
     # map with unmatched stimulus events after stimulus
-    def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]] := merge(
+    def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]] := #merge(
             if (defaultTime(stimulus) >= defaultTime(response)) then
                 Map_add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
             else
-                last(unmatchedStimulusEvents, merge(stimulus, response)),
+                last(unmatchedStimulusEvents, merge(stimulus, response))#,
+        #Map_empty[Int, Int])
+    #remove events that are too old
+    def unmatchedStimulusEvents:=merge(#unmatchedStimulusEventsNewStimulus
+        slift(unmatchedStimulusEventsNewStimulus, time(merge(stimulus, response)) - maxTimeDiff - 1,
+            removeEntrysValueSmallerThanAFromMap),
         Map_empty[Int, Int])
-        
-
-
-    
-    #def unmatchedStimulusEvents:= #unmatchedStimulusEventsNewStimulus
-     #   slift(unmatchedStimulusEventsNewStimulus, time(merge(stimulus, response) - maxTimeDiff),
-     #       removeEntrysValueSmallerThanAFromMap)
-     # map with unmatched stimulus events after response
-    def unmatchedStimulusEvents : Events[Map[Int, Int]]= merge(
-        if (defaultTime(stimulus) <= defaultTime(response) &&
-                Map_contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
-                Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-            Map_remove(unmatchedStimulusEventsNewStimulus, response)
-        else
-            unmatchedStimulusEventsNewStimulus,
-        unmatchedStimulusEventsNewStimulus)
     # set with colors that are no longer allowed on stimulus stream
     def invalidStimulusColors : Events[Set[Int]] := merge(
         if (defaultTime(stimulus) <= defaultTime(response)) then
