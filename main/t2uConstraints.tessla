@@ -158,14 +158,14 @@ def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, min
 def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int): Events[Bool] :=
     sporadicConstraint(events, period, period, jitter, minDist)
 
-def arbitraryConstraintRec(e: Events[Unit], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[Bool] :=
+def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[Bool] :=
     static if (List_size(minDist) > 1 && List_size(maxDist) > 1) then
         arbitraryConstraintRec(e, List_tail(minDist), List_tail(maxDist), ctr+1) &&
         repeatConstraint(e, List_head(minDist), List_head(maxDist), ctr)
     else
         repeatConstraint(e, List_head(minDist), List_head(maxDist), ctr)
 
-def arbitraryConstraint(e: Events[Unit], minDist: List[Int], maxDist: List[Int]): Events[Bool] :=
+def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[Bool] :=
     arbitraryConstraintRec(e, minDist, maxDist, 1)
 
 def burstConstraint(e: Events[Int], length: Int, maxOccurences: Int, minDist: Int): Events[Bool] :=

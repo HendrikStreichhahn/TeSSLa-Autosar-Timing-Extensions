@@ -59,6 +59,9 @@ public class testTraceGenerator{
             case "InputSynchronizationConstraint":
                 trace = InputSynchronizationConstraint(args);
                 break;
+            case "ArbitraryConstraint":
+                trace = ArbitraryConstraint(args);
+                break;
 			default:
 				System.out.println("Unknown Constraint");
 				return;
@@ -74,6 +77,19 @@ public class testTraceGenerator{
 		else
 			System.out.println("finished");
 	}
+    
+    private static ArbitraryConstraintGenerator ArbitraryConstraint(String[] args){
+        //read parameters
+		int[] parameters = readArguments(args, 7);
+		if (parameters == null){
+			System.out.println("Invalid Arguments EventCount min1 min2 min1 min2 min1 min2 ");
+			return null;
+		}
+        ArbitraryConstraintGenerator trace = new ArbitraryConstraintGenerator();
+        trace.generateTestTrace(parameters[0], parameters[1], parameters[2], parameters[3], parameters[4],
+            parameters[5], parameters[6]);
+		return trace;
+    }
     
     private static InputSynchronizationConstraintGenerator InputSynchronizationConstraint(String[] args){
 		
