@@ -207,7 +207,8 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
     # Map with unmatched stimulus events after stimulus
     def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
         if defaultTime(stimulus) >= defaultTime(response) &&
-                !Map_contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
+                !Map_contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) &&
+                default(last(result, merge(stimulus, response)), true) then
             Map_add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, defaultTime(stimulus))
         else
             last(unmatchedStimulusEvents, merge(stimulus, response)),
@@ -235,12 +236,15 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
             safeDelay(slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff -
                 time(mergeUnit(stimulus, response)) + 1,
                 mergeUnit(stimulus, response)))
-    #evaluation
-    slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes) &&
+                
+    #evaluation            
+    def result = slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes) &&
         # all unmatched stimulus events can still be matched
         # no stimulus with color, that was already in response
         ((!(defaultTime(stimulus) >= defaultTime(response))) ||
             !(Set_contains(previousResponseColors, stimulus)))
+    result
+    
 }
 
 def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[Bool] := {
