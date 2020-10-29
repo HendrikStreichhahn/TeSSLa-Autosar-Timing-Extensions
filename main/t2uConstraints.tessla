@@ -130,7 +130,8 @@ def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preemp
     # timestamps, when the constraint is evaluated
     def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
     def evaluateTimes: Events[Unit] := 
-        mergeUnit(inputTimes, safeDelay(if (time(inputTimes) != defaultTime(end)) then
+        mergeUnit(inputTimes, safeDelay(if (time(inputTimes) != defaultTime(end) &&
+                                                time(inputTimes) != defaultTime(preempt)) then
                                             upper - execTime + 1
                                         else
                                             infty, inputTimes))
