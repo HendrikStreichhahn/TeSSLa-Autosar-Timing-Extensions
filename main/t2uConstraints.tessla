@@ -172,11 +172,14 @@ def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int])
 def burstConstraint(e: Events[Int], length: Int, maxOccurences: Int, minDist: Int): Events[Bool] :=
     repeatConstraint(e, length, infty, maxOccurences) && repeatConstraint(e, minDist, infty, 1)
 
-def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minimum: Int) : Events[Bool] := {
+def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[Bool] := {
+    @liftable
+    def aModuloBOr1if1(a: Int, b: Int): Int:=
+        if b == 1 then 1 else a % b;
     # upper bound for latest e
     def lowerBoundX: Events[Int] :=  merge (
         # increase by period and adjust by offset and jitter
-        if (count(e) % Map_size(offset) == 1 && !isFirst(e)) then
+        if (aModuloBOr1if1(count(e), Map_size(offset))== 1 && !isFirst(e)) then
             max(last(lowerBoundX, e) + periodX,
                 time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))-jitter) 
         #adjust by offset and jitter
@@ -187,7 +190,7 @@ def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitt
         
     def upperBoundX: Events[Int] :=  merge (
         # increase by period and adjust by offset and jitter
-        if (count(e) % Map_size(offset) == 1 && !isFirst(e)) then
+        if (aModuloBOr1if1(count(e), Map_size(offset))== 1 && !isFirst(e))  then
             min(last(upperBoundX, e) + periodX,
                 time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))) 
         else
@@ -195,12 +198,12 @@ def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitt
             min(last(upperBoundX, e),
                 time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))),
         time(e) - Map_get(offset, (count(e)-1) % Map_size(offset)))
-    def evaluateTimes = mergeUnit(e, safeDelay(upperBoundX + 
-        Map_get(offset, (count(e)) % Map_size(offset)) + jitter - time(e) + 1, e))
+    def evaluateTimes= mergeUnit(e, safeDelay(upperBoundX + (if count(e) % Map_size(offset) == 0 then periodX else 0) +
+        Map_get(offset, count(e) % Map_size(offset)) + jitter - time(e) + 1, e))
     #evaluate
     lowerBoundX + Map_get(offset, (count(e)-1) % Map_size(offset)) <= time(evaluateTimes) &&
         time(evaluateTimes) <= upperBoundX + Map_get(offset, (count(e)-1) % Map_size(offset)) + jitter &&
-        repeatConstraint(e, minimum, infty, 1)
+        repeatConstraint(e, minDist, infty, 1)
 }
 
 # subset reaction constraint without stray response events
