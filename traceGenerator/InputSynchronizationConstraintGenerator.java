@@ -10,9 +10,9 @@ public class InputSynchronizationConstraintGenerator extends TraceSet{
             traces[i] = new Trace("stimulus" + i);
 	}
 
-	public void generateTestTrace(int eventCount, int tolerance, int clusterDistance){
+	public boolean generateTestTrace(int eventCount, int tolerance, int clusterDistance){
         Random rand = new Random();
-        int timeNow= rand.nextInt(clusterDistance);
+        int timeNow= rand.nextInt(clusterDistance) + tolerance + clusterDistance;
         int clr = 0;
         
         while(eventCount > 0){
@@ -26,20 +26,20 @@ public class InputSynchronizationConstraintGenerator extends TraceSet{
                     boolean inserted = false;
                     for (int j = 0; j < 25 && !inserted; j++)
                         inserted = traces[i].insertEvent(new Event(clusterStart - rand.nextInt(tolerance), clr));
-                    if (!inserted)
-                        System.out.println("Tried to insert multiple events in one timestamp" +
-                            " in one stream! Trace might be invalid!");
+                    if (!inserted){
+                        return false;
+                    }
                 }
                     
             
-            if (!inserted1)
-                    System.out.println("Tried to insert multiple events in one timestamp" +
-                        " in one stream! Trace might be invalid!");
+            if (!inserted1){
+                return false;
+            }
             
             eventCount-= traces.length;
             clr++;
         }
+        return true;
         
 	}
 }
-//# 1000 5 8

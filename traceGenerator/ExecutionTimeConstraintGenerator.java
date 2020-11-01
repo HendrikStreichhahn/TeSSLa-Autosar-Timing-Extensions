@@ -1,4 +1,5 @@
 import java.util.Random;
+import java.io.IOException;
 
 public class ExecutionTimeConstraintGenerator extends TraceSet{
     
@@ -15,38 +16,36 @@ public class ExecutionTimeConstraintGenerator extends TraceSet{
         return traces;
     }
 
-	public void generateTestTrace(int eventCount, int lower, int upper,
-            int minDistance, int maxDistance, int maxPreemptions, int maxPreemptionTime){
+	public boolean generateTestTrace(int eventCount, int lower, int upper,
+            int minDistance, int maxDistance, int numPreemptions, int preemptLength){
         Random rand = new Random();
-		int timeNow = 0;
+		double timeNow = 0.0;
+        double segmentLength = ((double)(lower + (upper - lower)/2)) / (numPreemptions+1);
+
         while (eventCount > 0) {
-            //start event
-            timeNow += minDistance + rand.nextInt(maxDistance)+1;
-            int timeStart = timeNow;
-            traces[0].insertEvent(new Event(timeStart, 0));
-            eventCount--;
-            //preemptions
-            int preemptNum = rand.nextInt(maxPreemptions);
-            if (preemptNum != 0) {
-                int timeBetweenPreempts = ((lower + upper)/2)/(preemptNum+1);
-                if (!(lower <= 5 * timeBetweenPreempts && timeBetweenPreempts <= upper))
-                    System.out.println("Fehler!");
-                for (int i = 0; i < preemptNum; i++){
-                    timeNow += timeBetweenPreempts;
-                    traces[2].insertEvent(new Event(timeNow, 0));
-                    timeNow+= rand.nextInt(maxPreemptionTime)+1;
-                    traces[3].insertEvent(new Event(timeNow, 0));
-                    eventCount-= 2;
-                }
-                timeNow += timeBetweenPreempts;
-            } else {
-                timeNow += lower + rand.nextInt(upper - lower);
+            timeNow += minDistance + rand.nextInt(maxDistance+1);
+            double timeStart = timeNow;
+            //start Event
+            traces[0].insertEvent(new Event((int)timeNow, 0)); 
+            
+            //split into preemptCount segments of equal length
+            
+            for (int i = 0; i < numPreemptions; i++){
+                //update time
+                timeNow+= segmentLength;
+                //preempt event
+                traces[2].insertEvent(new Event((int)timeNow, 0));
+                //resume event
+                timeNow+= preemptLength;
+                traces[3].insertEvent(new Event((int)timeNow, 0));
+                eventCount-= 2;
             }
+            //stop event
+            timeNow+= segmentLength;
+            traces[1].insertEvent(new Event((int)timeNow, 0));
+            eventCount-= 2;
             
-            // end event
-            
-            traces[1].insertEvent(new Event(timeNow, 0));
-            eventCount--;
         }
-	}
+        return true;
+    }
 }

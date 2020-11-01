@@ -8,7 +8,7 @@ public class StrongDelayConstraintGenerator extends TraceSet{
 		traces[1] = new Trace("target");
 	}
 
-	public void generateTestTrace(int sourceEventCount,  int minDistanceSource, int maxDistanceSource,
+	public boolean generateTestTrace(int sourceEventCount,  int minDistanceSource, int maxDistanceSource,
 			int lower, int upper){
 		int eventCount = 0;
 		int timeNow = 0;
@@ -19,11 +19,22 @@ public class StrongDelayConstraintGenerator extends TraceSet{
 			
 			// insert events
 			boolean inserted = true;
+            //insert source
 			inserted&= traces[0].insertEvent(new Event(timeNow, 0));
-			inserted&= traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
-			if (!inserted)
-				System.out.println("Tried to insert multiple events in one timestamp!");
+            //insert target
+            boolean insertedTarget = false;
+            int targetTime= timeNow + lower;
+            while (!insertedTarget && targetTime <= timeNow + upper){
+                boolean currentInserted = traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
+                insertedTarget|= currentInserted;
+                if (currentInserted)
+                    eventCount++;
+            }
+			if (!inserted || !insertedTarget){
+                return false;
+            }
 			eventCount++;
 		}
+        return true;
 	}
 }

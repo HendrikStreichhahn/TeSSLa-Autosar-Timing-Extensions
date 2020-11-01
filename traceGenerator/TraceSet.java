@@ -20,10 +20,26 @@ public abstract class TraceSet{
 				min = traces[i].getNextEvent().getTimeStamp();
 		return min;
 	}
+    
+    public String getNextTimestampsEvents(){
+        String result = "";
+        // find 'next' timeStamp
+        int timeStamp = nextTimeStamp();
+        for (int i = 0; i < traces.length; i++)
+            if (traces[i].getNextEvent() != null && traces[i].getNextEvent().getTimeStamp() == timeStamp){
+                Event evt = traces[i].popNextEvent();
+               result += "" + timeStamp + ": " + traces[i].getName() + " = " + evt.getColor() + "\n";
+            }
+        return result;
+    }
+    
+    public void initOutput(){
+        for (int i = 0; i < traces.length; i++)
+			traces[i].initOutput();
+    }
 	
 	public boolean saveToFile(String path){
-		for (int i = 0; i < traces.length; i++)
-			traces[i].initOutput();
+		initOutput();
 		
 		try {
 			FileWriter fileWriter = new FileWriter(path);
@@ -32,10 +48,10 @@ public abstract class TraceSet{
 				int timeStamp = nextTimeStamp();
 				// write all events with this timestamp, pop them from traces
 				for (int i = 0; i < traces.length; i++)
-				if (traces[i].getNextEvent() != null && traces[i].getNextEvent().getTimeStamp() == timeStamp){
-					Event evt = traces[i].popNextEvent();
-					fileWriter.write("" + timeStamp + ": " + traces[i].getName() + " = " + evt.getColor() + "\n");
-				}
+                    if (traces[i].getNextEvent() != null && traces[i].getNextEvent().getTimeStamp() == timeStamp){
+                        Event evt = traces[i].popNextEvent();
+                        fileWriter.write("" + timeStamp + ": " + traces[i].getName() + " = " + evt.getColor() + "\n");
+                    }
 					
 			}
 			fileWriter.close();

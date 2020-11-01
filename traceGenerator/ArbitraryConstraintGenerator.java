@@ -1,4 +1,6 @@
 import java.util.Random;
+import java.io.IOException;
+import java.security.InvalidParameterException;
 
 public class ArbitraryConstraintGenerator extends TraceSet{
 	public ArbitraryConstraintGenerator(){
@@ -45,20 +47,41 @@ public class ArbitraryConstraintGenerator extends TraceSet{
         }
 	}
     
-    /*private int min3(int val1, int val2, int val3){
-        int res = val1;
-        if (val2 = -1)
-            res= Math.min(res, val2);
-        if (val3 = -1)
-            res= Math.min(res, val3);
-        return res;
+    public boolean generateTestTrace(int eventCount, int[] min, int[] max){
+        Random rand = new Random();
+        if (min.length == 0 || max.length == 0)
+            throw new InvalidParameterException();
+        int timeNow = min[0] + rand.nextInt(max[0] - min[0]+1);
+        int numEvents = 0;
+        
+        int[] prevEventTimes = new int[min.length];
+        while (numEvents < eventCount){
+            //System.out.println("Event at: " + timeNow);
+            //insert event
+            traces[0].insertEvent(new Event(timeNow, 0));
+            numEvents++;
+            //update prev events
+            for (int i = prevEventTimes.length-2; i >= 0; i--)
+                prevEventTimes[i+1]= prevEventTimes[i];
+            prevEventTimes[0] = timeNow;
+            
+            //lower bound for next event
+            int lowerBoundNext = Integer.MIN_VALUE;
+            for (int i = 0; i < min.length && i < numEvents; i++)
+                lowerBoundNext = Math.max(lowerBoundNext, prevEventTimes[i] + min[i]);
+            //upper bound for next event
+            int upperBoundNext = Integer.MAX_VALUE;
+            for (int i = 0; i < max.length && i < numEvents; i++)
+                upperBoundNext = Math.min(upperBoundNext, prevEventTimes[i] + max[i]);
+
+            //calc next Event
+            if (upperBoundNext < lowerBoundNext){
+                
+                return false;
+            }
+            timeNow = lowerBoundNext + rand.nextInt(upperBoundNext - lowerBoundNext+1);
+        }
+        return true;
     }
-    private int max3(int val1, int val2, int val3){
-        int res = val1;
-        if (val2 = -1)
-            res= Math.max(res, val2);
-        if (val3 = -1)
-            res= Math.max(res, val3);
-        return res;
-    }*/
+
 }

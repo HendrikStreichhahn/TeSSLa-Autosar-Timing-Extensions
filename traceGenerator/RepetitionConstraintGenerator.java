@@ -7,7 +7,7 @@ public class RepetitionConstraintGenerator extends TraceSet{
 		traces[0] = new Trace("event");
 	}
 
-	public void generateTestTrace(int eventCount, int lower, int upper, int span, int jitter){
+	public boolean generateTestTrace(int eventCount, int lower, int upper, int span, int jitter){
         // generate x events
         RepeatConstraintGenerator xTimestamps = new RepeatConstraintGenerator();
 		xTimestamps.generateTestTrace(eventCount, lower, upper, span);
@@ -24,9 +24,13 @@ public class RepetitionConstraintGenerator extends TraceSet{
                 new Event(currentX + rand.nextInt(jitter+1), 0));
                 i--;
             }
-            if (!inserted)
-                System.out.println("Tried to insert multiple events in one timestamp" +
-                    " in one stream! Trace might be invalid!");
+            if (!inserted){
+                //System.out.println("Tried to insert multiple events in one timestamp" +
+                //    " in one stream! Trace might be invalid!");
+                return false;
+            }
+                
         }
+        return true;
 	}
 }

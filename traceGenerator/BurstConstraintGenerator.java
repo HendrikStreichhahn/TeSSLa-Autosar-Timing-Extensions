@@ -7,7 +7,7 @@ public class BurstConstraintGenerator extends TraceSet{
 		traces[0] = new Trace("event");
 	}
 
-	public void generateTestTrace(int eventCount, int length, int maxOccurrences){
+	public boolean generateTestTrace(int eventCount, int length, int maxOccurrences){
         Random rand = new Random();
         int timeNow= rand.nextInt(length);
         int clr = 0;
@@ -24,13 +24,14 @@ public class BurstConstraintGenerator extends TraceSet{
                     inserted = traces[0].insertEvent(new Event(timeNow + rand.nextInt(length), clr));
                     i--;
                 }
-                if (!inserted)
-                    System.out.println("Tried to insert multiple events in one timestamp" +
-                        " in one stream! Trace might be invalid!");
+                if (!inserted){
+                    return false;
+                }
             }
             eventCount-= eventsThisCluster;
             clr++;
         }
+        return true;
         
 	}
 }

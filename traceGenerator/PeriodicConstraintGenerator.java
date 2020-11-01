@@ -12,14 +12,16 @@ public class PeriodicConstraintGenerator extends TraceSet{
         return traces;
     }
 
-	public void generateTestTrace(int eventCount, int period, int jitter){
+	public boolean generateTestTrace(int eventCount, int period, int jitter){
         Random rand = new Random();
 		int timeNow = rand.nextInt(period);
+        boolean allInserted = true;
         while (eventCount > 0) {
             //source event
             timeNow+= period;
-            traces[0].insertEvent(new Event(timeNow + rand.nextInt(jitter+1), 0));
+            allInserted &= traces[0].insertEvent(new Event(timeNow + rand.nextInt(jitter+1), 0));
             eventCount--;
         }
+        return allInserted;
 	}
 }

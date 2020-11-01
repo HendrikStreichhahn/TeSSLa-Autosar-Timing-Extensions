@@ -8,7 +8,7 @@ public class ReactionConstraintGenerator extends TraceSet{
 		traces[1] = new Trace("response");
 	}
 
-	public void generateTestTrace(int eventCount, int minStimulusDistace, int maxStimulusDistace,
+	public boolean generateTestTrace(int eventCount, int minStimulusDistace, int maxStimulusDistace,
             int minimum, int maximum){
         Random rand = new Random();
         int timeNow= rand.nextInt(maxStimulusDistace);
@@ -16,7 +16,7 @@ public class ReactionConstraintGenerator extends TraceSet{
         
         while(eventCount > 0){
             // stimulus event
-            timeNow+= minStimulusDistace + rand.nextInt(maxStimulusDistace - minStimulusDistace);
+            timeNow+= minStimulusDistace + rand.nextInt(maxStimulusDistace - minStimulusDistace+1);
             traces[0].insertEvent(new Event(timeNow, clr));
             // response event
             int i = 10;
@@ -26,13 +26,12 @@ public class ReactionConstraintGenerator extends TraceSet{
                     , clr));
                 i--;
             }
-            if (!inserted)
-                System.out.println("Tried to insert multiple events in one timestamp" +
-                    " in one stream! Trace might be invalid!");
-
+            if (!inserted){
+                return false;
+            }
             eventCount-= 2;
             clr++;
         }
-        
+        return true;
 	}
 }

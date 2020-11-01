@@ -1,0 +1,9 @@
+include "../../main/t2uStrongSynchronizationConstraint.tessla"
+
+in event0: Events[Int]
+in event1: Events[Int]
+in event2: Events[Int]
+
+def constraint = StrongSynchronizationConstraint3(event0, event1, event2, 10)
+
+out constraint

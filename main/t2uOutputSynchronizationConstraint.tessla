@@ -4,8 +4,8 @@ def buildOutputSynchronizationCluster(time: Int, streamCount: Int) : outputSynch
     {startTime = time, fulfilledStreams = buildMap(streamCount, false)}
 
 type outputSynchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, Bool]}
-def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int,
-        endOfStreams: Events[Unit]): Events[Bool]:= {
+def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int,
+        endOfStreams: Events[A]): Events[Bool]:= {
     ##### Help funtions #####
 
     # add an empty cluster to storedClusters
@@ -169,8 +169,8 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
         slift(eventStreamIndices, stimulusColors, responseColorsWereInStimulus))
 }
 
-def outputSynchronizationConstraint2(stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int,
-        endOfStreams: Events[Unit]): Events[Bool] := {
+def outputSynchronizationConstraint2[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int,
+        endOfStreams: Events[A]): Events[Bool] := {
     def timeNow = 
         merge(time(stimulus),
         merge(time(response1),
@@ -188,8 +188,8 @@ def outputSynchronizationConstraint2(stimulus: Events[Int], response1: Events[In
     outputSynchronizationConstraint(eventsNow, 2, tolerance, endOfStreams)
 }
 
-def outputSynchronizationConstraint3(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
-        response3: Events[Int], tolerance: Int, endOfStreams: Events[Unit]): Events[Bool] := {
+def outputSynchronizationConstraint3[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], tolerance: Int, endOfStreams: Events[A]): Events[Bool] := {
     def timeNow = 
         merge(time(stimulus),
         merge(time(response1),
@@ -211,8 +211,8 @@ def outputSynchronizationConstraint3(stimulus: Events[Int], response1: Events[In
     outputSynchronizationConstraint(eventsNow, 3, tolerance, endOfStreams)
 }
 
-def outputSynchronizationConstraint4(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
-        response3: Events[Int], response4: Events[Int], tolerance: Int, endOfStreams: Events[Unit]): Events[Bool] := {
+def outputSynchronizationConstraint4[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], tolerance: Int, endOfStreams: Events[A]): Events[Bool] := {
     def timeNow = 
         merge(time(stimulus),
         merge(time(response1),
@@ -238,8 +238,8 @@ def outputSynchronizationConstraint4(stimulus: Events[Int], response1: Events[In
     outputSynchronizationConstraint(eventsNow, 4, tolerance, endOfStreams)
 }
 
-def outputSynchronizationConstraint5(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
-        response3: Events[Int], response4: Events[Int], response5: Events[Int], tolerance: Int, endOfStreams: Events[Unit]):
+def outputSynchronizationConstraint5[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], response5: Events[Int], tolerance: Int, endOfStreams: Events[A]):
         Events[Bool] := {
     def timeNow = 
         merge(time(stimulus),

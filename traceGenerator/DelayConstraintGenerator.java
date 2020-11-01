@@ -8,7 +8,7 @@ public class DelayConstraintGenerator extends TraceSet{
 		traces[1] = new Trace("target");
 	}
 
-	public void generateTestTrace(int sourceEventCount,  int minDistanceSource, int maxDistanceSource,
+	public boolean generateTestTrace(int sourceEventCount,  int minDistanceSource, int maxDistanceSource,
 			int lower, int upper){
 		int eventCount = 0;
 		int timeNow = 0;
@@ -22,11 +22,21 @@ public class DelayConstraintGenerator extends TraceSet{
             //insert source
 			inserted&= traces[0].insertEvent(new Event(timeNow, 0));
             //insert target
-			for (int i = 0; i <= rand.nextInt(minDistanceSource/5)+1; i++)
-				traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
-			if (!inserted)
-				System.out.println("Tried to insert multiple events in one timestamp!");
+            boolean insertedTarget = false;
+            int targetTime= timeNow + lower;
+            for (int i = 0; i < rand.nextInt(3) + 1; i++)
+                while (!insertedTarget && targetTime <= timeNow + upper){
+                    boolean currentInserted = traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
+                    insertedTarget|= currentInserted;
+                    if (currentInserted)
+                        eventCount++;
+                }
+                    
+			if (!inserted || !insertedTarget){
+                return false;
+            }
 			eventCount++;
 		}
+        return true;
 	}
 }

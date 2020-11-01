@@ -7,7 +7,7 @@ public class PatternConstraintGenerator extends TraceSet{
 		traces[0] = new Trace("event");
 	}
 
-	public void generateTestTrace(int eventCount, int period, int offset[], int jitter){
+	public boolean generateTestTrace(int eventCount, int period, int offset[], int jitter){
         // generate x events
         PeriodicConstraintGenerator xTimestamps = new PeriodicConstraintGenerator();
 		xTimestamps.generateTestTrace(eventCount/offset.length, period, 0);
@@ -22,9 +22,11 @@ public class PatternConstraintGenerator extends TraceSet{
             for (int i = 0; i < offset.length; i++){
                 inserted = traces[0].insertEvent(new Event(currentX + offset[i] + rand.nextInt(jitter+1), 0));
                 if (!inserted)
-                    System.out.println("Tried to insert multiple events in one timestamp" +
-                        " in one stream! Trace might be invalid!");
+                    return false;
+                    //System.out.println("Tried to insert multiple events in one timestamp" +
+                    //    " in one stream! Trace might be invalid!");
             }
         }
+        return true;
 	}
 }

@@ -169,7 +169,7 @@ def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[In
 def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[Bool] :=
     arbitraryConstraintRec(e, minDist, maxDist, 1)
 
-def burstConstraint(e: Events[Int], length: Int, maxOccurences: Int, minDist: Int): Events[Bool] :=
+def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[Bool] :=
     repeatConstraint(e, length, infty, maxOccurences) && repeatConstraint(e, minDist, infty, 1)
 
 def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[Bool] := {

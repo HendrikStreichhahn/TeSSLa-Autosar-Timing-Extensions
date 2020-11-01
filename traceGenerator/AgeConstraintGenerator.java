@@ -8,10 +8,10 @@ public class AgeConstraintGenerator extends TraceSet{
 		traces[1] = new Trace("response");
 	}
 
-	public void generateTestTrace(int eventCount, int minStimulusDistace, int maxStimulusDistace,
+	public boolean generateTestTrace(int eventCount, int minStimulusDistace, int maxStimulusDistace,
             int minimum, int maximum){
         Random rand = new Random();
-        int timeNow= rand.nextInt(maxStimulusDistace);
+        int timeNow= rand.nextInt(maxStimulusDistace)+100;
         int clr = 0;
         
         while(eventCount > 0){
@@ -26,13 +26,13 @@ public class AgeConstraintGenerator extends TraceSet{
                     , clr));
                 i--;
             }
-            if (!inserted)
-                System.out.println("Tried to insert multiple events in one timestamp" +
-                    " in one stream! Trace might be invalid!");
+            if (!inserted){
+                return false;
+            }
 
             eventCount-= 2;
             clr++;
         }
-        
+        return true;
 	}
 }

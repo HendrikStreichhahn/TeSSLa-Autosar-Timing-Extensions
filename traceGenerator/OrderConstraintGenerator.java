@@ -14,7 +14,7 @@ public class OrderConstraintGenerator extends TraceSet{
         return traces;
     }
 
-	public void generateTestTrace(int eventCount, int maxDistSource, int maxDistSourceTarget){
+	public boolean generateTestTrace(int eventCount, int maxDistSource, int maxDistSourceTarget){
         Random rand = new Random();
 		int timeNow = 0;
         int targetTime = 0;
@@ -32,5 +32,6 @@ public class OrderConstraintGenerator extends TraceSet{
             eventCount-= 2;
         }
         traces[2].insertEvent(new Event(targetTime + maxDistSourceTarget +1, 0));
+        return true;
 	}
 }

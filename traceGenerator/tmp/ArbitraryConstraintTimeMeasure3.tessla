@@ -1,0 +1,4 @@
+include "../../main/t2uConstraints.tessla"
+in event: Events[Int]
+def constraint := arbitraryConstraint(event, List_append(List_append(List_append(List_empty[Int], 20), 40), 60), List_append(List_append(List_append(List_empty[Int], 20), 40), 60))
+out constraint
