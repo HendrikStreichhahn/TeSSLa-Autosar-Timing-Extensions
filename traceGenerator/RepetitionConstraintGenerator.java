@@ -20,8 +20,10 @@ public class RepetitionConstraintGenerator extends TraceSet{
             int i = 10;
             boolean inserted = false;
             while(i > 0 && !inserted) {
-                inserted = traces[0].insertEvent(
-                new Event(currentX + rand.nextInt(jitter+1), 0));
+                int timeStamp = currentX + rand.nextInt(jitter+1);
+                if (timeStamp == 0)
+                    System.out.println("RepetitionConstraint Event at 0");
+                inserted = traces[0].insertEvent(new Event(timeStamp, 0));
                 i--;
             }
             if (!inserted){

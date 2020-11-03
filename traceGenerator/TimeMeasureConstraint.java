@@ -21,7 +21,7 @@ public abstract class TimeMeasureConstraint{
         try{
             Thread.sleep(5*1000);
         } catch (InterruptedException e){
-            //ignore
+            System.out.println(e);
         }
         //measure time per event
         trace.initOutput();

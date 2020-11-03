@@ -28,7 +28,7 @@ public class SynchronizationConstraintGenerator extends TraceSet{
                     int k = 25;
                     boolean inserted = false;
                     while(k > 0 && !inserted) {
-                        inserted = traces[i].insertEvent(new Event(timeNow + rand.nextInt(tolerance), 0));
+                        inserted = traces[i].insertEvent(new Event(timeNow + rand.nextInt(tolerance+1), 0));
                         k--;
                     }
                     eventCount--;
@@ -36,9 +36,6 @@ public class SynchronizationConstraintGenerator extends TraceSet{
                         //System.out.println("generateTestTrace trace false");
                         return false;
                     }
-                        
-                        //System.out.println("Tried to insert multiple events in one timestamp " +
-                        //    " in one stream! Trace might be invalid!");
                 }
             }
         }

@@ -16,7 +16,7 @@ public class RepeatConstraintGenerator extends TraceSet{
 	public boolean generateTestTrace(int eventCount, int lower, int upper, int span){
         Random rand = new Random();
         
-        int startTime = 1;//rand.nextInt(upper);
+        int startTime = upper;//rand.nextInt(upper);
         
         int spanDistance = lower/(span);
         
