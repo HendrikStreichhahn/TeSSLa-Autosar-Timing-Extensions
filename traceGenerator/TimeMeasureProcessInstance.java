@@ -66,8 +66,11 @@ public class TimeMeasureProcessInstance {
         if (availableOut != 0){
             String answer = stdoutReader.readLine();
             //System.out.println(stdinString.replace('\n', ' ') + "=>" + answer);
-            if (debugOutput || answer.contains("false")) 
+            if (debugOutput || answer.contains("false")){
                 System.out.println(answer);
+                //System.exit(-1);
+            }
+                
         }
             
                 
