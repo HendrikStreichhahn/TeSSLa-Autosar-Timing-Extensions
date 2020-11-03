@@ -96,7 +96,7 @@ def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jit
             max(List_head(last(LowerBoundX, e)), time(e)-jitter)
     # upper bound for current x
     def upperBoundXNow: Events[Int] =
-        if (List_size(last(LowerBoundX, e)) < span) then
+        if (List_size(last(UpperBoundX, e)) < span) then
             time(e)
         else
             min(List_head(last(UpperBoundX, e)), time(e))
@@ -118,7 +118,9 @@ def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jit
             List_append(last(List_tail(UpperBoundX), e), upperBoundXNow + upper),
         List_empty[Int]
     )
-    def evaluateTimes = mergeUnit(e, safeDelay(List_head(UpperBoundX) + jitter - time(e)+1, e))
+    def evaluateTimes = mergeUnit(e,
+        safeDelay((if (List_size(UpperBoundX) == 0) then 0 else List_head(UpperBoundX)) +
+                jitter - time(e)+1, e))
     # Evaluation
     allPreviousTrue((List_size(LowerBoundX) == 0 && List_size(UpperBoundX) == 0) ||
         lowerBoundXNow <= time(evaluateTimes) &&
