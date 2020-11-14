@@ -16,8 +16,8 @@ public class RepetitionConstraintGenerator extends TraceSet{
         Trace xTrace = xTimestamps.getTraces()[0];
         xTrace.initOutput();
         while(xTrace.getNextEvent() != null){
-            int currentX = xTrace.popNextEvent().getTimeStamp();
-            int i = 10;
+            int currentX = xTrace.popNextEvent().getTimeStamp()+1;
+            int i = 25;
             boolean inserted = false;
             while(i > 0 && !inserted) {
                 int timeStamp = currentX + rand.nextInt(jitter+1);

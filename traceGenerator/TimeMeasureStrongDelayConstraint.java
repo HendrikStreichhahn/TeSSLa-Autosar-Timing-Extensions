@@ -3,11 +3,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class TimeMeasureStrongDelayConstraint extends TimeMeasureConstraint{
-    int lower, upper;
+    int lower, upper, sourceDistance;
     
-    public TimeMeasureStrongDelayConstraint(int lower, int upper){
+    public TimeMeasureStrongDelayConstraint(int lower, int upper, int sourceDistance){
         this.lower = lower;
         this.upper = upper;
+        this.sourceDistance = sourceDistance;
     }
     
     public TraceSet generateTrace(int eventCount){
@@ -15,10 +16,8 @@ public class TimeMeasureStrongDelayConstraint extends TimeMeasureConstraint{
         //Trace generieren
         StrongDelayConstraintGenerator trace = new StrongDelayConstraintGenerator();
         // generate Constraint parameters randomly
-        int minDistanceSource = 1;
-        int maxDistanceSource = upper + lower;
         //generate trace, repeat until fulfilled trace generated
-        while (!trace.generateTestTrace(eventCount, minDistanceSource, maxDistanceSource, lower, upper)){
+        while (!trace.generateTestTrace(eventCount, sourceDistance, sourceDistance, lower, upper)){
             trace = new StrongDelayConstraintGenerator();
             //System.out.println("trace regenerated");
         }

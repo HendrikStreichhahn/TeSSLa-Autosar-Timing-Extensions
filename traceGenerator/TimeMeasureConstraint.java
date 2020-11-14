@@ -3,6 +3,12 @@ import java.io.IOException;
 public abstract class TimeMeasureConstraint{
     static final String PATHTOMAIN = "../../main/t2uConstraints.tessla";
     
+    private String traceStrings = "";
+    
+    public String getTrace(){
+        return traceStrings;
+    }
+    
     //generate an random trace
     public abstract TraceSet generateTrace(int eventCount);
     
@@ -33,11 +39,13 @@ public abstract class TimeMeasureConstraint{
         try{
             // first timestamp without waiting
             String tesslaInput = trace.getNextTimestampsEvents();
+            traceStrings+= tesslaInput + "\n";
             program.writeNoWait(tesslaInput);
             //System.out.print("write: " + tesslaInput);
             for (tesslaInput = trace.getNextTimestampsEvents(); tesslaInput != ""; 
                     tesslaInput = trace.getNextTimestampsEvents()){
                 //System.out.print("write: " + tesslaInput);
+                traceStrings+= tesslaInput + "\n";
                 long time = program.timeToAnswer(tesslaInput);
                 //System.out.println("answer after: " + time);
                 //update time vals

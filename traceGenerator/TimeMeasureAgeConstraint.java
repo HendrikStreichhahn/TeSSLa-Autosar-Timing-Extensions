@@ -19,7 +19,7 @@ public class TimeMeasureAgeConstraint extends TimeMeasureConstraint{
         //generate trace, repeat until fulfilled trace generated
         while (!trace.generateTestTrace(eventCount, minStimulusDist, maxStimulusDist, minimum, maximum)){
             trace = new AgeConstraintGenerator();
-            //System.out.println("trace regenerated");
+            System.out.println("trace regenerated");
         }
         return trace;
     }

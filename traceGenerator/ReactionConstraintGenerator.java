@@ -22,7 +22,7 @@ public class ReactionConstraintGenerator extends TraceSet{
             int i = 10;
             boolean inserted = false;
             while(i > 0 && !inserted) {
-                inserted = traces[1].insertEvent(new Event(timeNow + minimum + rand.nextInt(maximum - minimum)
+                inserted = traces[1].insertEvent(new Event(timeNow + minimum + rand.nextInt(maximum - minimum+1)
                     , clr));
                 i--;
             }

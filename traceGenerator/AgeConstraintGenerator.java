@@ -16,13 +16,13 @@ public class AgeConstraintGenerator extends TraceSet{
         
         while(eventCount > 0){
             // stimulus event
-            timeNow+= minStimulusDistace + rand.nextInt(maxStimulusDistace - minStimulusDistace);
+            timeNow+= minStimulusDistace + rand.nextInt(maxStimulusDistace - minStimulusDistace+1);
             traces[1].insertEvent(new Event(timeNow, clr));
             // response event
             int i = 10;
             boolean inserted = false;
             while(i > 0 && !inserted) {
-                inserted = traces[0].insertEvent(new Event(timeNow - minimum - rand.nextInt(maximum - minimum)
+                inserted = traces[0].insertEvent(new Event(timeNow - minimum - rand.nextInt(maximum - minimum+1)
                     , clr));
                 i--;
             }
