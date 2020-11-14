@@ -58,6 +58,17 @@ def List_attachInt(ListLeft: List[Int], ListRight: List[Int]): List[Int] :=
 def List_attachIntLifted(ListLeft: Events[List[Int]], ListRight: Events[List[Int]]): Events[List[Int]] :=
     slift(ListLeft, ListRight, List_attachInt)
 
+
+def List_remove(aList: List[Int], val: Int): List[Int] :=
+    static if (List_size(aList) == 0) then
+        aList
+    else
+        static if (List_head(aList) == val) then
+            List_remove(List_tail(aList), val)
+        else
+            List_prepend(List_head(aList), List_remove(List_tail(aList), val));
+        
+
 # FREMDQUELLTEXT => abgewandelte Form von resetCount
 def resetSum[A](events: Events[Int], reset: Events[A]): Events[Int] = sum where {
   def sum: Events[Int] = default(

@@ -253,19 +253,61 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
     
 }
 
+
 def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[Bool] := {
-    # map with unmatched stimulus events after stimulus
-    def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]] := #merge(
-            if (defaultTime(stimulus) >= defaultTime(response)) then
-                Map_add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
+    #removes colors, that were before timeBound, from the list
+    def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
+            colorTimeStamps: Map[Int, Int], timeBound: Int): List[Int] :=
+        # list empty
+        static if (List_size(latestStimulusColors) == 0) then
+            latestStimulusColors
+        else
+            # oldest event not too old-> return current list
+            if (Map_contains(colorTimeStamps, List_head(latestStimulusColors)) &&
+                    Map_get(colorTimeStamps, List_head(latestStimulusColors)) >= timeBound) then
+                latestStimulusColors
             else
-                last(unmatchedStimulusEvents, merge(stimulus, response))#,
-        #Map_empty[Int, Int])
+                # recursive call without oldest color
+                removeOldStimulusColorsFromList(List_tail(latestStimulusColors), colorTimeStamps, timeBound)
+    
+    #removes colors, that were before timeBound, from the map
+    def removeOldStimulusColorsFromSet(latestStimulusColors: List[Int],
+            colorTimeStamps: Map[Int, Int], timeBound: Int): Map[Int, Int] :=
+        static if (List_size(latestStimulusColors) == 0) then
+            colorTimeStamps
+        else
+             # oldest event not too old-> return current map
+            if (Map_contains(colorTimeStamps, List_head(latestStimulusColors)) &&
+                    Map_get(colorTimeStamps, List_head(latestStimulusColors)) >= timeBound)  then
+                colorTimeStamps
+            else
+                # recursive call without oldest color
+                removeOldStimulusColorsFromSet(List_tail(latestStimulusColors),
+                    Map_remove(colorTimeStamps, List_head(latestStimulusColors)), timeBound)
+
+
+    # map with unmatched stimulus events after stimulus
+    def stimulusEventsNewStimulus : Events[Map[Int, Int]] := 
+            if (defaultTime(stimulus) >= defaultTime(response)) then
+                Map_add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
+            else
+                last(stimulusEvents, merge(stimulus, response))
     #remove events that are too old
-    def unmatchedStimulusEvents:=merge(#unmatchedStimulusEventsNewStimulus
-        slift(unmatchedStimulusEventsNewStimulus, time(merge(stimulus, response)) - maxTimeDiff - 1,
-            removeEntrysValueSmallerThanAFromMap),
+    def stimulusEvents:=
+        merge(
+            slift3(last(stimulusColorsYoungerThanMax, stimulus),
+                stimulusEventsNewStimulus,
+                time(merge(stimulus, response)) - maxTimeDiff,
+                removeOldStimulusColorsFromSet),
         Map_empty[Int, Int])
+    
+    def stimulusColorsYoungerThanMax: Events[List[Int]]:= merge(
+        slift3(List_append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
+            stimulusEvents, 
+            time(merge(stimulus, response)) - maxTimeDiff,
+            removeOldStimulusColorsFromList),
+        List_empty[Int])
+        
     # set with colors that are no longer allowed on stimulus stream
     def invalidStimulusColors : Events[Set[Int]] := merge(
         if (defaultTime(stimulus) <= defaultTime(response)) then
@@ -278,9 +320,9 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
     # 'now' has stimulus event => color of stimulus event is valid
     ((!(defaultTime(stimulus) >= defaultTime(response))) ||
         !Set_contains(invalidStimulusColors, stimulus)) &&
-    # 'now' has response event => time matches to unmatched stimulus event
-    ((!(defaultTime(stimulus) <= defaultTime(response))) || 
-        Map_contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
-        Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-        Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response))
+        # 'now' has response event => time matches to unmatched stimulus event
+        ((!(defaultTime(stimulus) <= defaultTime(response))) || 
+            Map_contains(stimulusEventsNewStimulus, merge(response, -1)) &&
+            Map_get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+            Map_get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response))
 }
