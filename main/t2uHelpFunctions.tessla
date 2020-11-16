@@ -1,4 +1,4 @@
-def infty : Int := 9223372036854775807 #(2^63-1) 2*infty = ??
+def infty : Int := 9223372036854775807
 
 # returns the time of the n-last event
 def nLastTime[A](e: Events[A], n: Int): Events[Int] :=
@@ -37,13 +37,7 @@ def mapAllTrueRec(aMap: Map[Int, Bool], keys: List[Int]): Bool :=
         true
     else
         mapAllTrueRec(aMap, List_tail(keys)) && Map_get(aMap, List_head(keys))
-    
-# creates a list of boolean events, initialized with init
-def buildList[A](size: Int, init: A): List[A] :=
-    static if (size <= 0) then
-        List_empty[A]
-    else
-        List_append(buildList(size-1, init), init)
+   
         
 # attaches right list to left list, preserving the order
 def List_attach[T](ListLeft: List[T], ListRight: List[T]): List[T] :=
@@ -140,11 +134,11 @@ def Map_attachIntIntLifted(MapLeft: Events[Map[Int, Int]], MapRight: Events[Map[
     slift(MapLeft, MapRight, Map_attachIntInt)
     
 # creates a list of A, initialized with init
-# def buildList[A](size: Int, init: A): List[A] :=
-#    static if (size <= 0) then
-#        List_empty[A]
-#    else
-#        List_append(buildList(size-1, init), init)
+def buildList[A](size: Int, init: A): List[A] :=
+    static if (size <= 0) then
+        List_empty[A]
+    else
+        List_append(buildList(size-1, init), init)
         
 def buildMap[A](size: Int, init: A): Map[Int, A] :=
     static if (size <= 0) then
@@ -166,8 +160,6 @@ def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
 			removeItemsSmallerThanAFromListFront(List_tail(list), A)
 		else
 			list
-
-#def removeEntrysValueSmallerThanAFromMapRec(aMap: Events[Map[Int, Int]], value: Events[Int], remainingKeys: Events[List[Int]]): Events[Map[Int, Int]] :=
 
 def removeEntrysValueSmallerThanAFromMap(aMap: Map[Int, Int], value: Int) : Map[Int, Int] :=
     removeEntrysValueSmallerThanAFromMapRec(aMap, value, Map_keys(aMap))
