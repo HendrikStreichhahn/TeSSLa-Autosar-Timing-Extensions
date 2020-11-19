@@ -147,9 +147,9 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
         merge(List_attachIntLifted(last(allFulfilled, time(eventStreamIndices)), slift1(storedClustersBeforeRemove, fulfilledClustersInMap)), List_empty[Int])
     
     #each color, that previosly were in response
-    def previousResponseColors: Events[Set[Int]] := merge(
-        slift3(eventStreamIndices, last(previousResponseColors, evalTimes), evalTimes, addAllCurrentColorsToSet),
-        Set_empty[Int])
+    #def previousResponseColors: Events[Set[Int]] := merge(
+    #    slift3(eventStreamIndices, last(previousResponseColors, evalTimes), evalTimes, addAllCurrentColorsToSet),
+    #    Set_empty[Int])
 
     # delay
     def evalTimes = time(mergeUnit(eventStreamIndices,
@@ -160,11 +160,6 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
     allPreviousTrue(slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled) &&
         # on end of streams-> all stimulus colors had synchronization cluster
         merge(on(endOfStreams,  slift(stimulusColors, allFulfilled, aSublistEqBInt)), true) &&
-        #current stimulus color were not in response before
-        if (Map_contains(eventStreamIndices, 0)) then
-            !Set_contains(prev(previousResponseColors), Map_get(eventStreamIndices, 0))
-        else
-            true &&
         #current response color were in stimulus before (no seperation between stimulus and response needed in function call-> stimulus results in true anyway)
         slift(eventStreamIndices, stimulusColors, responseColorsWereInStimulus))
 }
