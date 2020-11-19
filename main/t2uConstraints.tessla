@@ -326,3 +326,14 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
             Map_get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
             Map_get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response))
 }
+
+def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[Bool]:= {
+    # colors, that occured in response-> not allows in stimulus anymore
+    def previousResponseColors: Events[Set[Int]]:=
+        merge(Set_add(last(previousResponseColors, response), response), Set_empty[Int])
+    on(merge(stimulus, response), allPreviousTrue(
+        if (defaultTime(stimulus) >= defaultTime(response)) then 
+            !Set_contains(previousResponseColors, stimulus)
+        else
+            true))
+}
