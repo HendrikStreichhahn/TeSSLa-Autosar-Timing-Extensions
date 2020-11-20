@@ -24,9 +24,8 @@ public class TimeMeasureAll{
     public static void main(String[] args){
         //measureDelayConstraint("results/DelayResult.txt", 1000);
         //measureStrongDelayConstraint("results/StrongDelayResult.txt", 1000);
-        //measureRepeatConstraint("results/RepeatResult.txt", 1000);
-        //measureRepetitionConstraint("results/RepetitionResult.txt", 1000);// nochmal laufen lassen 
-        measureSynchronizationConstraint("results/SynchronizationResult.txt", 1000);
+        measureRepeatConstraint("results/RepeatResult.txt", 1000);
+        measureRepetitionConstraint("results/RepetitionResult.txt", 1000);// nochmal laufen lassen 
         //measureStrongSynchronizationConstraint("results/StrongSynchronizationResult.txt", 1000);//should be fixed 
         //measureExecutionTimeConstraint("results/ExecutionTimeResult.txt", 1000);
         //measureOrderConstraint("results/OrderResult.txt", 1000);
@@ -40,12 +39,10 @@ public class TimeMeasureAll{
         //measureArbitraryConstraint3("results/Arbitrary3Result.txt", 1000);
         //measureBurstConstraint("results/BurstResult.txt", 1000);
         //measureReactionConstraint("results/ReactionResult.txt", 1000);
-        //TODO measureAgeConstraint("results/AgeResult.txt", 1000);
+        //measureAgeConstraint("results/AgeResult.txt", 1000);
         //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 1000);
-        
         //measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 1000);
-        
-        
+        //measureSynchronizationConstraint("results/SynchronizationResult.txt", 1000);
         
     }
     
@@ -117,9 +114,11 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
         int i = 0;
+        int[] spans = new int[]{1, 10, 50, 100};
         for (int lower = 500; lower <= 900; lower += 100)//5
             for (int upper = lower + 100; upper <= lower + 500; upper += 100)//5
-                for (int span = 1; span <= 301; span+= 100){//4
+                for (int spanCount = 0; spanCount < spans.length; spanCount+= 1){//4
+                    int span = spans[spanCount];
                     System.out.println("RepeatConstraint Trace " + (i+1) + " of " + 100);
                     params[i] = ("lower = " + lower + " upper = " + upper + " span = " + span);
                     TimeMeasureRepeatConstraint constraint = new TimeMeasureRepeatConstraint(lower, upper,
@@ -143,9 +142,11 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
         int i = 0;
+        int[] spans = new int[]{1, 10, 50, 100};
         for (int lower = 500; lower <= 900; lower += 100)
             for (int upper = lower + 400; upper <= lower + 800; upper += 100)
-                for (int span = 1; span <= 301; span+= 100){
+               for (int spanCount = 0; spanCount < spans.length; spanCount+= 1){//4
+                    int span = spans[spanCount];
                     System.out.println("RepetitionConstraint Trace " + (i+1) + " of " + 100);
                     int jitter = lower/2;
                     params[i] = ("lower = " + lower + " upper = " + upper + " span = " + span +
@@ -169,16 +170,16 @@ public class TimeMeasureAll{
     
     private static void measureSynchronizationConstraint(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/SynchronizationConstraintTimeMeasure.tessla";
-        int numTraces = 120;
+        int numTraces = 132;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
         String[] params = new String[numTraces];
         int i = 0;
-
+        //int clusterDistance = 100;
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
-            for (int tolerance = 3; tolerance <= 9; tolerance+=2)//4
-                for (int maxEventsPerCluster = 2; maxEventsPerCluster <= tolerance; maxEventsPerCluster+=2)
-                    for (int clusterDistance = tolerance+1; clusterDistance <= 3*tolerance+1;       //3
-                            clusterDistance+= tolerance){
+            for (int tolerance = 1; tolerance <= 10; tolerance+=3)//4
+                for (int maxEventsPerCluster = 2; maxEventsPerCluster <= Math.min(5, tolerance); maxEventsPerCluster++)
+                    for (int clusterDistance = 6; clusterDistance <= 25;       //3
+                            clusterDistance*= 2){
                         System.out.println("Synchronization Trace " + (i+1) + " of " + numTraces);
                         params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
                             " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
@@ -194,6 +195,7 @@ public class TimeMeasureAll{
                         //measure time per event
                         results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA +
                             " " + TESSLAFILEPATH);
+                        System.out.println(results[i]);
                         i++;
                     }
         //save results to file
@@ -274,7 +276,7 @@ public class TimeMeasureAll{
         String[] params = new String[100];
         int i = 0;
         for (int maxDistSource = 1; maxDistSource <= 91; maxDistSource+= 10)//10
-            for (int maxDistSourceTarget = 1; maxDistSourceTarget <= 91; maxDistSourceTarget+= 10){//10
+            for (int maxDistSourceTarget = 0; maxDistSourceTarget <= 45; maxDistSourceTarget+= 5){//10
                 System.out.println("OrderTimeConstraint Trace " + (i+1) + " of " + 100);
                 params[i] = "maxDistSource :" + maxDistSource + " maxDistSourceTarget: "
                     + maxDistSourceTarget;
@@ -626,11 +628,12 @@ public class TimeMeasureAll{
         String[] params = new String[traceCount];
         int i = 0;
         for (int minimum = 100; minimum <= 1000; minimum += 100)
-            for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
+            for (int stimulusDistance = 2*minimum; stimulusDistance >= 1; stimulusDistance/= 2){
                 int maximum = minimum;
                     System.out.println("AgeConstraint Trace " + (i+1) + " of " + traceCount);
                     params[i] = "stimulusDistance: " + stimulusDistance+ " minimum: " + minimum +
                         " maximum: " + maximum;
+                    System.out.println(params[i]);
                     TimeMeasureAgeConstraint constraint = new TimeMeasureAgeConstraint(minimum,
                         maximum, stimulusDistance, stimulusDistance);
                     TraceSet trace = constraint.generateTrace(traceSize);
@@ -639,6 +642,7 @@ public class TimeMeasureAll{
                         System.out.println(TESSLAFILEPATH + " could not be created!");
                     //measure time per event
                     results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
+                    System.out.println(results[i]);
                     if (results[i] == null)
                         return;
                     i++;
@@ -656,7 +660,7 @@ public class TimeMeasureAll{
         int i = 0;
         for (int streamCount = 2; streamCount <= 5; streamCount++)//4
             for (int tolerance = 10; tolerance <= 25; tolerance+= 3)//5
-                for (int clusterDistance = 1; clusterDistance <= tolerance;       //5
+                for (int clusterDistance = 2; clusterDistance <= 2*tolerance;       //5
                         clusterDistance*=2){
                     System.out.println("OutputSynchronizationConstraint Trace " + (i+1) + " of "
                         + traceCount);
@@ -688,7 +692,7 @@ public class TimeMeasureAll{
         int i = 0;
         for (int streamCount = 2; streamCount <= 5; streamCount++)//4
             for (int tolerance = 10; tolerance <= 25; tolerance+= 3)//5
-                for (int clusterDistance = 1; clusterDistance <= tolerance;       //5
+                for (int clusterDistance = 2; clusterDistance <= 2*tolerance;       //5
                         clusterDistance*=2){
                     System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
                         + traceCount);

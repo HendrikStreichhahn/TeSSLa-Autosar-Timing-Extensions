@@ -11,7 +11,7 @@ public class AgeConstraintGenerator extends TraceSet{
 	public boolean generateTestTrace(int eventCount, int minStimulusDistace, int maxStimulusDistace,
             int minimum, int maximum){
         Random rand = new Random();
-        int timeNow= maxStimulusDistace + 100;
+        int timeNow= maxStimulusDistace + maximum + 100;
         int clr = 0;
         
         while(eventCount > 0){
