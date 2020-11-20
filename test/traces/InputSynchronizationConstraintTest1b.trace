@@ -15,7 +15,7 @@
 51: response = 2
 52: response = 3
 
-#fail
+#-> no fail, because only event chain is invalid, not the constrained itself
 55: stimulus1 = 1
 56: stimulus2 = 1
 57: stimulus3 = 1

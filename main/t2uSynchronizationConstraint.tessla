@@ -66,9 +66,8 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
                 # add head of list to return list
                 List_prepend(List_head(events), eventsToRemove(List_tail(events), timeNow, tolerance))
             else
+                # rest of list can't be older-> return empty
                 List_empty[SynchronizationEventInfo]
-                # don't add head of list to return list
-                #eventsToRemove(List_tail(events), timeNow, tolerance)
 
     # removes all events, that are older than tolerance
     def removeEvents(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int):
@@ -80,8 +79,8 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
             if(timeNow - List_head(events).eventTime > tolerance) then
                 removeEvents(List_tail(events), timeNow, tolerance)
             else
+                # rest of list can't be older-> return unchanged
                 events
-                #List_prepend(List_head(events), removeEvents(List_tail(events), timeNow, tolerance))
 
     def noUnfulfilledRemoved(removedEvents: List[SynchronizationEventInfo]) : Bool :=
         static if (List_size(removedEvents) == 0) then

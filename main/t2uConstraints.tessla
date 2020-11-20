@@ -229,28 +229,17 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
         else
             unmatchedStimulusEventsNewStimulus,
         unmatchedStimulusEventsNewStimulus)
-    #set with color, that were previosly in response
-    def previousResponseColors: Events[Set[Int]] := merge(
-        # 'now' has response event
-        if defaultTime(stimulus) <= defaultTime(response) then
-            Set_add(last(previousResponseColors, merge(stimulus, response)), response)
-        else
-            last(previousResponseColors, merge(stimulus, response)),
-        Set_empty[Int])
     
     def evaluateTimes = mergeUnit(mergeUnit(stimulus, response),
             safeDelay(slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff -
                 time(mergeUnit(stimulus, response)) + 1,
                 mergeUnit(stimulus, response)))
                 
-    #evaluation            
-    def result = slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes) &&
-        # all unmatched stimulus events can still be matched
-        # no stimulus with color, that was already in response
-        ((!(defaultTime(stimulus) >= defaultTime(response))) ||
-            !(Set_contains(previousResponseColors, stimulus)))
-    result
+    #evaluation
+    # all unmatched stimulus events can still be matched    
+    def result = slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes)
     
+    result
 }
 
 
@@ -308,21 +297,21 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
             removeOldStimulusColorsFromList),
         List_empty[Int])
         
-    # set with colors that are no longer allowed on stimulus stream
-    def invalidStimulusColors : Events[Set[Int]] := merge(
-        if (defaultTime(stimulus) <= defaultTime(response)) then
-            Set_add(last(invalidStimulusColors, merge(stimulus, response)), response)
-        else
-            last(invalidStimulusColors, merge(stimulus, response)),
-        Set_empty[Int]
-    )
     #evaluation
-    # 'now' has stimulus event => color of stimulus event is valid
-    ((!(defaultTime(stimulus) >= defaultTime(response))) ||
-        !Set_contains(invalidStimulusColors, stimulus)) &&
-        # 'now' has response event => time matches to unmatched stimulus event
-        ((!(defaultTime(stimulus) <= defaultTime(response))) || 
-            Map_contains(stimulusEventsNewStimulus, merge(response, -1)) &&
-            Map_get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-            Map_get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response))
+    # 'now' has response event => time matches to unmatched stimulus event
+    ((!(defaultTime(stimulus) <= defaultTime(response))) || 
+        Map_contains(stimulusEventsNewStimulus, merge(response, -1)) &&
+        Map_get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+        Map_get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response))
+}
+
+def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[Bool]:= {
+    # colors, that occured in response-> not allows in stimulus anymore
+    def previousResponseColors: Events[Set[Int]]:=
+        merge(Set_add(last(previousResponseColors, response), response), Set_empty[Int])
+    on(merge(stimulus, response), allPreviousTrue(
+        if (defaultTime(stimulus) >= defaultTime(response)) then 
+            !Set_contains(previousResponseColors, stimulus)
+        else
+            true))
 }

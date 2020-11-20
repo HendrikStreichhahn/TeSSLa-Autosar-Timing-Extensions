@@ -115,13 +115,6 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
                 else
                     colors, 
                 currentTime)
-                
-    def responseColorsWereInStimulus(eventStreamIndices: Map[Int, Int], stimulusColors: List[Int]): Bool:=
-        static if (Map_size(eventStreamIndices) == 0) then
-            true
-        else
-            List_containsInt(stimulusColors, Map_headValue(eventStreamIndices)) && 
-            responseColorsWereInStimulus(Map_tail(eventStreamIndices), stimulusColors)
     
     # Stored Information #
     def stimulusColors: Events[List[Int]] := merge(
@@ -146,10 +139,6 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
     def allFulfilled: Events[List[Int]] :=
         merge(List_attachIntLifted(last(allFulfilled, time(eventStreamIndices)), slift1(storedClustersBeforeRemove, fulfilledClustersInMap)), List_empty[Int])
     
-    #each color, that previosly were in response
-    def previousResponseColors: Events[Set[Int]] := merge(
-        slift3(eventStreamIndices, last(previousResponseColors, evalTimes), evalTimes, addAllCurrentColorsToSet),
-        Set_empty[Int])
 
     # delay
     def evalTimes = time(mergeUnit(eventStreamIndices,
@@ -159,14 +148,7 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
         # each started synchronization cluster is younger than tolerance or fulfilled
     allPreviousTrue(slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled) &&
         # on end of streams-> all stimulus colors had synchronization cluster
-        merge(on(endOfStreams,  slift(stimulusColors, allFulfilled, aSublistEqBInt)), true) &&
-        #current stimulus color were not in response before
-        if (Map_contains(eventStreamIndices, 0)) then
-            !Set_contains(prev(previousResponseColors), Map_get(eventStreamIndices, 0))
-        else
-            true &&
-        #current response color were in stimulus before (no seperation between stimulus and response needed in function call-> stimulus results in true anyway)
-        slift(eventStreamIndices, stimulusColors, responseColorsWereInStimulus))
+        merge(on(endOfStreams,  slift(stimulusColors, allFulfilled, aSublistEqBInt)), true))
 }
 
 def outputSynchronizationConstraint2[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int,

@@ -3,21 +3,12 @@ include "t2uHelpFunctions.tessla"
 type synchronizationCluster = {xTime: Int, fulfilledStreams: Map[Int, Bool]}
 
 def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[Bool]:= {
-            
-    def List_attachsynchronizationCluster(ListLeft: List[synchronizationCluster], ListRight: List[synchronizationCluster]): List[synchronizationCluster] :=
-        List_attach(ListLeft, ListRight);
 
     def SynchronizationCluster(aTime: Int, aFulfilledStreams: Map[Int, Bool]): synchronizationCluster :=
         {xTime = aTime, fulfilledStreams = aFulfilledStreams}
         
     def buildSynchronizationCluster(time: Int, streamCount: Int): synchronizationCluster :=
         {xTime = time, fulfilledStreams = buildMap(streamCount, false)}
-        
-    def getFulfilledStreamMap(cluster: synchronizationCluster):  Map[Int, Bool] :=
-        cluster.fulfilledStreams
-        
-    def getFulfilledStreamMapLifted(cluster: Events[synchronizationCluster]): Events[Map[Int, Bool]] :=
-        slift1(cluster, getFulfilledStreamMap)
         
     def getXTime(cluster: synchronizationCluster): Int :=
         cluster.xTime
@@ -51,37 +42,28 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
                 clusterFulfilled(fulfilledStreams, List_tail(keys))
             else
                 false
-            
-    def removeFulfilled(activeClustersLeft: List[synchronizationCluster], activeClustersRight: List[synchronizationCluster]):
-            List[synchronizationCluster] :=
-        #activeClustersRight
-        static if List_size(activeClustersRight) == 0 then
-            activeClustersLeft
+                
+    def removeFulfilled(activeClusters: List[synchronizationCluster]) : List[synchronizationCluster] :=
+        static if (List_size(activeClusters) == 0) then
+            activeClusters
         else
-            # head of right list is fulfilled-> remove it
-            if clusterFulfilled(List_head(activeClustersRight).fulfilledStreams,
-                    Map_keys(List_head(activeClustersRight).fulfilledStreams)) then
-                removeFulfilled(activeClustersLeft, List_tail(activeClustersRight))
+            if clusterFulfilled(List_head(activeClusters).fulfilledStreams,
+                    Map_keys(List_head(activeClusters).fulfilledStreams)) then
+                removeFulfilled(List_tail(activeClusters))
             else
-                removeFulfilled(List_append(activeClustersLeft, List_head(activeClustersRight)), List_tail(activeClustersRight))
+                List_prepend(List_head(activeClusters), removeFulfilled(List_tail(activeClusters)))
             
-    def addEventToClusterList(
-            activeClustersLeft: List[synchronizationCluster],      # List of actice clusters (left side)
-            activeClustersRight: List[synchronizationCluster],     # List of actice clusters (right side, head is used)
-            eventStreamIndex: Int): List[synchronizationCluster] :=# the index of the stream, where the event has occurred
-        # streamIndex in head of right list is fulfilled-> check in tail
-        #activeClustersRight
-        static if Map_get(List_head(activeClustersRight).fulfilledStreams, eventStreamIndex) then
-            addEventToClusterList(
-                List_append(activeClustersLeft, List_head(activeClustersRight)),
-                List_tail(activeClustersRight),
-                eventStreamIndex)
-        # streamIndex in head of right list is not fulfilled-> set to true
+    def addEventToClusterList(activeClusters: List[synchronizationCluster], eventStreamIndex: Int):
+            List[synchronizationCluster]:= 
+        # new event doesn't fit in head of list-> check next one
+        static if Map_get(List_head(activeClusters).fulfilledStreams, eventStreamIndex) then
+            List_prepend(List_head(activeClusters),
+                addEventToClusterList(List_tail(activeClusters), eventStreamIndex))
         else
-            List_attach(activeClustersLeft, 
-                List_prepend(SynchronizationCluster(List_head(activeClustersRight).xTime, 
-                        Map_add(List_head(activeClustersRight).fulfilledStreams, eventStreamIndex, true)),
-                   List_tail(activeClustersRight)))
+            #set event to fulfilled
+            List_prepend(SynchronizationCluster(List_head(activeClusters).xTime, 
+                        Map_add(List_head(activeClusters).fulfilledStreams, eventStreamIndex, true)),
+                List_tail(activeClusters))
                 
     def addEventsToClusters(activeClusters: List[synchronizationCluster], eventIndices: List[Int], time: Int, streamCount: Int) : List[synchronizationCluster]:=
         static if (List_size(eventIndices) == 0) then
@@ -90,15 +72,13 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
             # recursive call-> do for all events in list
             addEventsToClusters(
                 # remove clusters, that don't take more events
-                    addEventToClusterList(List_empty[synchronizationCluster], 
+                    addEventToClusterList(#List_empty[synchronizationCluster], 
                         List_attach(activeClusters, if existsMatchingCluster(activeClusters, List_head(eventIndices))
                                                         then List_empty[synchronizationCluster]
                                                         else List_append(List_empty[synchronizationCluster],
                                                             buildSynchronizationCluster(time, streamCount))),
                     List_head(eventIndices)), 
                 List_tail(eventIndices), time, streamCount)
-
-    #def evaluateTimes: Events[Int] := time(eventIndices);
     
     def evaluateTimes: Events[Int] := time(mergeUnit(eventIndices,
         safeDelay(if (List_size(activeClusters) != 0) then
@@ -111,7 +91,7 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
         slift4(last(activeClusters, eventIndices), eventIndices, evaluateTimes, streamCount, addEventsToClusters)
     # active clusters after removing of full clusters
     def activeClusters: Events[List[synchronizationCluster]] := merge(
-        slift(List_empty[synchronizationCluster], activeClustersNewEvent, removeFulfilled), 
+        slift1(activeClustersNewEvent, removeFulfilled), 
         List_empty[synchronizationCluster])
     allPreviousTrue(List_size(activeClustersNewEvent) == 0 ||
         getXTimeLifted(List_head(activeClustersNewEvent)) +
