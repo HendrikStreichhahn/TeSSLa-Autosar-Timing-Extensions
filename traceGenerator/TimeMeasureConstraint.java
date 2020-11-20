@@ -18,33 +18,37 @@ public abstract class TimeMeasureConstraint{
             return null;
         }
         //sleep 5 seconds-> wait until TeSSLa is ready
-        try{
-            Thread.sleep(5*1000);
+        /*try{
+            //Thread.sleep(5*1000);
         } catch (InterruptedException e){
             System.out.println(e);
-        }
+        }*/
         //measure time per event
         trace.initOutput();
         long completeTime = 0;
         long min = Long.MAX_VALUE;
         long max = 0;
-        int eventCount = 1;
+        int eventCount;
         //program.setDebugOutput(true);
         try{
+            
             // first timestamp without waiting
             String tesslaInput = trace.getNextTimestampsEvents();
             program.writeNoWait(tesslaInput);
+            int eventThisTimeStamp = numEvents(tesslaInput);
+            eventCount = eventThisTimeStamp;
             //System.out.print("write: " + tesslaInput);
             for (tesslaInput = trace.getNextTimestampsEvents(); tesslaInput != ""; 
                     tesslaInput = trace.getNextTimestampsEvents()){
+                eventThisTimeStamp = numEvents(tesslaInput);
                 //System.out.print("write: " + tesslaInput);
                 long time = program.timeToAnswer(tesslaInput);
                 //System.out.println("answer after: " + time);
                 //update time vals
-                min = Math.min(min, time);
-                max = Math.max(max, time);
+                min = Math.min(min, time/eventThisTimeStamp);
+                max = Math.max(max, time/eventThisTimeStamp);
                 completeTime += time;
-                eventCount++;
+                eventCount+= eventThisTimeStamp;
             }
         } catch (IOException e){
             System.err.println("IOException between TeSSLa and Timemeasure!");
@@ -60,6 +64,14 @@ public abstract class TimeMeasureConstraint{
         }
         
         return new SingleMeasureResult(min, max, completeTime/eventCount);
+    }
+    
+    protected int numEvents(String TesslaInput){
+        int res = 0;
+        for (char chr : TesslaInput.toCharArray())
+            if (chr == '\n')
+                res++;
+        return res;
     }
     
     protected String generateTesslaIntMap(int[] keys, int[] vals){
