@@ -115,6 +115,19 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
                 else
                     colors, 
                 currentTime)
+                
+    def setAddList(aSet: Set[Int], aList: List[Int]): Set[Int]:=
+        static if (List_size(aList) == 0) then
+            aSet
+        else
+            setAddList(Set_add(aSet, List_head(aList)), List_tail(aList))
+            
+    def endConditionFulfilled(fulfilledClusters: Set[Int], stimulusColors: List[Int]): Bool :=
+        static if (List_size(stimulusColors) == 0) then
+            true
+        else
+            Set_contains(fulfilledClusters, List_head(stimulusColors)) &&
+                endConditionFulfilled(fulfilledClusters, List_tail(stimulusColors))
     
     # Stored Information #
     def stimulusColors: Events[List[Int]] := merge(
@@ -136,10 +149,10 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
         Map_empty[Int, outputSynchronizationCluster])
         
     # colors of all fulfilled cluster
-    def allFulfilled: Events[List[Int]] :=
-        merge(List_attachIntLifted(last(allFulfilled, time(eventStreamIndices)), slift1(storedClustersBeforeRemove, fulfilledClustersInMap)), List_empty[Int])
+    def allFulfilled: Events[Set[Int]] := #on(eventStreamIndices, List_empty[Int])
+        merge(slift(last(allFulfilled, time(eventStreamIndices)), slift1(storedClustersBeforeRemove, fulfilledClustersInMap), setAddList), Set_empty[Int])
     
-
+    
     # delay
     def evalTimes = time(mergeUnit(eventStreamIndices,
         delay(slift1(storedClusters, startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
@@ -148,7 +161,7 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
         # each started synchronization cluster is younger than tolerance or fulfilled
     allPreviousTrue(slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled) &&
         # on end of streams-> all stimulus colors had synchronization cluster
-        merge(on(endOfStreams,  slift(stimulusColors, allFulfilled, aSublistEqBInt)), true))
+        merge(on(endOfStreams,  slift(allFulfilled, stimulusColors, endConditionFulfilled)), true))
 }
 
 def outputSynchronizationConstraint2[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int,
