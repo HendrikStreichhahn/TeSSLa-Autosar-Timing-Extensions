@@ -42,21 +42,21 @@ public abstract class TimeMeasureConstraint{
             String tesslaInput = trace.getNextTimestampsEvents();
             traceStrings+= tesslaInput + "\n";
             program.writeNoWait(tesslaInput);
-            int eventThisTimeStamp = numEvents(tesslaInput);
-            eventCount = eventThisTimeStamp;
+            //int eventThisTimeStamp = numEvents(tesslaInput);
+            eventCount = 1;
             //System.out.print("write: " + tesslaInput);
             for (tesslaInput = trace.getNextTimestampsEvents(); tesslaInput != ""; 
                     tesslaInput = trace.getNextTimestampsEvents()){
-                eventThisTimeStamp = numEvents(tesslaInput);
+                //eventThisTimeStamp = numEvents(tesslaInput);
                 //System.out.print("write: " + tesslaInput);
                 traceStrings+= tesslaInput + "\n";
                 long time = program.timeToAnswer(tesslaInput);
                 //System.out.println("answer after: " + time);
                 //update time vals
-                min = Math.min(min, time/eventThisTimeStamp);
-                max = Math.max(max, time/eventThisTimeStamp);
+                min = Math.min(min, time);
+                max = Math.max(max, time);
                 completeTime += time;
-                eventCount+= eventThisTimeStamp;
+                eventCount+= 1;
             }
         } catch (IOException e){
             System.err.println("IOException between TeSSLa and Timemeasure!");
@@ -71,7 +71,7 @@ public abstract class TimeMeasureConstraint{
             
         }
         
-        return new SingleMeasureResult(min, max, completeTime/eventCount);
+        return new SingleMeasureResult(min, max, completeTime, completeTime/eventCount);
     }
     
     protected int numEvents(String TesslaInput){

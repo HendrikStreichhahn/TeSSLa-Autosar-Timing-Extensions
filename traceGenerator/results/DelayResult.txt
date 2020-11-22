@@ -1,105 +1,105 @@
-average: Minimum: 0.357543ms Maximum: 43.40201ms Average: 1.257111 ms
-minimum: Minimum: 0.2274ms Maximum: 40.2614ms Average: 0.934336 ms
-maximum: Minimum: 0.5142ms Maximum: 55.3043ms Average: 1.992229 ms
-lower = 100 upper = 100 sourceDistance = 1 => Minimum: 0.5049ms Maximum: 55.3043ms Average: 1.561557 ms
-lower = 100 upper = 100 sourceDistance = 2 => Minimum: 0.4823ms Maximum: 43.9438ms Average: 1.364392 ms
-lower = 100 upper = 100 sourceDistance = 4 => Minimum: 0.387ms Maximum: 43.2513ms Average: 1.253573 ms
-lower = 100 upper = 100 sourceDistance = 8 => Minimum: 0.3472ms Maximum: 43.9057ms Average: 1.037263 ms
-lower = 100 upper = 100 sourceDistance = 16 => Minimum: 0.4127ms Maximum: 43.5126ms Average: 1.0769 ms
-lower = 100 upper = 100 sourceDistance = 32 => Minimum: 0.4425ms Maximum: 43.6851ms Average: 1.047963 ms
-lower = 100 upper = 100 sourceDistance = 64 => Minimum: 0.3143ms Maximum: 44.3472ms Average: 1.075064 ms
-lower = 100 upper = 100 sourceDistance = 128 => Minimum: 0.3185ms Maximum: 44.9181ms Average: 1.060897 ms
-lower = 200 upper = 200 sourceDistance = 1 => Minimum: 0.5142ms Maximum: 46.1076ms Average: 1.739247 ms
-lower = 200 upper = 200 sourceDistance = 2 => Minimum: 0.2658ms Maximum: 43.9027ms Average: 1.396962 ms
-lower = 200 upper = 200 sourceDistance = 4 => Minimum: 0.3434ms Maximum: 43.209ms Average: 1.082268 ms
-lower = 200 upper = 200 sourceDistance = 8 => Minimum: 0.3951ms Maximum: 40.8653ms Average: 1.122609 ms
-lower = 200 upper = 200 sourceDistance = 16 => Minimum: 0.3888ms Maximum: 41.1292ms Average: 1.100313 ms
-lower = 200 upper = 200 sourceDistance = 32 => Minimum: 0.3976ms Maximum: 43.5953ms Average: 1.018888 ms
-lower = 200 upper = 200 sourceDistance = 64 => Minimum: 0.32ms Maximum: 43.6429ms Average: 0.97736 ms
-lower = 200 upper = 200 sourceDistance = 128 => Minimum: 0.3665ms Maximum: 44.019ms Average: 0.996819 ms
-lower = 200 upper = 200 sourceDistance = 256 => Minimum: 0.341ms Maximum: 44.1245ms Average: 1.039618 ms
-lower = 300 upper = 300 sourceDistance = 1 => Minimum: 0.4308ms Maximum: 40.4917ms Average: 1.809803 ms
-lower = 300 upper = 300 sourceDistance = 2 => Minimum: 0.2699ms Maximum: 43.5377ms Average: 1.468494 ms
-lower = 300 upper = 300 sourceDistance = 4 => Minimum: 0.342ms Maximum: 41.7857ms Average: 1.378451 ms
-lower = 300 upper = 300 sourceDistance = 8 => Minimum: 0.3629ms Maximum: 43.2038ms Average: 1.240255 ms
-lower = 300 upper = 300 sourceDistance = 16 => Minimum: 0.3772ms Maximum: 46.8788ms Average: 1.115045 ms
-lower = 300 upper = 300 sourceDistance = 32 => Minimum: 0.4038ms Maximum: 44.8223ms Average: 1.042385 ms
-lower = 300 upper = 300 sourceDistance = 64 => Minimum: 0.3475ms Maximum: 42.8314ms Average: 0.977575 ms
-lower = 300 upper = 300 sourceDistance = 128 => Minimum: 0.3892ms Maximum: 40.4902ms Average: 1.019151 ms
-lower = 300 upper = 300 sourceDistance = 256 => Minimum: 0.4562ms Maximum: 43.3141ms Average: 1.07705 ms
-lower = 300 upper = 300 sourceDistance = 512 => Minimum: 0.4177ms Maximum: 43.113ms Average: 0.99362 ms
-lower = 400 upper = 400 sourceDistance = 1 => Minimum: 0.3367ms Maximum: 42.9621ms Average: 1.891256 ms
-lower = 400 upper = 400 sourceDistance = 2 => Minimum: 0.3814ms Maximum: 41.1158ms Average: 1.624724 ms
-lower = 400 upper = 400 sourceDistance = 4 => Minimum: 0.3152ms Maximum: 43.3111ms Average: 1.317115 ms
-lower = 400 upper = 400 sourceDistance = 8 => Minimum: 0.3114ms Maximum: 44.6649ms Average: 1.190934 ms
-lower = 400 upper = 400 sourceDistance = 16 => Minimum: 0.3167ms Maximum: 40.9208ms Average: 1.059759 ms
-lower = 400 upper = 400 sourceDistance = 32 => Minimum: 0.3871ms Maximum: 40.4731ms Average: 1.069587 ms
-lower = 400 upper = 400 sourceDistance = 64 => Minimum: 0.38ms Maximum: 44.1037ms Average: 1.086387 ms
-lower = 400 upper = 400 sourceDistance = 128 => Minimum: 0.3744ms Maximum: 43.4052ms Average: 1.035464 ms
-lower = 400 upper = 400 sourceDistance = 256 => Minimum: 0.3712ms Maximum: 43.5948ms Average: 0.974906 ms
-lower = 400 upper = 400 sourceDistance = 512 => Minimum: 0.3769ms Maximum: 43.4187ms Average: 1.121895 ms
-lower = 500 upper = 500 sourceDistance = 1 => Minimum: 0.3607ms Maximum: 42.4756ms Average: 1.96455 ms
-lower = 500 upper = 500 sourceDistance = 2 => Minimum: 0.3481ms Maximum: 43.2625ms Average: 1.764941 ms
-lower = 500 upper = 500 sourceDistance = 4 => Minimum: 0.374ms Maximum: 44.1496ms Average: 1.505921 ms
-lower = 500 upper = 500 sourceDistance = 8 => Minimum: 0.3183ms Maximum: 44.0546ms Average: 1.277105 ms
-lower = 500 upper = 500 sourceDistance = 16 => Minimum: 0.2847ms Maximum: 44.4996ms Average: 1.125305 ms
-lower = 500 upper = 500 sourceDistance = 32 => Minimum: 0.339ms Maximum: 43.0693ms Average: 1.014793 ms
-lower = 500 upper = 500 sourceDistance = 64 => Minimum: 0.4827ms Maximum: 44.5455ms Average: 1.14205 ms
-lower = 500 upper = 500 sourceDistance = 128 => Minimum: 0.3942ms Maximum: 40.9046ms Average: 1.119565 ms
-lower = 500 upper = 500 sourceDistance = 256 => Minimum: 0.3299ms Maximum: 44.4991ms Average: 1.010878 ms
-lower = 500 upper = 500 sourceDistance = 512 => Minimum: 0.3886ms Maximum: 40.2614ms Average: 1.026329 ms
-lower = 600 upper = 600 sourceDistance = 1 => Minimum: 0.3724ms Maximum: 44.1199ms Average: 1.959141 ms
-lower = 600 upper = 600 sourceDistance = 2 => Minimum: 0.2597ms Maximum: 42.5201ms Average: 1.70327 ms
-lower = 600 upper = 600 sourceDistance = 4 => Minimum: 0.3509ms Maximum: 41.93ms Average: 1.621785 ms
-lower = 600 upper = 600 sourceDistance = 8 => Minimum: 0.2274ms Maximum: 43.5225ms Average: 1.282859 ms
-lower = 600 upper = 600 sourceDistance = 16 => Minimum: 0.3582ms Maximum: 52.6291ms Average: 1.096599 ms
-lower = 600 upper = 600 sourceDistance = 32 => Minimum: 0.2748ms Maximum: 43.8888ms Average: 1.034023 ms
-lower = 600 upper = 600 sourceDistance = 64 => Minimum: 0.3506ms Maximum: 44.2923ms Average: 0.969116 ms
-lower = 600 upper = 600 sourceDistance = 128 => Minimum: 0.5036ms Maximum: 43.6869ms Average: 1.11621 ms
-lower = 600 upper = 600 sourceDistance = 256 => Minimum: 0.3807ms Maximum: 43.664ms Average: 1.030674 ms
-lower = 600 upper = 600 sourceDistance = 512 => Minimum: 0.4757ms Maximum: 45.3126ms Average: 1.069525 ms
-lower = 600 upper = 600 sourceDistance = 1024 => Minimum: 0.3538ms Maximum: 40.2896ms Average: 0.936674 ms
-lower = 700 upper = 700 sourceDistance = 1 => Minimum: 0.3114ms Maximum: 41.6016ms Average: 1.916728 ms
-lower = 700 upper = 700 sourceDistance = 2 => Minimum: 0.3691ms Maximum: 43.3343ms Average: 1.842019 ms
-lower = 700 upper = 700 sourceDistance = 4 => Minimum: 0.2663ms Maximum: 44.087ms Average: 1.466806 ms
-lower = 700 upper = 700 sourceDistance = 8 => Minimum: 0.2422ms Maximum: 40.8111ms Average: 1.345396 ms
-lower = 700 upper = 700 sourceDistance = 16 => Minimum: 0.3048ms Maximum: 40.9609ms Average: 1.186395 ms
-lower = 700 upper = 700 sourceDistance = 32 => Minimum: 0.3659ms Maximum: 45.6512ms Average: 1.051383 ms
-lower = 700 upper = 700 sourceDistance = 64 => Minimum: 0.3138ms Maximum: 44.3097ms Average: 1.021563 ms
-lower = 700 upper = 700 sourceDistance = 128 => Minimum: 0.3329ms Maximum: 43.4643ms Average: 0.947139 ms
-lower = 700 upper = 700 sourceDistance = 256 => Minimum: 0.3126ms Maximum: 43.6039ms Average: 0.942685 ms
-lower = 700 upper = 700 sourceDistance = 512 => Minimum: 0.3641ms Maximum: 45.075ms Average: 0.937723 ms
-lower = 700 upper = 700 sourceDistance = 1024 => Minimum: 0.4394ms Maximum: 41.1861ms Average: 1.105025 ms
-lower = 800 upper = 800 sourceDistance = 1 => Minimum: 0.3458ms Maximum: 40.9302ms Average: 1.90083 ms
-lower = 800 upper = 800 sourceDistance = 2 => Minimum: 0.3351ms Maximum: 44.9078ms Average: 1.992229 ms
-lower = 800 upper = 800 sourceDistance = 4 => Minimum: 0.4021ms Maximum: 43.1584ms Average: 1.614221 ms
-lower = 800 upper = 800 sourceDistance = 8 => Minimum: 0.2796ms Maximum: 44.2767ms Average: 1.451466 ms
-lower = 800 upper = 800 sourceDistance = 16 => Minimum: 0.2771ms Maximum: 44.1895ms Average: 1.27976 ms
-lower = 800 upper = 800 sourceDistance = 32 => Minimum: 0.3424ms Maximum: 44.4866ms Average: 1.059171 ms
-lower = 800 upper = 800 sourceDistance = 64 => Minimum: 0.3272ms Maximum: 41.5816ms Average: 1.09702 ms
-lower = 800 upper = 800 sourceDistance = 128 => Minimum: 0.3874ms Maximum: 44.0269ms Average: 1.039092 ms
-lower = 800 upper = 800 sourceDistance = 256 => Minimum: 0.4409ms Maximum: 41.1283ms Average: 0.934336 ms
-lower = 800 upper = 800 sourceDistance = 512 => Minimum: 0.3298ms Maximum: 43.6602ms Average: 0.95777 ms
-lower = 800 upper = 800 sourceDistance = 1024 => Minimum: 0.3664ms Maximum: 42.7355ms Average: 1.001082 ms
-lower = 900 upper = 900 sourceDistance = 1 => Minimum: 0.3264ms Maximum: 40.6304ms Average: 1.949696 ms
-lower = 900 upper = 900 sourceDistance = 2 => Minimum: 0.3626ms Maximum: 45.1021ms Average: 1.990859 ms
-lower = 900 upper = 900 sourceDistance = 4 => Minimum: 0.3123ms Maximum: 40.7867ms Average: 1.51264 ms
-lower = 900 upper = 900 sourceDistance = 8 => Minimum: 0.3747ms Maximum: 41.4192ms Average: 1.449799 ms
-lower = 900 upper = 900 sourceDistance = 16 => Minimum: 0.2414ms Maximum: 41.3292ms Average: 1.105152 ms
-lower = 900 upper = 900 sourceDistance = 32 => Minimum: 0.3317ms Maximum: 44.0857ms Average: 1.068824 ms
-lower = 900 upper = 900 sourceDistance = 64 => Minimum: 0.4323ms Maximum: 43.2476ms Average: 1.216188 ms
-lower = 900 upper = 900 sourceDistance = 128 => Minimum: 0.3945ms Maximum: 41.2721ms Average: 1.096739 ms
-lower = 900 upper = 900 sourceDistance = 256 => Minimum: 0.4844ms Maximum: 41.0625ms Average: 1.087059 ms
-lower = 900 upper = 900 sourceDistance = 512 => Minimum: 0.3372ms Maximum: 43.5568ms Average: 0.981626 ms
-lower = 900 upper = 900 sourceDistance = 1024 => Minimum: 0.4355ms Maximum: 42.0225ms Average: 1.064409 ms
-lower = 1000 upper = 1000 sourceDistance = 1 => Minimum: 0.3408ms Maximum: 43.8373ms Average: 1.921194 ms
-lower = 1000 upper = 1000 sourceDistance = 2 => Minimum: 0.3091ms Maximum: 43.8417ms Average: 1.9521 ms
-lower = 1000 upper = 1000 sourceDistance = 4 => Minimum: 0.278ms Maximum: 40.8083ms Average: 1.716873 ms
-lower = 1000 upper = 1000 sourceDistance = 8 => Minimum: 0.2472ms Maximum: 45.3577ms Average: 1.401432 ms
-lower = 1000 upper = 1000 sourceDistance = 16 => Minimum: 0.3658ms Maximum: 41.1121ms Average: 1.206381 ms
-lower = 1000 upper = 1000 sourceDistance = 32 => Minimum: 0.2695ms Maximum: 41.0689ms Average: 1.120039 ms
-lower = 1000 upper = 1000 sourceDistance = 64 => Minimum: 0.3415ms Maximum: 43.6073ms Average: 1.084494 ms
-lower = 1000 upper = 1000 sourceDistance = 128 => Minimum: 0.3938ms Maximum: 44.2226ms Average: 0.936748 ms
-lower = 1000 upper = 1000 sourceDistance = 256 => Minimum: 0.3255ms Maximum: 43.0541ms Average: 0.949328 ms
-lower = 1000 upper = 1000 sourceDistance = 512 => Minimum: 0.3394ms Maximum: 52.9506ms Average: 1.024829 ms
-lower = 1000 upper = 1000 sourceDistance = 1024 => Minimum: 0.3515ms Maximum: 43.9829ms Average: 1.082244 ms
+average: Minimum: 0.209892ms Maximum: 5284.0513ms Complete: 41.3823ms Average: 0.604619 ms
+minimum: Minimum: 0.1925ms Maximum: 38.7553ms Complete: 2147.4836ms Average: 0.335091 ms
+maximum: Minimum: 0.2397ms Maximum: 48.1023ms Complete: 18329.643ms Average: 2.583095 ms
+lower = 100 upper = 100 sourceDistance = 1 => Minimum: 0.207ms Maximum: 38.7553ms Complete: 3908.1448ms Average: 0.587072 ms
+lower = 100 upper = 100 sourceDistance = 2 => Minimum: 0.2158ms Maximum: 41.0488ms Complete: 4016.9897ms Average: 0.500559 ms
+lower = 100 upper = 100 sourceDistance = 4 => Minimum: 0.212ms Maximum: 40.5142ms Complete: 3849.0393ms Average: 0.43487 ms
+lower = 100 upper = 100 sourceDistance = 8 => Minimum: 0.1991ms Maximum: 39.8994ms Complete: 3639.5693ms Average: 0.388635 ms
+lower = 100 upper = 100 sourceDistance = 16 => Minimum: 0.2132ms Maximum: 41.8988ms Complete: 3282.3137ms Average: 0.370841 ms
+lower = 100 upper = 100 sourceDistance = 32 => Minimum: 0.2025ms Maximum: 42.405ms Complete: 3446.3745ms Average: 0.344637 ms
+lower = 100 upper = 100 sourceDistance = 64 => Minimum: 0.199ms Maximum: 42.2412ms Complete: 3635.7197ms Average: 0.363571 ms
+lower = 100 upper = 100 sourceDistance = 128 => Minimum: 0.1942ms Maximum: 41.5939ms Complete: 3562.5073ms Average: 0.35625 ms
+lower = 200 upper = 200 sourceDistance = 1 => Minimum: 0.2225ms Maximum: 42.3476ms Complete: 5384.712ms Average: 0.794205 ms
+lower = 200 upper = 200 sourceDistance = 2 => Minimum: 0.2113ms Maximum: 42.0341ms Complete: 4923.144ms Average: 0.619341 ms
+lower = 200 upper = 200 sourceDistance = 4 => Minimum: 0.2253ms Maximum: 46.051ms Complete: 4387.5127ms Average: 0.496943 ms
+lower = 200 upper = 200 sourceDistance = 8 => Minimum: 0.206ms Maximum: 41.8438ms Complete: 4115.748ms Average: 0.425796 ms
+lower = 200 upper = 200 sourceDistance = 16 => Minimum: 0.1968ms Maximum: 42.6738ms Complete: 3496.9985ms Average: 0.37385 ms
+lower = 200 upper = 200 sourceDistance = 32 => Minimum: 0.2022ms Maximum: 39.6797ms Complete: 3700.966ms Average: 0.370096 ms
+lower = 200 upper = 200 sourceDistance = 64 => Minimum: 0.2116ms Maximum: 40.7602ms Complete: 3651.661ms Average: 0.365166 ms
+lower = 200 upper = 200 sourceDistance = 128 => Minimum: 0.202ms Maximum: 41.8807ms Complete: 3541.0059ms Average: 0.3541 ms
+lower = 200 upper = 200 sourceDistance = 256 => Minimum: 0.197ms Maximum: 41.4984ms Complete: 3815.6235ms Average: 0.381562 ms
+lower = 300 upper = 300 sourceDistance = 1 => Minimum: 0.2058ms Maximum: 41.9505ms Complete: 6723.807ms Average: 0.991858 ms
+lower = 300 upper = 300 sourceDistance = 2 => Minimum: 0.2313ms Maximum: 40.1326ms Complete: 5899.9707ms Average: 0.739252 ms
+lower = 300 upper = 300 sourceDistance = 4 => Minimum: 0.1995ms Maximum: 40.4327ms Complete: 4679.337ms Average: 0.52844 ms
+lower = 300 upper = 300 sourceDistance = 8 => Minimum: 0.2117ms Maximum: 40.9169ms Complete: 4231.534ms Average: 0.44627 ms
+lower = 300 upper = 300 sourceDistance = 16 => Minimum: 0.2115ms Maximum: 41.0347ms Complete: 3816.7651ms Average: 0.394905 ms
+lower = 300 upper = 300 sourceDistance = 32 => Minimum: 0.2025ms Maximum: 39.3834ms Complete: 3441.674ms Average: 0.344167 ms
+lower = 300 upper = 300 sourceDistance = 64 => Minimum: 0.2113ms Maximum: 41.8814ms Complete: 3630.4114ms Average: 0.363041 ms
+lower = 300 upper = 300 sourceDistance = 128 => Minimum: 0.225ms Maximum: 40.3016ms Complete: 3607.1272ms Average: 0.360712 ms
+lower = 300 upper = 300 sourceDistance = 256 => Minimum: 0.2397ms Maximum: 40.0427ms Complete: 3980.6099ms Average: 0.39806 ms
+lower = 300 upper = 300 sourceDistance = 512 => Minimum: 0.2126ms Maximum: 40.9033ms Complete: 3880.0903ms Average: 0.388009 ms
+lower = 400 upper = 400 sourceDistance = 1 => Minimum: 0.2071ms Maximum: 39.757ms Complete: 7897.6724ms Average: 1.161251 ms
+lower = 400 upper = 400 sourceDistance = 2 => Minimum: 0.2121ms Maximum: 41.9622ms Complete: 6511.048ms Average: 0.814899 ms
+lower = 400 upper = 400 sourceDistance = 4 => Minimum: 0.204ms Maximum: 41.9775ms Complete: 5447.4404ms Average: 0.612622 ms
+lower = 400 upper = 400 sourceDistance = 8 => Minimum: 0.1966ms Maximum: 40.8125ms Complete: 4223.944ms Average: 0.450169 ms
+lower = 400 upper = 400 sourceDistance = 16 => Minimum: 0.2212ms Maximum: 41.9929ms Complete: 4056.2031ms Average: 0.414617 ms
+lower = 400 upper = 400 sourceDistance = 32 => Minimum: 0.2065ms Maximum: 42.3155ms Complete: 3832.0085ms Average: 0.3832 ms
+lower = 400 upper = 400 sourceDistance = 64 => Minimum: 0.1926ms Maximum: 45.7808ms Complete: 3619.6628ms Average: 0.361966 ms
+lower = 400 upper = 400 sourceDistance = 128 => Minimum: 0.1953ms Maximum: 40.5019ms Complete: 3350.912ms Average: 0.335091 ms
+lower = 400 upper = 400 sourceDistance = 256 => Minimum: 0.2205ms Maximum: 41.7433ms Complete: 3676.4897ms Average: 0.367648 ms
+lower = 400 upper = 400 sourceDistance = 512 => Minimum: 0.1939ms Maximum: 39.9635ms Complete: 3560.4346ms Average: 0.356043 ms
+lower = 500 upper = 500 sourceDistance = 1 => Minimum: 0.2167ms Maximum: 39.7776ms Complete: 9377.096ms Average: 1.374134 ms
+lower = 500 upper = 500 sourceDistance = 2 => Minimum: 0.2125ms Maximum: 41.5137ms Complete: 7598.0483ms Average: 0.940818 ms
+lower = 500 upper = 500 sourceDistance = 4 => Minimum: 0.2228ms Maximum: 42.6417ms Complete: 6460.65ms Average: 0.720974 ms
+lower = 500 upper = 500 sourceDistance = 8 => Minimum: 0.1961ms Maximum: 39.7023ms Complete: 4656.289ms Average: 0.488849 ms
+lower = 500 upper = 500 sourceDistance = 16 => Minimum: 0.213ms Maximum: 40.1035ms Complete: 4211.8945ms Average: 0.427646 ms
+lower = 500 upper = 500 sourceDistance = 32 => Minimum: 0.2115ms Maximum: 41.9339ms Complete: 3978.0132ms Average: 0.397801 ms
+lower = 500 upper = 500 sourceDistance = 64 => Minimum: 0.2021ms Maximum: 41.1115ms Complete: 3706.8628ms Average: 0.370686 ms
+lower = 500 upper = 500 sourceDistance = 128 => Minimum: 0.2026ms Maximum: 41.566ms Complete: 3718.9934ms Average: 0.371899 ms
+lower = 500 upper = 500 sourceDistance = 256 => Minimum: 0.2155ms Maximum: 42.2377ms Complete: 3705.9731ms Average: 0.370597 ms
+lower = 500 upper = 500 sourceDistance = 512 => Minimum: 0.2153ms Maximum: 39.9437ms Complete: 3824.6475ms Average: 0.382464 ms
+lower = 600 upper = 600 sourceDistance = 1 => Minimum: 0.2163ms Maximum: 39.0727ms Complete: 10371.258ms Average: 1.502209 ms
+lower = 600 upper = 600 sourceDistance = 2 => Minimum: 0.2133ms Maximum: 39.9363ms Complete: 9056.656ms Average: 1.118934 ms
+lower = 600 upper = 600 sourceDistance = 4 => Minimum: 0.2027ms Maximum: 41.7647ms Complete: 6479.2544ms Average: 0.720317 ms
+lower = 600 upper = 600 sourceDistance = 8 => Minimum: 0.2033ms Maximum: 48.1023ms Complete: 4952.8765ms Average: 0.524391 ms
+lower = 600 upper = 600 sourceDistance = 16 => Minimum: 0.2027ms Maximum: 41.9432ms Complete: 4322.727ms Average: 0.435319 ms
+lower = 600 upper = 600 sourceDistance = 32 => Minimum: 0.205ms Maximum: 42.3138ms Complete: 3924.853ms Average: 0.392485 ms
+lower = 600 upper = 600 sourceDistance = 64 => Minimum: 0.2023ms Maximum: 42.7238ms Complete: 3748.641ms Average: 0.374864 ms
+lower = 600 upper = 600 sourceDistance = 128 => Minimum: 0.2125ms Maximum: 41.2864ms Complete: 3933.2925ms Average: 0.393329 ms
+lower = 600 upper = 600 sourceDistance = 256 => Minimum: 0.2201ms Maximum: 39.9432ms Complete: 3569.988ms Average: 0.356998 ms
+lower = 600 upper = 600 sourceDistance = 512 => Minimum: 0.1965ms Maximum: 42.1052ms Complete: 3442.4502ms Average: 0.344245 ms
+lower = 600 upper = 600 sourceDistance = 1024 => Minimum: 0.2229ms Maximum: 41.6841ms Complete: 3872.7908ms Average: 0.387279 ms
+lower = 700 upper = 700 sourceDistance = 1 => Minimum: 0.2239ms Maximum: 41.062ms Complete: 12221.991ms Average: 1.763889 ms
+lower = 700 upper = 700 sourceDistance = 2 => Minimum: 0.2212ms Maximum: 39.8962ms Complete: 10185.355ms Average: 1.249736 ms
+lower = 700 upper = 700 sourceDistance = 4 => Minimum: 0.2137ms Maximum: 41.5135ms Complete: 7664.1396ms Average: 0.865027 ms
+lower = 700 upper = 700 sourceDistance = 8 => Minimum: 0.1931ms Maximum: 42.7821ms Complete: 5349.466ms Average: 0.572074 ms
+lower = 700 upper = 700 sourceDistance = 16 => Minimum: 0.193ms Maximum: 41.3527ms Complete: 4370.1724ms Average: 0.440319 ms
+lower = 700 upper = 700 sourceDistance = 32 => Minimum: 0.2116ms Maximum: 42.0612ms Complete: 4104.749ms Average: 0.410474 ms
+lower = 700 upper = 700 sourceDistance = 64 => Minimum: 0.1964ms Maximum: 43.4151ms Complete: 3704.259ms Average: 0.370425 ms
+lower = 700 upper = 700 sourceDistance = 128 => Minimum: 0.1927ms Maximum: 42.198ms Complete: 3376.346ms Average: 0.337634 ms
+lower = 700 upper = 700 sourceDistance = 256 => Minimum: 0.2053ms Maximum: 42.8426ms Complete: 3588.357ms Average: 0.358835 ms
+lower = 700 upper = 700 sourceDistance = 512 => Minimum: 0.1968ms Maximum: 43.4048ms Complete: 3620.4382ms Average: 0.362043 ms
+lower = 700 upper = 700 sourceDistance = 1024 => Minimum: 0.1925ms Maximum: 41.8495ms Complete: 3638.691ms Average: 0.363869 ms
+lower = 800 upper = 800 sourceDistance = 1 => Minimum: 0.2077ms Maximum: 42.2074ms Complete: 13226.009ms Average: 1.876029 ms
+lower = 800 upper = 800 sourceDistance = 2 => Minimum: 0.2248ms Maximum: 42.0524ms Complete: 10634.861ms Average: 1.294408 ms
+lower = 800 upper = 800 sourceDistance = 4 => Minimum: 0.233ms Maximum: 41.9113ms Complete: 9098.485ms Average: 1.026801 ms
+lower = 800 upper = 800 sourceDistance = 8 => Minimum: 0.1967ms Maximum: 41.7866ms Complete: 5703.9863ms Average: 0.598843 ms
+lower = 800 upper = 800 sourceDistance = 16 => Minimum: 0.2246ms Maximum: 42.1229ms Complete: 4764.073ms Average: 0.478272 ms
+lower = 800 upper = 800 sourceDistance = 32 => Minimum: 0.2151ms Maximum: 39.737ms Complete: 4234.949ms Average: 0.423494 ms
+lower = 800 upper = 800 sourceDistance = 64 => Minimum: 0.1929ms Maximum: 43.866ms Complete: 3697.137ms Average: 0.369713 ms
+lower = 800 upper = 800 sourceDistance = 128 => Minimum: 0.2057ms Maximum: 40.048ms Complete: 3595.3994ms Average: 0.359539 ms
+lower = 800 upper = 800 sourceDistance = 256 => Minimum: 0.2122ms Maximum: 39.8228ms Complete: 3663.0906ms Average: 0.366309 ms
+lower = 800 upper = 800 sourceDistance = 512 => Minimum: 0.2022ms Maximum: 41.582ms Complete: 3566.888ms Average: 0.356688 ms
+lower = 800 upper = 800 sourceDistance = 1024 => Minimum: 0.2072ms Maximum: 41.5285ms Complete: 3703.6543ms Average: 0.370365 ms
+lower = 900 upper = 900 sourceDistance = 1 => Minimum: 0.2244ms Maximum: 43.2257ms Complete: 15841.586ms Average: 2.237196 ms
+lower = 900 upper = 900 sourceDistance = 2 => Minimum: 0.213ms Maximum: 39.74ms Complete: 11888.922ms Average: 1.463972 ms
+lower = 900 upper = 900 sourceDistance = 4 => Minimum: 0.2322ms Maximum: 40.806ms Complete: 9473.991ms Average: 1.059849 ms
+lower = 900 upper = 900 sourceDistance = 8 => Minimum: 0.2316ms Maximum: 41.9734ms Complete: 6610.222ms Average: 0.692822 ms
+lower = 900 upper = 900 sourceDistance = 16 => Minimum: 0.2034ms Maximum: 41.6961ms Complete: 4989.53ms Average: 0.503433 ms
+lower = 900 upper = 900 sourceDistance = 32 => Minimum: 0.2063ms Maximum: 39.6324ms Complete: 4080.1228ms Average: 0.408012 ms
+lower = 900 upper = 900 sourceDistance = 64 => Minimum: 0.2179ms Maximum: 41.5171ms Complete: 3860.7937ms Average: 0.395978 ms
+lower = 900 upper = 900 sourceDistance = 128 => Minimum: 0.223ms Maximum: 42.3816ms Complete: 3515.9575ms Average: 0.403761 ms
+lower = 900 upper = 900 sourceDistance = 256 => Minimum: 0.2122ms Maximum: 42.429ms Complete: 3501.3562ms Average: 0.350135 ms
+lower = 900 upper = 900 sourceDistance = 512 => Minimum: 0.1935ms Maximum: 39.9076ms Complete: 3466.0693ms Average: 0.346606 ms
+lower = 900 upper = 900 sourceDistance = 1024 => Minimum: 0.2312ms Maximum: 41.3257ms Complete: 3889.067ms Average: 0.388906 ms
+lower = 1000 upper = 1000 sourceDistance = 1 => Minimum: 0.2326ms Maximum: 39.623ms Complete: 18329.643ms Average: 2.583095 ms
+lower = 1000 upper = 1000 sourceDistance = 2 => Minimum: 0.2142ms Maximum: 39.939ms Complete: 12746.693ms Average: 1.558085 ms
+lower = 1000 upper = 1000 sourceDistance = 4 => Minimum: 0.2067ms Maximum: 39.5611ms Complete: 9022.544ms Average: 1.009345 ms
+lower = 1000 upper = 1000 sourceDistance = 8 => Minimum: 0.2032ms Maximum: 39.0685ms Complete: 6449.8022ms Average: 0.68593 ms
+lower = 1000 upper = 1000 sourceDistance = 16 => Minimum: 0.2151ms Maximum: 40.2297ms Complete: 5194.6846ms Average: 0.526577 ms
+lower = 1000 upper = 1000 sourceDistance = 32 => Minimum: 0.2147ms Maximum: 43.2168ms Complete: 4472.2974ms Average: 0.447811 ms
+lower = 1000 upper = 1000 sourceDistance = 64 => Minimum: 0.2029ms Maximum: 41.575ms Complete: 3696.15ms Average: 0.369614 ms
+lower = 1000 upper = 1000 sourceDistance = 128 => Minimum: 0.2266ms Maximum: 39.6793ms Complete: 3778.0627ms Average: 0.377806 ms
+lower = 1000 upper = 1000 sourceDistance = 256 => Minimum: 0.2028ms Maximum: 42.7512ms Complete: 3724.1655ms Average: 0.372416 ms
+lower = 1000 upper = 1000 sourceDistance = 512 => Minimum: 0.2034ms Maximum: 39.4706ms Complete: 3597.74ms Average: 0.359774 ms
+lower = 1000 upper = 1000 sourceDistance = 1024 => Minimum: 0.2119ms Maximum: 39.8832ms Complete: 3792.9158ms Average: 0.379291 ms

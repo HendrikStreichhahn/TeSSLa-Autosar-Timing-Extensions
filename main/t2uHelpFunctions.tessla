@@ -156,7 +156,7 @@ def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
 	static if (List_size(list) == 0) then
 		list
 	else
-		if List_head(list) < A then
+		static if List_head(list) < A then
 			removeItemsSmallerThanAFromListFront(List_tail(list), A)
 		else
 			list

@@ -1,103 +1,103 @@
-average: Minimum: 0.016135ms Maximum: 32.878822ms Average: 1.135751 ms
-minimum: Minimum: 0.014ms Maximum: 30.5545ms Average: 0.95935 ms
-maximum: Minimum: 0.0196ms Maximum: 40.0919ms Average: 1.37789 ms
-lower = 500 upper = 600 jitter = 1 => Minimum: 0.0162ms Maximum: 32.1085ms Average: 1.048822 ms
-lower = 500 upper = 600 jitter = 11 => Minimum: 0.0165ms Maximum: 33.109ms Average: 1.066486 ms
-lower = 500 upper = 600 jitter = 21 => Minimum: 0.016ms Maximum: 31.4554ms Average: 1.074692 ms
-lower = 500 upper = 600 jitter = 31 => Minimum: 0.0194ms Maximum: 32.4847ms Average: 1.176011 ms
-lower = 500 upper = 700 jitter = 1 => Minimum: 0.0168ms Maximum: 32.9279ms Average: 1.149182 ms
-lower = 500 upper = 700 jitter = 11 => Minimum: 0.0155ms Maximum: 32.8227ms Average: 1.104683 ms
-lower = 500 upper = 700 jitter = 21 => Minimum: 0.0163ms Maximum: 31.3655ms Average: 1.123797 ms
-lower = 500 upper = 700 jitter = 31 => Minimum: 0.0172ms Maximum: 38.9172ms Average: 1.199127 ms
-lower = 500 upper = 800 jitter = 1 => Minimum: 0.0192ms Maximum: 31.96ms Average: 1.120131 ms
-lower = 500 upper = 800 jitter = 11 => Minimum: 0.0179ms Maximum: 32.4289ms Average: 1.12111 ms
-lower = 500 upper = 800 jitter = 21 => Minimum: 0.0172ms Maximum: 31.0088ms Average: 1.183841 ms
-lower = 500 upper = 800 jitter = 31 => Minimum: 0.0149ms Maximum: 33.522ms Average: 1.083742 ms
-lower = 500 upper = 900 jitter = 1 => Minimum: 0.0146ms Maximum: 32.9936ms Average: 1.06522 ms
-lower = 500 upper = 900 jitter = 11 => Minimum: 0.0189ms Maximum: 33.0214ms Average: 1.248022 ms
-lower = 500 upper = 900 jitter = 21 => Minimum: 0.0177ms Maximum: 30.9974ms Average: 1.187558 ms
-lower = 500 upper = 900 jitter = 31 => Minimum: 0.0142ms Maximum: 33.4956ms Average: 1.16562 ms
-lower = 500 upper = 1000 jitter = 1 => Minimum: 0.0152ms Maximum: 32.7471ms Average: 1.076718 ms
-lower = 500 upper = 1000 jitter = 11 => Minimum: 0.0153ms Maximum: 33.2707ms Average: 1.128353 ms
-lower = 500 upper = 1000 jitter = 21 => Minimum: 0.0164ms Maximum: 32.7233ms Average: 1.208985 ms
-lower = 500 upper = 1000 jitter = 31 => Minimum: 0.0169ms Maximum: 30.7944ms Average: 1.167208 ms
-lower = 600 upper = 700 jitter = 1 => Minimum: 0.0156ms Maximum: 30.818ms Average: 0.991106 ms
-lower = 600 upper = 700 jitter = 11 => Minimum: 0.017ms Maximum: 32.6403ms Average: 1.094532 ms
-lower = 600 upper = 700 jitter = 21 => Minimum: 0.0166ms Maximum: 32.2414ms Average: 1.009463 ms
-lower = 600 upper = 700 jitter = 31 => Minimum: 0.0149ms Maximum: 32.7469ms Average: 1.123363 ms
-lower = 600 upper = 800 jitter = 1 => Minimum: 0.015ms Maximum: 33.1127ms Average: 1.12528 ms
-lower = 600 upper = 800 jitter = 11 => Minimum: 0.0154ms Maximum: 32.8786ms Average: 1.192616 ms
-lower = 600 upper = 800 jitter = 21 => Minimum: 0.0165ms Maximum: 32.8139ms Average: 1.148393 ms
-lower = 600 upper = 800 jitter = 31 => Minimum: 0.0148ms Maximum: 32.5496ms Average: 1.37789 ms
-lower = 600 upper = 900 jitter = 1 => Minimum: 0.0158ms Maximum: 33.9099ms Average: 1.046192 ms
-lower = 600 upper = 900 jitter = 11 => Minimum: 0.015ms Maximum: 31.0469ms Average: 1.214531 ms
-lower = 600 upper = 900 jitter = 21 => Minimum: 0.0165ms Maximum: 34.8807ms Average: 1.08845 ms
-lower = 600 upper = 900 jitter = 31 => Minimum: 0.0189ms Maximum: 31.9955ms Average: 1.164806 ms
-lower = 600 upper = 1000 jitter = 1 => Minimum: 0.0159ms Maximum: 32.8574ms Average: 1.02021 ms
-lower = 600 upper = 1000 jitter = 11 => Minimum: 0.015ms Maximum: 31.5849ms Average: 1.152502 ms
-lower = 600 upper = 1000 jitter = 21 => Minimum: 0.0148ms Maximum: 31.7534ms Average: 1.042271 ms
-lower = 600 upper = 1000 jitter = 31 => Minimum: 0.0153ms Maximum: 32.5527ms Average: 1.278987 ms
-lower = 600 upper = 1100 jitter = 1 => Minimum: 0.0196ms Maximum: 31.454ms Average: 1.144466 ms
-lower = 600 upper = 1100 jitter = 11 => Minimum: 0.0156ms Maximum: 33.1662ms Average: 1.065213 ms
-lower = 600 upper = 1100 jitter = 21 => Minimum: 0.0156ms Maximum: 40.0919ms Average: 1.155886 ms
-lower = 600 upper = 1100 jitter = 31 => Minimum: 0.0156ms Maximum: 33.4324ms Average: 1.206785 ms
-lower = 700 upper = 800 jitter = 1 => Minimum: 0.0157ms Maximum: 33.0275ms Average: 1.078709 ms
-lower = 700 upper = 800 jitter = 11 => Minimum: 0.0148ms Maximum: 32.4562ms Average: 1.143065 ms
-lower = 700 upper = 800 jitter = 21 => Minimum: 0.0149ms Maximum: 33.311ms Average: 1.110832 ms
-lower = 700 upper = 800 jitter = 31 => Minimum: 0.0159ms Maximum: 30.9872ms Average: 1.114116 ms
-lower = 700 upper = 900 jitter = 1 => Minimum: 0.0184ms Maximum: 32.7106ms Average: 1.226744 ms
-lower = 700 upper = 900 jitter = 11 => Minimum: 0.0154ms Maximum: 32.2912ms Average: 1.170412 ms
-lower = 700 upper = 900 jitter = 21 => Minimum: 0.0158ms Maximum: 32.7777ms Average: 1.288268 ms
-lower = 700 upper = 900 jitter = 31 => Minimum: 0.0147ms Maximum: 32.9179ms Average: 1.160126 ms
-lower = 700 upper = 1000 jitter = 1 => Minimum: 0.0148ms Maximum: 32.7029ms Average: 1.060491 ms
-lower = 700 upper = 1000 jitter = 11 => Minimum: 0.014ms Maximum: 31.3043ms Average: 1.065813 ms
-lower = 700 upper = 1000 jitter = 21 => Minimum: 0.0163ms Maximum: 32.5858ms Average: 1.195741 ms
-lower = 700 upper = 1000 jitter = 31 => Minimum: 0.0155ms Maximum: 32.7149ms Average: 1.055725 ms
-lower = 700 upper = 1100 jitter = 1 => Minimum: 0.0148ms Maximum: 37.3082ms Average: 1.036941 ms
-lower = 700 upper = 1100 jitter = 11 => Minimum: 0.016ms Maximum: 30.5545ms Average: 1.151015 ms
-lower = 700 upper = 1100 jitter = 21 => Minimum: 0.0163ms Maximum: 33.2377ms Average: 1.219036 ms
-lower = 700 upper = 1100 jitter = 31 => Minimum: 0.0153ms Maximum: 32.7216ms Average: 1.18393 ms
-lower = 700 upper = 1200 jitter = 1 => Minimum: 0.0145ms Maximum: 31.3327ms Average: 1.224552 ms
-lower = 700 upper = 1200 jitter = 11 => Minimum: 0.0155ms Maximum: 38.5834ms Average: 1.134979 ms
-lower = 700 upper = 1200 jitter = 21 => Minimum: 0.0194ms Maximum: 32.8704ms Average: 1.137031 ms
-lower = 700 upper = 1200 jitter = 31 => Minimum: 0.0163ms Maximum: 31.1619ms Average: 1.208914 ms
-lower = 800 upper = 900 jitter = 1 => Minimum: 0.0175ms Maximum: 32.8639ms Average: 1.189504 ms
-lower = 800 upper = 900 jitter = 11 => Minimum: 0.0175ms Maximum: 33.5274ms Average: 1.348529 ms
-lower = 800 upper = 900 jitter = 21 => Minimum: 0.0183ms Maximum: 32.7514ms Average: 1.192307 ms
-lower = 800 upper = 900 jitter = 31 => Minimum: 0.0195ms Maximum: 30.6713ms Average: 1.237003 ms
-lower = 800 upper = 1000 jitter = 1 => Minimum: 0.0159ms Maximum: 32.1731ms Average: 0.95935 ms
-lower = 800 upper = 1000 jitter = 11 => Minimum: 0.0154ms Maximum: 31.4977ms Average: 0.987999 ms
-lower = 800 upper = 1000 jitter = 21 => Minimum: 0.0178ms Maximum: 33.1931ms Average: 1.198712 ms
-lower = 800 upper = 1000 jitter = 31 => Minimum: 0.0155ms Maximum: 36.2238ms Average: 1.049715 ms
-lower = 800 upper = 1100 jitter = 1 => Minimum: 0.0153ms Maximum: 31.9119ms Average: 1.171765 ms
-lower = 800 upper = 1100 jitter = 11 => Minimum: 0.0156ms Maximum: 31.034ms Average: 1.068369 ms
-lower = 800 upper = 1100 jitter = 21 => Minimum: 0.0151ms Maximum: 34.2009ms Average: 1.186817 ms
-lower = 800 upper = 1100 jitter = 31 => Minimum: 0.018ms Maximum: 33.3906ms Average: 1.147722 ms
-lower = 800 upper = 1200 jitter = 1 => Minimum: 0.0152ms Maximum: 32.8734ms Average: 1.1285 ms
-lower = 800 upper = 1200 jitter = 11 => Minimum: 0.0157ms Maximum: 38.2814ms Average: 1.073239 ms
-lower = 800 upper = 1200 jitter = 21 => Minimum: 0.0159ms Maximum: 33.0667ms Average: 1.049517 ms
-lower = 800 upper = 1200 jitter = 31 => Minimum: 0.0169ms Maximum: 31.5502ms Average: 1.069177 ms
-lower = 800 upper = 1300 jitter = 1 => Minimum: 0.0149ms Maximum: 32.7221ms Average: 1.159152 ms
-lower = 800 upper = 1300 jitter = 11 => Minimum: 0.0183ms Maximum: 30.5744ms Average: 1.150248 ms
-lower = 800 upper = 1300 jitter = 21 => Minimum: 0.0158ms Maximum: 33.2303ms Average: 1.141001 ms
-lower = 800 upper = 1300 jitter = 31 => Minimum: 0.0162ms Maximum: 33.7832ms Average: 1.173281 ms
-lower = 900 upper = 1000 jitter = 1 => Minimum: 0.0155ms Maximum: 34.511ms Average: 1.096046 ms
-lower = 900 upper = 1000 jitter = 11 => Minimum: 0.0158ms Maximum: 33.8005ms Average: 1.127508 ms
-lower = 900 upper = 1000 jitter = 21 => Minimum: 0.0175ms Maximum: 32.6553ms Average: 1.105326 ms
-lower = 900 upper = 1000 jitter = 31 => Minimum: 0.0149ms Maximum: 32.6149ms Average: 1.123899 ms
-lower = 900 upper = 1100 jitter = 1 => Minimum: 0.0186ms Maximum: 30.9558ms Average: 1.197582 ms
-lower = 900 upper = 1100 jitter = 11 => Minimum: 0.015ms Maximum: 31.5497ms Average: 1.099839 ms
-lower = 900 upper = 1100 jitter = 21 => Minimum: 0.0147ms Maximum: 33.2589ms Average: 1.043005 ms
-lower = 900 upper = 1100 jitter = 31 => Minimum: 0.016ms Maximum: 33.1428ms Average: 1.125412 ms
-lower = 900 upper = 1200 jitter = 1 => Minimum: 0.0162ms Maximum: 33.3656ms Average: 1.139857 ms
-lower = 900 upper = 1200 jitter = 11 => Minimum: 0.017ms Maximum: 33.0055ms Average: 1.076467 ms
-lower = 900 upper = 1200 jitter = 21 => Minimum: 0.0153ms Maximum: 31.5963ms Average: 1.189379 ms
-lower = 900 upper = 1200 jitter = 31 => Minimum: 0.0142ms Maximum: 33.1856ms Average: 1.146034 ms
-lower = 900 upper = 1300 jitter = 1 => Minimum: 0.0161ms Maximum: 33.5521ms Average: 1.154221 ms
-lower = 900 upper = 1300 jitter = 11 => Minimum: 0.0156ms Maximum: 30.8524ms Average: 1.128699 ms
-lower = 900 upper = 1300 jitter = 21 => Minimum: 0.016ms Maximum: 31.2306ms Average: 1.144803 ms
-lower = 900 upper = 1300 jitter = 31 => Minimum: 0.0167ms Maximum: 31.3039ms Average: 1.071642 ms
-lower = 900 upper = 1400 jitter = 1 => Minimum: 0.016ms Maximum: 33.4856ms Average: 1.096889 ms
-lower = 900 upper = 1400 jitter = 11 => Minimum: 0.0152ms Maximum: 32.5258ms Average: 1.181153 ms
-lower = 900 upper = 1400 jitter = 21 => Minimum: 0.0158ms Maximum: 38.9761ms Average: 1.21423 ms
-lower = 900 upper = 1400 jitter = 31 => Minimum: 0.0151ms Maximum: 32.5543ms Average: 1.122529 ms
+average: Minimum: 0.014873ms Maximum: 3970.7395ms Complete: 32.351498ms Average: 0.397073 ms
+minimum: Minimum: 0.0137ms Maximum: 29.6649ms Complete: 2147.4836ms Average: 0.355639 ms
+maximum: Minimum: 0.0171ms Maximum: 56.2645ms Complete: 4451.769ms Average: 0.445176 ms
+lower = 500 upper = 600 jitter = 1 => Minimum: 0.0148ms Maximum: 30.8904ms Complete: 3942.3538ms Average: 0.394235 ms
+lower = 500 upper = 600 jitter = 11 => Minimum: 0.0171ms Maximum: 32.068ms Complete: 3735.0388ms Average: 0.373503 ms
+lower = 500 upper = 600 jitter = 21 => Minimum: 0.0148ms Maximum: 33.3211ms Complete: 3959.4526ms Average: 0.395945 ms
+lower = 500 upper = 600 jitter = 31 => Minimum: 0.0151ms Maximum: 30.917ms Complete: 4388.4395ms Average: 0.438843 ms
+lower = 500 upper = 700 jitter = 1 => Minimum: 0.0155ms Maximum: 32.3898ms Complete: 3986.292ms Average: 0.398629 ms
+lower = 500 upper = 700 jitter = 11 => Minimum: 0.0144ms Maximum: 32.9088ms Complete: 4166.0654ms Average: 0.416606 ms
+lower = 500 upper = 700 jitter = 21 => Minimum: 0.0145ms Maximum: 34.4275ms Complete: 3795.8997ms Average: 0.379589 ms
+lower = 500 upper = 700 jitter = 31 => Minimum: 0.0137ms Maximum: 30.3745ms Complete: 4247.6084ms Average: 0.42476 ms
+lower = 500 upper = 800 jitter = 1 => Minimum: 0.015ms Maximum: 30.7852ms Complete: 4096.794ms Average: 0.409679 ms
+lower = 500 upper = 800 jitter = 11 => Minimum: 0.0155ms Maximum: 32.3373ms Complete: 3939.398ms Average: 0.393939 ms
+lower = 500 upper = 800 jitter = 21 => Minimum: 0.0152ms Maximum: 30.1833ms Complete: 3719.3489ms Average: 0.371934 ms
+lower = 500 upper = 800 jitter = 31 => Minimum: 0.0156ms Maximum: 33.0781ms Complete: 4158.913ms Average: 0.415891 ms
+lower = 500 upper = 900 jitter = 1 => Minimum: 0.0149ms Maximum: 32.8574ms Complete: 4275.1304ms Average: 0.427513 ms
+lower = 500 upper = 900 jitter = 11 => Minimum: 0.0155ms Maximum: 30.6233ms Complete: 3881.174ms Average: 0.388117 ms
+lower = 500 upper = 900 jitter = 21 => Minimum: 0.0147ms Maximum: 32.9825ms Complete: 4187.6567ms Average: 0.418765 ms
+lower = 500 upper = 900 jitter = 31 => Minimum: 0.0149ms Maximum: 29.6649ms Complete: 3793.5457ms Average: 0.379354 ms
+lower = 500 upper = 1000 jitter = 1 => Minimum: 0.0138ms Maximum: 32.966ms Complete: 4091.4133ms Average: 0.409141 ms
+lower = 500 upper = 1000 jitter = 11 => Minimum: 0.0148ms Maximum: 31.0217ms Complete: 3932.9475ms Average: 0.393294 ms
+lower = 500 upper = 1000 jitter = 21 => Minimum: 0.0145ms Maximum: 30.0861ms Complete: 3890.8455ms Average: 0.389084 ms
+lower = 500 upper = 1000 jitter = 31 => Minimum: 0.016ms Maximum: 30.5954ms Complete: 4194.649ms Average: 0.419464 ms
+lower = 600 upper = 700 jitter = 1 => Minimum: 0.0153ms Maximum: 31.034ms Complete: 4159.6567ms Average: 0.415965 ms
+lower = 600 upper = 700 jitter = 11 => Minimum: 0.0151ms Maximum: 32.4241ms Complete: 4015.9304ms Average: 0.401593 ms
+lower = 600 upper = 700 jitter = 21 => Minimum: 0.0138ms Maximum: 31.3017ms Complete: 4066.4175ms Average: 0.406641 ms
+lower = 600 upper = 700 jitter = 31 => Minimum: 0.0144ms Maximum: 30.842ms Complete: 3917.0234ms Average: 0.391702 ms
+lower = 600 upper = 800 jitter = 1 => Minimum: 0.0151ms Maximum: 32.4116ms Complete: 3609.8674ms Average: 0.360986 ms
+lower = 600 upper = 800 jitter = 11 => Minimum: 0.0146ms Maximum: 32.5478ms Complete: 3888.508ms Average: 0.38885 ms
+lower = 600 upper = 800 jitter = 21 => Minimum: 0.014ms Maximum: 30.95ms Complete: 4110.808ms Average: 0.41108 ms
+lower = 600 upper = 800 jitter = 31 => Minimum: 0.0153ms Maximum: 33.3033ms Complete: 4148.1953ms Average: 0.414819 ms
+lower = 600 upper = 900 jitter = 1 => Minimum: 0.014ms Maximum: 30.9788ms Complete: 3867.954ms Average: 0.386795 ms
+lower = 600 upper = 900 jitter = 11 => Minimum: 0.015ms Maximum: 32.7656ms Complete: 3896.6492ms Average: 0.389664 ms
+lower = 600 upper = 900 jitter = 21 => Minimum: 0.0142ms Maximum: 30.5409ms Complete: 3822.4983ms Average: 0.382249 ms
+lower = 600 upper = 900 jitter = 31 => Minimum: 0.0142ms Maximum: 31.9984ms Complete: 3921.667ms Average: 0.392166 ms
+lower = 600 upper = 1000 jitter = 1 => Minimum: 0.0149ms Maximum: 31.9497ms Complete: 4033.8462ms Average: 0.403384 ms
+lower = 600 upper = 1000 jitter = 11 => Minimum: 0.0146ms Maximum: 31.367ms Complete: 3932.7937ms Average: 0.393279 ms
+lower = 600 upper = 1000 jitter = 21 => Minimum: 0.0144ms Maximum: 30.6534ms Complete: 3707.1628ms Average: 0.370716 ms
+lower = 600 upper = 1000 jitter = 31 => Minimum: 0.0151ms Maximum: 30.6874ms Complete: 3677.6062ms Average: 0.36776 ms
+lower = 600 upper = 1100 jitter = 1 => Minimum: 0.0154ms Maximum: 32.1612ms Complete: 3818.0393ms Average: 0.381803 ms
+lower = 600 upper = 1100 jitter = 11 => Minimum: 0.0146ms Maximum: 30.6289ms Complete: 3726.1062ms Average: 0.37261 ms
+lower = 600 upper = 1100 jitter = 21 => Minimum: 0.0147ms Maximum: 32.585ms Complete: 4072.4626ms Average: 0.407246 ms
+lower = 600 upper = 1100 jitter = 31 => Minimum: 0.0143ms Maximum: 32.3952ms Complete: 3929.0874ms Average: 0.392908 ms
+lower = 700 upper = 800 jitter = 1 => Minimum: 0.0155ms Maximum: 33.3241ms Complete: 4068.666ms Average: 0.406866 ms
+lower = 700 upper = 800 jitter = 11 => Minimum: 0.0145ms Maximum: 30.3876ms Complete: 3612.0059ms Average: 0.3612 ms
+lower = 700 upper = 800 jitter = 21 => Minimum: 0.0138ms Maximum: 31.2362ms Complete: 3867.0464ms Average: 0.386704 ms
+lower = 700 upper = 800 jitter = 31 => Minimum: 0.0149ms Maximum: 33.9684ms Complete: 4250.216ms Average: 0.425021 ms
+lower = 700 upper = 900 jitter = 1 => Minimum: 0.0148ms Maximum: 32.763ms Complete: 3627.4194ms Average: 0.362741 ms
+lower = 700 upper = 900 jitter = 11 => Minimum: 0.0149ms Maximum: 32.6158ms Complete: 3684.0093ms Average: 0.3684 ms
+lower = 700 upper = 900 jitter = 21 => Minimum: 0.0147ms Maximum: 37.9766ms Complete: 4038.6357ms Average: 0.403863 ms
+lower = 700 upper = 900 jitter = 31 => Minimum: 0.0153ms Maximum: 32.6889ms Complete: 4160.567ms Average: 0.416056 ms
+lower = 700 upper = 1000 jitter = 1 => Minimum: 0.0151ms Maximum: 30.4758ms Complete: 3556.3938ms Average: 0.355639 ms
+lower = 700 upper = 1000 jitter = 11 => Minimum: 0.0152ms Maximum: 30.4507ms Complete: 4019.9036ms Average: 0.40199 ms
+lower = 700 upper = 1000 jitter = 21 => Minimum: 0.0146ms Maximum: 30.7424ms Complete: 3838.6604ms Average: 0.383866 ms
+lower = 700 upper = 1000 jitter = 31 => Minimum: 0.0143ms Maximum: 32.699ms Complete: 3754.2507ms Average: 0.375425 ms
+lower = 700 upper = 1100 jitter = 1 => Minimum: 0.0157ms Maximum: 30.6113ms Complete: 3868.4492ms Average: 0.386844 ms
+lower = 700 upper = 1100 jitter = 11 => Minimum: 0.0162ms Maximum: 32.5785ms Complete: 3697.4714ms Average: 0.369747 ms
+lower = 700 upper = 1100 jitter = 21 => Minimum: 0.0145ms Maximum: 33.2409ms Complete: 3859.5608ms Average: 0.385956 ms
+lower = 700 upper = 1100 jitter = 31 => Minimum: 0.0147ms Maximum: 31.2248ms Complete: 4153.291ms Average: 0.415329 ms
+lower = 700 upper = 1200 jitter = 1 => Minimum: 0.0154ms Maximum: 30.7892ms Complete: 3938.4692ms Average: 0.393846 ms
+lower = 700 upper = 1200 jitter = 11 => Minimum: 0.0146ms Maximum: 31.0723ms Complete: 3959.3308ms Average: 0.395933 ms
+lower = 700 upper = 1200 jitter = 21 => Minimum: 0.0143ms Maximum: 33.189ms Complete: 3874.4202ms Average: 0.387442 ms
+lower = 700 upper = 1200 jitter = 31 => Minimum: 0.0148ms Maximum: 30.7642ms Complete: 3788.1572ms Average: 0.378815 ms
+lower = 800 upper = 900 jitter = 1 => Minimum: 0.0153ms Maximum: 32.4622ms Complete: 4145.7017ms Average: 0.41457 ms
+lower = 800 upper = 900 jitter = 11 => Minimum: 0.0155ms Maximum: 33.0327ms Complete: 3847.5012ms Average: 0.38475 ms
+lower = 800 upper = 900 jitter = 21 => Minimum: 0.0154ms Maximum: 33.0549ms Complete: 4032.0269ms Average: 0.403202 ms
+lower = 800 upper = 900 jitter = 31 => Minimum: 0.015ms Maximum: 32.7826ms Complete: 3721.2192ms Average: 0.372121 ms
+lower = 800 upper = 1000 jitter = 1 => Minimum: 0.015ms Maximum: 56.2645ms Complete: 3946.0146ms Average: 0.394601 ms
+lower = 800 upper = 1000 jitter = 11 => Minimum: 0.0149ms Maximum: 32.2007ms Complete: 4212.059ms Average: 0.421205 ms
+lower = 800 upper = 1000 jitter = 21 => Minimum: 0.0156ms Maximum: 31.0155ms Complete: 4380.611ms Average: 0.438061 ms
+lower = 800 upper = 1000 jitter = 31 => Minimum: 0.0151ms Maximum: 30.3847ms Complete: 4375.857ms Average: 0.437585 ms
+lower = 800 upper = 1100 jitter = 1 => Minimum: 0.0148ms Maximum: 33.2588ms Complete: 3910.0293ms Average: 0.391002 ms
+lower = 800 upper = 1100 jitter = 11 => Minimum: 0.0151ms Maximum: 32.829ms Complete: 4025.9504ms Average: 0.402595 ms
+lower = 800 upper = 1100 jitter = 21 => Minimum: 0.0147ms Maximum: 38.9395ms Complete: 4006.8857ms Average: 0.400688 ms
+lower = 800 upper = 1100 jitter = 31 => Minimum: 0.0146ms Maximum: 45.3767ms Complete: 3846.916ms Average: 0.384691 ms
+lower = 800 upper = 1200 jitter = 1 => Minimum: 0.0142ms Maximum: 33.3413ms Complete: 3883.3203ms Average: 0.388332 ms
+lower = 800 upper = 1200 jitter = 11 => Minimum: 0.0147ms Maximum: 30.4976ms Complete: 3882.1865ms Average: 0.388218 ms
+lower = 800 upper = 1200 jitter = 21 => Minimum: 0.0156ms Maximum: 32.5439ms Complete: 3942.535ms Average: 0.394253 ms
+lower = 800 upper = 1200 jitter = 31 => Minimum: 0.0144ms Maximum: 32.4054ms Complete: 3952.5537ms Average: 0.395255 ms
+lower = 800 upper = 1300 jitter = 1 => Minimum: 0.015ms Maximum: 32.8543ms Complete: 4045.2856ms Average: 0.404528 ms
+lower = 800 upper = 1300 jitter = 11 => Minimum: 0.016ms Maximum: 30.3793ms Complete: 4121.5547ms Average: 0.412155 ms
+lower = 800 upper = 1300 jitter = 21 => Minimum: 0.0147ms Maximum: 32.5695ms Complete: 3930.6284ms Average: 0.393062 ms
+lower = 800 upper = 1300 jitter = 31 => Minimum: 0.0148ms Maximum: 31.2182ms Complete: 4129.975ms Average: 0.412997 ms
+lower = 900 upper = 1000 jitter = 1 => Minimum: 0.015ms Maximum: 31.5296ms Complete: 3921.685ms Average: 0.392168 ms
+lower = 900 upper = 1000 jitter = 11 => Minimum: 0.0154ms Maximum: 30.9922ms Complete: 4273.2427ms Average: 0.427324 ms
+lower = 900 upper = 1000 jitter = 21 => Minimum: 0.014ms Maximum: 33.402ms Complete: 3871.324ms Average: 0.387132 ms
+lower = 900 upper = 1000 jitter = 31 => Minimum: 0.0144ms Maximum: 30.8347ms Complete: 4072.5293ms Average: 0.407252 ms
+lower = 900 upper = 1100 jitter = 1 => Minimum: 0.0148ms Maximum: 30.753ms Complete: 3858.7327ms Average: 0.385873 ms
+lower = 900 upper = 1100 jitter = 11 => Minimum: 0.0145ms Maximum: 30.4766ms Complete: 3967.7644ms Average: 0.396776 ms
+lower = 900 upper = 1100 jitter = 21 => Minimum: 0.0155ms Maximum: 31.9395ms Complete: 3840.7515ms Average: 0.384075 ms
+lower = 900 upper = 1100 jitter = 31 => Minimum: 0.014ms Maximum: 30.6155ms Complete: 3854.5479ms Average: 0.385454 ms
+lower = 900 upper = 1200 jitter = 1 => Minimum: 0.0158ms Maximum: 31.7006ms Complete: 4147.245ms Average: 0.414724 ms
+lower = 900 upper = 1200 jitter = 11 => Minimum: 0.0137ms Maximum: 32.9416ms Complete: 4451.769ms Average: 0.445176 ms
+lower = 900 upper = 1200 jitter = 21 => Minimum: 0.0147ms Maximum: 32.4077ms Complete: 3698.157ms Average: 0.369815 ms
+lower = 900 upper = 1200 jitter = 31 => Minimum: 0.0149ms Maximum: 32.119ms Complete: 4268.8354ms Average: 0.426883 ms
+lower = 900 upper = 1300 jitter = 1 => Minimum: 0.0148ms Maximum: 31.1695ms Complete: 4126.7466ms Average: 0.412674 ms
+lower = 900 upper = 1300 jitter = 11 => Minimum: 0.0149ms Maximum: 30.2509ms Complete: 3797.4424ms Average: 0.379744 ms
+lower = 900 upper = 1300 jitter = 21 => Minimum: 0.015ms Maximum: 33.2622ms Complete: 3619.6702ms Average: 0.361967 ms
+lower = 900 upper = 1300 jitter = 31 => Minimum: 0.0152ms Maximum: 31.3774ms Complete: 4181.4604ms Average: 0.418146 ms
+lower = 900 upper = 1400 jitter = 1 => Minimum: 0.0146ms Maximum: 33.2902ms Complete: 4186.516ms Average: 0.418651 ms
+lower = 900 upper = 1400 jitter = 11 => Minimum: 0.0145ms Maximum: 32.3032ms Complete: 4116.7646ms Average: 0.411676 ms
+lower = 900 upper = 1400 jitter = 21 => Minimum: 0.0144ms Maximum: 32.6366ms Complete: 4018.352ms Average: 0.401835 ms
+lower = 900 upper = 1400 jitter = 31 => Minimum: 0.0157ms Maximum: 32.9333ms Complete: 4139.4146ms Average: 0.413941 ms

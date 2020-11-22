@@ -1,103 +1,103 @@
-average: Minimum: 0.014533ms Maximum: 31.658756ms Average: 0.62514 ms
-minimum: Minimum: 0.0132ms Maximum: 29.0026ms Average: 0.541432 ms
-maximum: Minimum: 0.0163ms Maximum: 45.8854ms Average: 0.782897 ms
-lower = 100 upper = 200 numPreemptions = 1 => Minimum: 0.0156ms Maximum: 31.1746ms Average: 0.70899 ms
-lower = 100 upper = 200 numPreemptions = 11 => Minimum: 0.0146ms Maximum: 31.8487ms Average: 0.582609 ms
-lower = 100 upper = 200 numPreemptions = 21 => Minimum: 0.0134ms Maximum: 32.0036ms Average: 0.666505 ms
-lower = 100 upper = 200 numPreemptions = 31 => Minimum: 0.0154ms Maximum: 32.1033ms Average: 0.632956 ms
-lower = 100 upper = 700 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 29.0026ms Average: 0.555166 ms
-lower = 100 upper = 700 numPreemptions = 11 => Minimum: 0.0152ms Maximum: 32.0729ms Average: 0.617027 ms
-lower = 100 upper = 700 numPreemptions = 21 => Minimum: 0.0153ms Maximum: 31.6504ms Average: 0.69155 ms
-lower = 100 upper = 700 numPreemptions = 31 => Minimum: 0.0142ms Maximum: 29.9249ms Average: 0.582167 ms
-lower = 100 upper = 1200 numPreemptions = 1 => Minimum: 0.0153ms Maximum: 45.8854ms Average: 0.782897 ms
-lower = 100 upper = 1200 numPreemptions = 11 => Minimum: 0.0149ms Maximum: 31.9986ms Average: 0.603506 ms
-lower = 100 upper = 1200 numPreemptions = 21 => Minimum: 0.0163ms Maximum: 32.4914ms Average: 0.697739 ms
-lower = 100 upper = 1200 numPreemptions = 31 => Minimum: 0.0144ms Maximum: 29.3924ms Average: 0.670188 ms
-lower = 100 upper = 1700 numPreemptions = 1 => Minimum: 0.0142ms Maximum: 30.6024ms Average: 0.59686 ms
-lower = 100 upper = 1700 numPreemptions = 11 => Minimum: 0.0145ms Maximum: 33.5027ms Average: 0.657198 ms
-lower = 100 upper = 1700 numPreemptions = 21 => Minimum: 0.0155ms Maximum: 30.2151ms Average: 0.598804 ms
-lower = 100 upper = 1700 numPreemptions = 31 => Minimum: 0.014ms Maximum: 32.1035ms Average: 0.578962 ms
-lower = 100 upper = 2200 numPreemptions = 1 => Minimum: 0.0145ms Maximum: 32.6023ms Average: 0.62934 ms
-lower = 100 upper = 2200 numPreemptions = 11 => Minimum: 0.0146ms Maximum: 32.0788ms Average: 0.638916 ms
-lower = 100 upper = 2200 numPreemptions = 21 => Minimum: 0.0146ms Maximum: 32.4458ms Average: 0.605889 ms
-lower = 100 upper = 2200 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 29.7107ms Average: 0.661755 ms
-lower = 300 upper = 400 numPreemptions = 1 => Minimum: 0.015ms Maximum: 30.3956ms Average: 0.635568 ms
-lower = 300 upper = 400 numPreemptions = 11 => Minimum: 0.0136ms Maximum: 31.9806ms Average: 0.61303 ms
-lower = 300 upper = 400 numPreemptions = 21 => Minimum: 0.0146ms Maximum: 31.477ms Average: 0.572673 ms
-lower = 300 upper = 400 numPreemptions = 31 => Minimum: 0.0147ms Maximum: 43.682ms Average: 0.572232 ms
-lower = 300 upper = 900 numPreemptions = 1 => Minimum: 0.0162ms Maximum: 30.2315ms Average: 0.595939 ms
-lower = 300 upper = 900 numPreemptions = 11 => Minimum: 0.0151ms Maximum: 30.1606ms Average: 0.639005 ms
-lower = 300 upper = 900 numPreemptions = 21 => Minimum: 0.0154ms Maximum: 32.2481ms Average: 0.706061 ms
-lower = 300 upper = 900 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 29.8477ms Average: 0.632793 ms
-lower = 300 upper = 1400 numPreemptions = 1 => Minimum: 0.0137ms Maximum: 31.369ms Average: 0.5844 ms
-lower = 300 upper = 1400 numPreemptions = 11 => Minimum: 0.0146ms Maximum: 32.4481ms Average: 0.612184 ms
-lower = 300 upper = 1400 numPreemptions = 21 => Minimum: 0.014ms Maximum: 30.1654ms Average: 0.596048 ms
-lower = 300 upper = 1400 numPreemptions = 31 => Minimum: 0.0161ms Maximum: 30.4504ms Average: 0.618674 ms
-lower = 300 upper = 1900 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 29.8156ms Average: 0.694634 ms
-lower = 300 upper = 1900 numPreemptions = 11 => Minimum: 0.0151ms Maximum: 29.5106ms Average: 0.660424 ms
-lower = 300 upper = 1900 numPreemptions = 21 => Minimum: 0.0151ms Maximum: 29.9819ms Average: 0.577494 ms
-lower = 300 upper = 1900 numPreemptions = 31 => Minimum: 0.014ms Maximum: 32.1391ms Average: 0.677617 ms
-lower = 300 upper = 2400 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 30.2023ms Average: 0.601483 ms
-lower = 300 upper = 2400 numPreemptions = 11 => Minimum: 0.014ms Maximum: 30.1568ms Average: 0.577912 ms
-lower = 300 upper = 2400 numPreemptions = 21 => Minimum: 0.0139ms Maximum: 30.0836ms Average: 0.604051 ms
-lower = 300 upper = 2400 numPreemptions = 31 => Minimum: 0.0138ms Maximum: 32.221ms Average: 0.625083 ms
-lower = 500 upper = 600 numPreemptions = 1 => Minimum: 0.0158ms Maximum: 30.7133ms Average: 0.650838 ms
-lower = 500 upper = 600 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 32.424ms Average: 0.588609 ms
-lower = 500 upper = 600 numPreemptions = 21 => Minimum: 0.0147ms Maximum: 30.1729ms Average: 0.570388 ms
-lower = 500 upper = 600 numPreemptions = 31 => Minimum: 0.0146ms Maximum: 32.3454ms Average: 0.644706 ms
-lower = 500 upper = 1100 numPreemptions = 1 => Minimum: 0.0146ms Maximum: 29.993ms Average: 0.606484 ms
-lower = 500 upper = 1100 numPreemptions = 11 => Minimum: 0.0163ms Maximum: 32.3576ms Average: 0.68739 ms
-lower = 500 upper = 1100 numPreemptions = 21 => Minimum: 0.0159ms Maximum: 32.4261ms Average: 0.642545 ms
-lower = 500 upper = 1100 numPreemptions = 31 => Minimum: 0.0137ms Maximum: 32.2987ms Average: 0.589541 ms
-lower = 500 upper = 1600 numPreemptions = 1 => Minimum: 0.0149ms Maximum: 32.2474ms Average: 0.748095 ms
-lower = 500 upper = 1600 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 32.7939ms Average: 0.660263 ms
-lower = 500 upper = 1600 numPreemptions = 21 => Minimum: 0.0148ms Maximum: 32.0368ms Average: 0.649159 ms
-lower = 500 upper = 1600 numPreemptions = 31 => Minimum: 0.0145ms Maximum: 31.7979ms Average: 0.680315 ms
-lower = 500 upper = 2100 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 30.0563ms Average: 0.6257 ms
-lower = 500 upper = 2100 numPreemptions = 11 => Minimum: 0.0142ms Maximum: 36.7381ms Average: 0.656325 ms
-lower = 500 upper = 2100 numPreemptions = 21 => Minimum: 0.0146ms Maximum: 31.4737ms Average: 0.655766 ms
-lower = 500 upper = 2100 numPreemptions = 31 => Minimum: 0.0143ms Maximum: 30.199ms Average: 0.596288 ms
-lower = 500 upper = 2600 numPreemptions = 1 => Minimum: 0.0146ms Maximum: 33.1106ms Average: 0.68013 ms
-lower = 500 upper = 2600 numPreemptions = 11 => Minimum: 0.0138ms Maximum: 29.5845ms Average: 0.584323 ms
-lower = 500 upper = 2600 numPreemptions = 21 => Minimum: 0.0154ms Maximum: 32.1202ms Average: 0.695484 ms
-lower = 500 upper = 2600 numPreemptions = 31 => Minimum: 0.014ms Maximum: 31.6497ms Average: 0.541432 ms
-lower = 700 upper = 800 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 30.6413ms Average: 0.568889 ms
-lower = 700 upper = 800 numPreemptions = 11 => Minimum: 0.0146ms Maximum: 31.6076ms Average: 0.603301 ms
-lower = 700 upper = 800 numPreemptions = 21 => Minimum: 0.0141ms Maximum: 30.1681ms Average: 0.668432 ms
-lower = 700 upper = 800 numPreemptions = 31 => Minimum: 0.0147ms Maximum: 32.2403ms Average: 0.580125 ms
-lower = 700 upper = 1300 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 32.3041ms Average: 0.700355 ms
-lower = 700 upper = 1300 numPreemptions = 11 => Minimum: 0.0135ms Maximum: 33.0126ms Average: 0.634581 ms
-lower = 700 upper = 1300 numPreemptions = 21 => Minimum: 0.0141ms Maximum: 40.8868ms Average: 0.583693 ms
-lower = 700 upper = 1300 numPreemptions = 31 => Minimum: 0.015ms Maximum: 32.3006ms Average: 0.676064 ms
-lower = 700 upper = 1800 numPreemptions = 1 => Minimum: 0.016ms Maximum: 30.3289ms Average: 0.622628 ms
-lower = 700 upper = 1800 numPreemptions = 11 => Minimum: 0.0139ms Maximum: 30.0264ms Average: 0.550251 ms
-lower = 700 upper = 1800 numPreemptions = 21 => Minimum: 0.0136ms Maximum: 30.2832ms Average: 0.601067 ms
-lower = 700 upper = 1800 numPreemptions = 31 => Minimum: 0.0136ms Maximum: 32.4113ms Average: 0.594219 ms
-lower = 700 upper = 2300 numPreemptions = 1 => Minimum: 0.0142ms Maximum: 29.8372ms Average: 0.607575 ms
-lower = 700 upper = 2300 numPreemptions = 11 => Minimum: 0.0155ms Maximum: 32.1253ms Average: 0.675542 ms
-lower = 700 upper = 2300 numPreemptions = 21 => Minimum: 0.0147ms Maximum: 30.217ms Average: 0.604645 ms
-lower = 700 upper = 2300 numPreemptions = 31 => Minimum: 0.0137ms Maximum: 30.6835ms Average: 0.584205 ms
-lower = 700 upper = 2800 numPreemptions = 1 => Minimum: 0.015ms Maximum: 30.5169ms Average: 0.586279 ms
-lower = 700 upper = 2800 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 31.6056ms Average: 0.651557 ms
-lower = 700 upper = 2800 numPreemptions = 21 => Minimum: 0.0142ms Maximum: 31.8928ms Average: 0.602038 ms
-lower = 700 upper = 2800 numPreemptions = 31 => Minimum: 0.014ms Maximum: 30.0623ms Average: 0.612393 ms
-lower = 900 upper = 1000 numPreemptions = 1 => Minimum: 0.0142ms Maximum: 32.4527ms Average: 0.586617 ms
-lower = 900 upper = 1000 numPreemptions = 11 => Minimum: 0.0138ms Maximum: 29.7269ms Average: 0.618112 ms
-lower = 900 upper = 1000 numPreemptions = 21 => Minimum: 0.0148ms Maximum: 32.1983ms Average: 0.601296 ms
-lower = 900 upper = 1000 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 30.998ms Average: 0.592873 ms
-lower = 900 upper = 1500 numPreemptions = 1 => Minimum: 0.0148ms Maximum: 31.6015ms Average: 0.584805 ms
-lower = 900 upper = 1500 numPreemptions = 11 => Minimum: 0.0138ms Maximum: 30.0404ms Average: 0.652727 ms
-lower = 900 upper = 1500 numPreemptions = 21 => Minimum: 0.0135ms Maximum: 31.5073ms Average: 0.599695 ms
-lower = 900 upper = 1500 numPreemptions = 31 => Minimum: 0.0135ms Maximum: 32.1591ms Average: 0.607055 ms
-lower = 900 upper = 2000 numPreemptions = 1 => Minimum: 0.0147ms Maximum: 30.2719ms Average: 0.625794 ms
-lower = 900 upper = 2000 numPreemptions = 11 => Minimum: 0.0141ms Maximum: 32.1428ms Average: 0.578763 ms
-lower = 900 upper = 2000 numPreemptions = 21 => Minimum: 0.0151ms Maximum: 30.1647ms Average: 0.62739 ms
-lower = 900 upper = 2000 numPreemptions = 31 => Minimum: 0.0145ms Maximum: 30.5013ms Average: 0.633587 ms
-lower = 900 upper = 2500 numPreemptions = 1 => Minimum: 0.0135ms Maximum: 33.0913ms Average: 0.590894 ms
-lower = 900 upper = 2500 numPreemptions = 11 => Minimum: 0.0145ms Maximum: 30.2258ms Average: 0.624789 ms
-lower = 900 upper = 2500 numPreemptions = 21 => Minimum: 0.0132ms Maximum: 31.6194ms Average: 0.593066 ms
-lower = 900 upper = 2500 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 30.0799ms Average: 0.645675 ms
-lower = 900 upper = 3000 numPreemptions = 1 => Minimum: 0.0148ms Maximum: 32.3361ms Average: 0.607467 ms
-lower = 900 upper = 3000 numPreemptions = 11 => Minimum: 0.0157ms Maximum: 32.2628ms Average: 0.664723 ms
-lower = 900 upper = 3000 numPreemptions = 21 => Minimum: 0.0154ms Maximum: 31.4683ms Average: 0.689582 ms
-lower = 900 upper = 3000 numPreemptions = 31 => Minimum: 0.0138ms Maximum: 29.9591ms Average: 0.571221 ms
+average: Minimum: 0.0143ms Maximum: 1948.4377ms Complete: 30.221516ms Average: 0.194413 ms
+minimum: Minimum: 0.0136ms Maximum: 28.6954ms Complete: 1627.2328ms Average: 0.162204 ms
+maximum: Minimum: 0.0151ms Maximum: 33.6054ms Complete: 2402.0344ms Average: 0.239437 ms
+lower = 100 upper = 200 numPreemptions = 1 => Minimum: 0.0146ms Maximum: 30.7261ms Complete: 1841.8297ms Average: 0.184182 ms
+lower = 100 upper = 200 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 28.8674ms Complete: 2051.314ms Average: 0.204967 ms
+lower = 100 upper = 200 numPreemptions = 21 => Minimum: 0.0142ms Maximum: 31.6099ms Complete: 2046.4775ms Average: 0.203994 ms
+lower = 100 upper = 200 numPreemptions = 31 => Minimum: 0.0138ms Maximum: 29.1506ms Complete: 1877.2847ms Average: 0.186831 ms
+lower = 100 upper = 700 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 29.4029ms Complete: 1781.8368ms Average: 0.178183 ms
+lower = 100 upper = 700 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 30.5622ms Complete: 1917.2914ms Average: 0.191575 ms
+lower = 100 upper = 700 numPreemptions = 21 => Minimum: 0.0145ms Maximum: 30.3311ms Complete: 1937.5166ms Average: 0.193133 ms
+lower = 100 upper = 700 numPreemptions = 31 => Minimum: 0.0144ms Maximum: 29.7033ms Complete: 1957.0585ms Average: 0.19477 ms
+lower = 100 upper = 1200 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 31.1301ms Complete: 2028.3423ms Average: 0.202834 ms
+lower = 100 upper = 1200 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 29.7165ms Complete: 1855.578ms Average: 0.185409 ms
+lower = 100 upper = 1200 numPreemptions = 21 => Minimum: 0.0144ms Maximum: 31.3682ms Complete: 2327.9429ms Average: 0.232051 ms
+lower = 100 upper = 1200 numPreemptions = 31 => Minimum: 0.0142ms Maximum: 28.9187ms Complete: 1908.2732ms Average: 0.189915 ms
+lower = 100 upper = 1700 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 29.2996ms Complete: 1878.0367ms Average: 0.187803 ms
+lower = 100 upper = 1700 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 28.9519ms Complete: 1889.9022ms Average: 0.188839 ms
+lower = 100 upper = 1700 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 31.3636ms Complete: 2402.0344ms Average: 0.239437 ms
+lower = 100 upper = 1700 numPreemptions = 31 => Minimum: 0.0148ms Maximum: 30.8251ms Complete: 1937.8358ms Average: 0.192857 ms
+lower = 100 upper = 2200 numPreemptions = 1 => Minimum: 0.0142ms Maximum: 30.163ms Complete: 2072.8733ms Average: 0.207287 ms
+lower = 100 upper = 2200 numPreemptions = 11 => Minimum: 0.0141ms Maximum: 29.0341ms Complete: 1767.7708ms Average: 0.176635 ms
+lower = 100 upper = 2200 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 28.9481ms Complete: 1627.2328ms Average: 0.162204 ms
+lower = 100 upper = 2200 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 30.747ms Complete: 1994.1088ms Average: 0.198458 ms
+lower = 300 upper = 400 numPreemptions = 1 => Minimum: 0.014ms Maximum: 29.1158ms Complete: 1954.612ms Average: 0.195461 ms
+lower = 300 upper = 400 numPreemptions = 11 => Minimum: 0.0139ms Maximum: 29.9245ms Complete: 1929.0403ms Average: 0.192749 ms
+lower = 300 upper = 400 numPreemptions = 21 => Minimum: 0.014ms Maximum: 28.907ms Complete: 2037.3368ms Average: 0.203083 ms
+lower = 300 upper = 400 numPreemptions = 31 => Minimum: 0.0139ms Maximum: 29.0103ms Complete: 1810.0127ms Average: 0.180136 ms
+lower = 300 upper = 900 numPreemptions = 1 => Minimum: 0.0146ms Maximum: 30.3762ms Complete: 1889.3075ms Average: 0.18893 ms
+lower = 300 upper = 900 numPreemptions = 11 => Minimum: 0.0151ms Maximum: 30.7896ms Complete: 2083.0522ms Average: 0.208138 ms
+lower = 300 upper = 900 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 31.1062ms Complete: 1859.8412ms Average: 0.18539 ms
+lower = 300 upper = 900 numPreemptions = 31 => Minimum: 0.014ms Maximum: 28.7553ms Complete: 1820.8629ms Average: 0.181216 ms
+lower = 300 upper = 1400 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 28.8934ms Complete: 1775.7933ms Average: 0.177579 ms
+lower = 300 upper = 1400 numPreemptions = 11 => Minimum: 0.0142ms Maximum: 32.0003ms Complete: 1999.1614ms Average: 0.199756 ms
+lower = 300 upper = 1400 numPreemptions = 21 => Minimum: 0.0144ms Maximum: 28.8012ms Complete: 2057.016ms Average: 0.205045 ms
+lower = 300 upper = 1400 numPreemptions = 31 => Minimum: 0.0144ms Maximum: 30.9421ms Complete: 1946.7516ms Average: 0.193745 ms
+lower = 300 upper = 1900 numPreemptions = 1 => Minimum: 0.0145ms Maximum: 30.3944ms Complete: 1817.512ms Average: 0.181751 ms
+lower = 300 upper = 1900 numPreemptions = 11 => Minimum: 0.0144ms Maximum: 30.8804ms Complete: 1964.6155ms Average: 0.196304 ms
+lower = 300 upper = 1900 numPreemptions = 21 => Minimum: 0.0147ms Maximum: 31.0007ms Complete: 1946.8175ms Average: 0.19406 ms
+lower = 300 upper = 1900 numPreemptions = 31 => Minimum: 0.0144ms Maximum: 30.7899ms Complete: 2080.3308ms Average: 0.207039 ms
+lower = 300 upper = 2400 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 30.6432ms Complete: 1851.5527ms Average: 0.185155 ms
+lower = 300 upper = 2400 numPreemptions = 11 => Minimum: 0.0141ms Maximum: 29.6165ms Complete: 1902.3015ms Average: 0.190078 ms
+lower = 300 upper = 2400 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 31.1079ms Complete: 2093.3008ms Average: 0.208662 ms
+lower = 300 upper = 2400 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 30.959ms Complete: 1795.0757ms Average: 0.17865 ms
+lower = 500 upper = 600 numPreemptions = 1 => Minimum: 0.0146ms Maximum: 28.9362ms Complete: 1889.1273ms Average: 0.188912 ms
+lower = 500 upper = 600 numPreemptions = 11 => Minimum: 0.0139ms Maximum: 31.3723ms Complete: 1933.3214ms Average: 0.193177 ms
+lower = 500 upper = 600 numPreemptions = 21 => Minimum: 0.0141ms Maximum: 30.3723ms Complete: 2032.8624ms Average: 0.202637 ms
+lower = 500 upper = 600 numPreemptions = 31 => Minimum: 0.014ms Maximum: 28.8766ms Complete: 2082.5474ms Average: 0.207259 ms
+lower = 500 upper = 1100 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 29.1442ms Complete: 2063.5242ms Average: 0.206352 ms
+lower = 500 upper = 1100 numPreemptions = 11 => Minimum: 0.0144ms Maximum: 30.7104ms Complete: 2085.2454ms Average: 0.208357 ms
+lower = 500 upper = 1100 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 31.0528ms Complete: 1895.7007ms Average: 0.188965 ms
+lower = 500 upper = 1100 numPreemptions = 31 => Minimum: 0.0145ms Maximum: 29.3238ms Complete: 1949.4127ms Average: 0.19401 ms
+lower = 500 upper = 1600 numPreemptions = 1 => Minimum: 0.0139ms Maximum: 29.8199ms Complete: 1809.5396ms Average: 0.180953 ms
+lower = 500 upper = 1600 numPreemptions = 11 => Minimum: 0.0145ms Maximum: 30.2823ms Complete: 1969.9546ms Average: 0.196837 ms
+lower = 500 upper = 1600 numPreemptions = 21 => Minimum: 0.0145ms Maximum: 28.916ms Complete: 1938.9137ms Average: 0.193272 ms
+lower = 500 upper = 1600 numPreemptions = 31 => Minimum: 0.014ms Maximum: 29.017ms Complete: 1817.0919ms Average: 0.180841 ms
+lower = 500 upper = 2100 numPreemptions = 1 => Minimum: 0.0143ms Maximum: 30.4997ms Complete: 1844.5193ms Average: 0.184451 ms
+lower = 500 upper = 2100 numPreemptions = 11 => Minimum: 0.0145ms Maximum: 28.6954ms Complete: 1757.5942ms Average: 0.175618 ms
+lower = 500 upper = 2100 numPreemptions = 21 => Minimum: 0.0145ms Maximum: 31.0487ms Complete: 1939.6766ms Average: 0.193348 ms
+lower = 500 upper = 2100 numPreemptions = 31 => Minimum: 0.0145ms Maximum: 31.1552ms Complete: 2059.4746ms Average: 0.204963 ms
+lower = 500 upper = 2600 numPreemptions = 1 => Minimum: 0.0138ms Maximum: 30.807ms Complete: 1911.4891ms Average: 0.191148 ms
+lower = 500 upper = 2600 numPreemptions = 11 => Minimum: 0.0142ms Maximum: 30.904ms Complete: 2011.5321ms Average: 0.200992 ms
+lower = 500 upper = 2600 numPreemptions = 21 => Minimum: 0.0144ms Maximum: 30.9316ms Complete: 2057.3174ms Average: 0.205075 ms
+lower = 500 upper = 2600 numPreemptions = 31 => Minimum: 0.014ms Maximum: 28.8986ms Complete: 1833.0674ms Average: 0.182431 ms
+lower = 700 upper = 800 numPreemptions = 1 => Minimum: 0.0142ms Maximum: 30.8673ms Complete: 2026.4198ms Average: 0.202641 ms
+lower = 700 upper = 800 numPreemptions = 11 => Minimum: 0.0145ms Maximum: 30.4438ms Complete: 1957.5869ms Average: 0.195602 ms
+lower = 700 upper = 800 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 30.6805ms Complete: 1793.1497ms Average: 0.178742 ms
+lower = 700 upper = 800 numPreemptions = 31 => Minimum: 0.0143ms Maximum: 28.8701ms Complete: 2117.216ms Average: 0.21071 ms
+lower = 700 upper = 1300 numPreemptions = 1 => Minimum: 0.0146ms Maximum: 30.715ms Complete: 2204.9817ms Average: 0.220498 ms
+lower = 700 upper = 1300 numPreemptions = 11 => Minimum: 0.0146ms Maximum: 30.4025ms Complete: 1939.6384ms Average: 0.193808 ms
+lower = 700 upper = 1300 numPreemptions = 21 => Minimum: 0.0138ms Maximum: 31.1473ms Complete: 1744.7843ms Average: 0.173921 ms
+lower = 700 upper = 1300 numPreemptions = 31 => Minimum: 0.0143ms Maximum: 29.0025ms Complete: 1926.3278ms Average: 0.191712 ms
+lower = 700 upper = 1800 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 28.9695ms Complete: 1991.6046ms Average: 0.19916 ms
+lower = 700 upper = 1800 numPreemptions = 11 => Minimum: 0.0144ms Maximum: 29.0651ms Complete: 2078.5574ms Average: 0.207689 ms
+lower = 700 upper = 1800 numPreemptions = 21 => Minimum: 0.0141ms Maximum: 30.0603ms Complete: 1925.6025ms Average: 0.191946 ms
+lower = 700 upper = 1800 numPreemptions = 31 => Minimum: 0.0145ms Maximum: 30.0502ms Complete: 1907.052ms Average: 0.189794 ms
+lower = 700 upper = 2300 numPreemptions = 1 => Minimum: 0.0148ms Maximum: 33.6054ms Complete: 2256.4502ms Average: 0.225645 ms
+lower = 700 upper = 2300 numPreemptions = 11 => Minimum: 0.0145ms Maximum: 30.9242ms Complete: 2110.1973ms Average: 0.210851 ms
+lower = 700 upper = 2300 numPreemptions = 21 => Minimum: 0.0145ms Maximum: 31.4031ms Complete: 1981.1672ms Average: 0.197484 ms
+lower = 700 upper = 2300 numPreemptions = 31 => Minimum: 0.0147ms Maximum: 30.6934ms Complete: 1992.5149ms Average: 0.198299 ms
+lower = 700 upper = 2800 numPreemptions = 1 => Minimum: 0.0138ms Maximum: 30.4446ms Complete: 1731.0227ms Average: 0.173102 ms
+lower = 700 upper = 2800 numPreemptions = 11 => Minimum: 0.0139ms Maximum: 30.9729ms Complete: 1911.9678ms Average: 0.191043 ms
+lower = 700 upper = 2800 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 30.8628ms Complete: 1922.6288ms Average: 0.191649 ms
+lower = 700 upper = 2800 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 30.6237ms Complete: 2032.0706ms Average: 0.202236 ms
+lower = 900 upper = 1000 numPreemptions = 1 => Minimum: 0.015ms Maximum: 30.788ms Complete: 2032.9066ms Average: 0.20329 ms
+lower = 900 upper = 1000 numPreemptions = 11 => Minimum: 0.0147ms Maximum: 30.9108ms Complete: 2075.0623ms Average: 0.20734 ms
+lower = 900 upper = 1000 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 30.8ms Complete: 1989.0468ms Average: 0.19827 ms
+lower = 900 upper = 1000 numPreemptions = 31 => Minimum: 0.0145ms Maximum: 30.4123ms Complete: 2251.0757ms Average: 0.224032 ms
+lower = 900 upper = 1500 numPreemptions = 1 => Minimum: 0.0141ms Maximum: 29.8938ms Complete: 1790.0975ms Average: 0.179009 ms
+lower = 900 upper = 1500 numPreemptions = 11 => Minimum: 0.0142ms Maximum: 30.5865ms Complete: 2009.9113ms Average: 0.20083 ms
+lower = 900 upper = 1500 numPreemptions = 21 => Minimum: 0.0142ms Maximum: 31.0298ms Complete: 1986.706ms Average: 0.198036 ms
+lower = 900 upper = 1500 numPreemptions = 31 => Minimum: 0.0148ms Maximum: 31.1734ms Complete: 1919.2645ms Average: 0.191009 ms
+lower = 900 upper = 2000 numPreemptions = 1 => Minimum: 0.0144ms Maximum: 29.9782ms Complete: 1932.5804ms Average: 0.193258 ms
+lower = 900 upper = 2000 numPreemptions = 11 => Minimum: 0.0143ms Maximum: 30.7812ms Complete: 1969.2942ms Average: 0.196772 ms
+lower = 900 upper = 2000 numPreemptions = 21 => Minimum: 0.0148ms Maximum: 30.4657ms Complete: 1744.5355ms Average: 0.173897 ms
+lower = 900 upper = 2000 numPreemptions = 31 => Minimum: 0.0148ms Maximum: 30.4908ms Complete: 1979.8754ms Average: 0.197041 ms
+lower = 900 upper = 2500 numPreemptions = 1 => Minimum: 0.0142ms Maximum: 29.0687ms Complete: 1865.6853ms Average: 0.186568 ms
+lower = 900 upper = 2500 numPreemptions = 11 => Minimum: 0.0136ms Maximum: 28.9244ms Complete: 1648.7692ms Average: 0.164745 ms
+lower = 900 upper = 2500 numPreemptions = 21 => Minimum: 0.0138ms Maximum: 30.2679ms Complete: 1859.606ms Average: 0.185367 ms
+lower = 900 upper = 2500 numPreemptions = 31 => Minimum: 0.0141ms Maximum: 30.6416ms Complete: 2153.3599ms Average: 0.214307 ms
+lower = 900 upper = 3000 numPreemptions = 1 => Minimum: 0.0139ms Maximum: 30.4566ms Complete: 1868.5983ms Average: 0.186859 ms
+lower = 900 upper = 3000 numPreemptions = 11 => Minimum: 0.0141ms Maximum: 30.7456ms Complete: 1945.0924ms Average: 0.194353 ms
+lower = 900 upper = 3000 numPreemptions = 21 => Minimum: 0.0143ms Maximum: 28.901ms Complete: 1795.7599ms Average: 0.179003 ms
+lower = 900 upper = 3000 numPreemptions = 31 => Minimum: 0.0148ms Maximum: 30.4339ms Complete: 1878.8662ms Average: 0.186989 ms
