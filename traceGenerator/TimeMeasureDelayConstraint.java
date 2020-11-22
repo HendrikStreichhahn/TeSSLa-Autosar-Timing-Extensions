@@ -3,24 +3,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class TimeMeasureDelayConstraint extends TimeMeasureConstraint{
-    int lower, upper;
+    int lower, upper, sourceDistance;
     
-    public TimeMeasureDelayConstraint(int lower, int upper){
+    public TimeMeasureDelayConstraint(int lower, int upper, int sourceDistance){
         this.lower = lower;
         this.upper = upper;
+        this.sourceDistance = sourceDistance;
     }
     
     public TraceSet generateTrace(int eventCount){
         Random rand = new Random();
         //Trace generieren
         DelayConstraintGenerator trace = new DelayConstraintGenerator();
-        // generate Constraint parameters randomly
-        int minDistanceSource = 1;
-        int maxDistanceSource = upper + lower;
         //generate trace, repeat until fulfilled trace generated
-        while (!trace.generateTestTrace(eventCount, minDistanceSource, maxDistanceSource, lower, upper)){
+        while (!trace.generateTestTrace(eventCount, sourceDistance, sourceDistance+1, lower, upper)){
             trace = new DelayConstraintGenerator();
-            //System.out.println("trace regenerated");
+            System.out.println("trace regenerated");
         }
         return trace;
     }

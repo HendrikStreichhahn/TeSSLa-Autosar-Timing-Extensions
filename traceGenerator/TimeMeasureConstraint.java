@@ -3,6 +3,12 @@ import java.io.IOException;
 public abstract class TimeMeasureConstraint{
     static final String PATHTOMAIN = "../../main/t2uConstraints.tessla";
     
+    private String traceStrings = "";
+    
+    public String getTrace(){
+        return traceStrings;
+    }
+    
     //generate an random trace
     public abstract TraceSet generateTrace(int eventCount);
     
@@ -18,11 +24,11 @@ public abstract class TimeMeasureConstraint{
             return null;
         }
         //sleep 5 seconds-> wait until TeSSLa is ready
-        /*try{
-            //Thread.sleep(5*1000);
+        try{
+            Thread.sleep(5*1000);
         } catch (InterruptedException e){
             System.out.println(e);
-        }*/
+        }
         //measure time per event
         trace.initOutput();
         long completeTime = 0;
@@ -34,21 +40,23 @@ public abstract class TimeMeasureConstraint{
             
             // first timestamp without waiting
             String tesslaInput = trace.getNextTimestampsEvents();
+            traceStrings+= tesslaInput + "\n";
             program.writeNoWait(tesslaInput);
-            int eventThisTimeStamp = numEvents(tesslaInput);
-            eventCount = eventThisTimeStamp;
+            //int eventThisTimeStamp = numEvents(tesslaInput);
+            eventCount = 1;
             //System.out.print("write: " + tesslaInput);
             for (tesslaInput = trace.getNextTimestampsEvents(); tesslaInput != ""; 
                     tesslaInput = trace.getNextTimestampsEvents()){
-                eventThisTimeStamp = numEvents(tesslaInput);
+                //eventThisTimeStamp = numEvents(tesslaInput);
                 //System.out.print("write: " + tesslaInput);
+                traceStrings+= tesslaInput + "\n";
                 long time = program.timeToAnswer(tesslaInput);
                 //System.out.println("answer after: " + time);
                 //update time vals
-                min = Math.min(min, time/eventThisTimeStamp);
-                max = Math.max(max, time/eventThisTimeStamp);
+                min = Math.min(min, time);
+                max = Math.max(max, time);
                 completeTime += time;
-                eventCount+= eventThisTimeStamp;
+                eventCount+= 1;
             }
         } catch (IOException e){
             System.err.println("IOException between TeSSLa and Timemeasure!");
@@ -63,7 +71,7 @@ public abstract class TimeMeasureConstraint{
             
         }
         
-        return new SingleMeasureResult(min, max, completeTime/eventCount);
+        return new SingleMeasureResult(min, max, completeTime, completeTime/eventCount);
     }
     
     protected int numEvents(String TesslaInput){

@@ -3,5 +3,5 @@ in start: Events[Int]
 in preempt: Events[Int]
 in resume: Events[Int]
 in stop: Events[Int]
-def constraint := executionTimeConstraint(start, stop, preempt, resume, 100, 700)
+def constraint := executionTimeConstraint(start, stop, preempt, resume, 900, 3000)
 out constraint
