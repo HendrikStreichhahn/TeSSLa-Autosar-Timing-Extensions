@@ -1,0 +1,3 @@
+include "../../main/t2uConstraints.tessla"
+in event: Events[Int]
+out event

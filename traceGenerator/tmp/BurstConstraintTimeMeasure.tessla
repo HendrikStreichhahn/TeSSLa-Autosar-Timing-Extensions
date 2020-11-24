@@ -1,4 +1,4 @@
 include "../../main/t2uConstraints.tessla"
 in event: Events[Int]
-def constraint := burstConstraint(event, 400, 100, 1)
+def constraint := burstConstraint(event, 2000, 900, 1)
 out constraint

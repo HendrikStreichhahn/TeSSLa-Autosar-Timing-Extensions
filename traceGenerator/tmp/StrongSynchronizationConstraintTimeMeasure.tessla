@@ -4,6 +4,6 @@ in event1: Events[Int]
 in event2: Events[Int]
 in event3: Events[Int]
 in event4: Events[Int]
-def tolerance =25
+def tolerance =97
 def constraint := StrongSynchronizationConstraint5(event0, event1, event2, event3, event4, tolerance)
 out constraint

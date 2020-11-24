@@ -23,18 +23,18 @@ public class TimeMeasureAll{
     
     public static void main(String[] args){
         //measureJustOutput("results/justOutput.txt", 10000);
-        measureDelayConstraint("results/DelayResult.txt", 10000);
+        //measureDelayConstraint("results/DelayResult.txt", 10000);
         //measureStrongDelayConstraint("results/StrongDelayResult.txt", 10000);
         //measureRepeatConstraint("results/RepeatResult.txt", 10000);
         //measureRepetitionConstraint("results/RepetitionResult.txt", 10000);// nochmal laufen lassen
         //measureSynchronizationConstraint("results/SynchronizationResult.txt", 10000);
         //measureSynchronizationConstraint2("results/SynchronizationResult2.txt", 10000);
-        measureStrongSynchronizationConstraint("results/StrongSynchronizationResult.txt", 10000);//should be fixed 
+        //measureStrongSynchronizationConstraint("results/StrongSynchronizationResult.txt", 10000);//should be fixed 
         //measureExecutionTimeConstraint("results/ExecutionTimeResult.txt", 10000);
         //measureOrderConstraint("results/OrderResult.txt", 10000);
         //measureSporadicConstraint("results/SporadicResult.txt", 10000);
         //measurePeriodicConstraint("results/PeriodicResult.txt", 10000);
-        measurePatternConstraint("results/PatternResult.txt", 10000);
+        //measurePatternConstraint("results/PatternResult.txt", 10000);
         //measurePatternConstraint1("results/Pattern1Result.txt", 10000);
         //measurePatternConstraint2("results/Pattern2Result.txt", 10000);//should be fixed 
         //measurePatternConstraint3("results/Pattern3Result.txt", 10000);//should be fixed 
@@ -51,7 +51,7 @@ public class TimeMeasureAll{
         
     }
     
-    static final String PATHTOTESSLA = "java11 -Xss64m -jar ../../tessla-assembly-1.0.12.jar";
+    static final String PATHTOTESSLA = "java11 -Xss512m -jar ../../tessla-assembly-1.0.12.jar";
     
     private static void measureJustOutput(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/JustOutputTimeMeasure.tessla";
@@ -143,9 +143,9 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
         int i = 0;
-        int[] spans = new int[]{1, 100, 250, 500};
-        for (int lower = 500; lower <= 900; lower += 100)//5
-            for (int upper = lower + 100; upper <= lower + 500; upper += 100)//5
+        int[] spans = new int[]{1, 300, 600, 900};
+        for (int lower = 5000; lower <= 9000; lower += 1000)//5
+            for (int upper = lower + 1000; upper <= lower + 5000; upper += 1000)//5
                 for (int spanCount = 0; spanCount < spans.length; spanCount+= 1){//4
                     int span = spans[spanCount];
                     System.out.println("RepeatConstraint Trace " + (i+1) + " of " + 100);
@@ -199,16 +199,14 @@ public class TimeMeasureAll{
     
     private static void measureSynchronizationConstraint(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/SynchronizationConstraintTimeMeasure.tessla";
-        int numTraces = 56;
+        int numTraces = 64;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
         String[] params = new String[numTraces];
         int i = 0;
         int maxEventsPerCluster = 2;
-        //int clusterDistance = 100;
+        int clusterDistance = 200;
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
-            for (int tolerance = 1; tolerance <= 100; tolerance+=20)//4
-                    for (int clusterDistance = Math.max(tolerance/2, 1); clusterDistance <= 2*tolerance;       //3
-                            clusterDistance*= 2){
+            for (int tolerance = 5; tolerance <= 155; tolerance+=10){
                         System.out.println("Synchronization Trace " + (i+1) + " of " + numTraces);
                         params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
                             " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
@@ -274,7 +272,7 @@ public class TimeMeasureAll{
         int i = 0;
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
             for (int tolerance = 1; tolerance <= 100; tolerance+=12)//6
-                for (int clusterDistance = 1; clusterDistance <= 128;       //5
+                for (int clusterDistance = 2; clusterDistance <= 246;       //5
                         clusterDistance*=4){
                     System.out.println("StrongSynchronizationConstraint Trace " + (i+1) + " of " + traceCount);
                     params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
@@ -408,8 +406,8 @@ public class TimeMeasureAll{
         int jitter = 0;
         for (int i = 0; i < 100; i++){
             System.out.println("PatternConstraint1 Trace " + (i+1) + " of " + numTraces);
-            int[] offset = new int[i];
-            for (int j = 0; j < i; j++)
+            int[] offset = new int[i+1];
+            for (int j = 0; j <= i; j++)
                 offset[j] = j+1;
             int period = 200;
             params[i] = "period= " + period + " |offset|= " + (i+1) + " jitter=0";
@@ -423,6 +421,8 @@ public class TimeMeasureAll{
                 if (results[i] == null)
                     return;
         }
+        //save results to file
+        writeResults(outputFileName, results, params);
     }
     
     private static void measurePatternConstraint1(String outputFileName, int traceSize){
@@ -547,13 +547,20 @@ public class TimeMeasureAll{
         int jitter = 0;
         for (int i = 0; i < 100; i++){
             System.out.println("ArbitraryConstraint Trace " + (i+1) + " of " + numTraces);
-            int[] minimum = new int[i];
-            int[] maximum = new int[i];
-            for (int j = 0; j < i; j++){
-                minimum[i] = i*2;
-                maximum[i] = i*2+1;
+            int[] minimum = new int[(i+1)*3];
+            int[] maximum = new int[(i+1)*3];
+            for (int j = 0; j < minimum.length; j++){
+                minimum[j] = (j+1)*2;
+                maximum[j] = (j+1)*2;
             }
-            params[i] = "|maximum|=" + i;
+            params[i] = "|maximum|=" + minimum.length ;//+ " min: [";
+            /*for (int min : minimum)
+                params[i]+= min + ",";
+            params[i]+= "] max: [";
+            for (int max : maximum)
+                params[i]+= max + ",";
+             params[i]+= "]";*/
+            System.out.println(params[i]);
             TimeMeasureArbitraryConstraint constraint = new TimeMeasureArbitraryConstraint(minimum, maximum);
             TraceSet trace = constraint.generateTrace(traceSize);
             //generate TesslaFile
@@ -564,6 +571,8 @@ public class TimeMeasureAll{
             if (results[i] == null)
                 return;
         }
+        //save results to file
+        writeResults(outputFileName, results, params);
     }
     
     private static void measureArbitraryConstraint1(String outputFileName, int traceSize){
@@ -680,9 +689,10 @@ public class TimeMeasureAll{
         final int traceCount = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
+        int length = 2000;
         int i = 0;
-        for (int maxOccurrences = 1; maxOccurrences <= 100; maxOccurrences++){
-            int length = 4 * maxOccurrences;
+        for (int ctr = 1; ctr <= 100; ctr++){
+            int maxOccurrences= 9 * ctr;
             System.out.println("BurstConstraint Trace " + (i+1) + " of " + traceCount);
             params[i] = "length: " + length + " maxOccurrences: " + maxOccurrences;
             TimeMeasureBurstConstraint constraint = new TimeMeasureBurstConstraint(length, maxOccurrences);
