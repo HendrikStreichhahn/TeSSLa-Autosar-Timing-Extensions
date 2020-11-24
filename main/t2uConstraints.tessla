@@ -18,7 +18,7 @@ def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, uppe
                 List_head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
                 List_head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
             #remove matched target events
-            merge(slift(unfinishedSourceTimesNewSource, defaultTime(target), 
+            merge(slift(unfinishedSourceTimesNewSource, defaultTime(target) - lower + 1, 
 					removeItemsSmallerThanAFromListFront),
 				List_empty[Int])
         else
