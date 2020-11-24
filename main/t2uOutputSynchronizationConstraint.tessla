@@ -121,13 +121,17 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
             aSet
         else
             setAddList(Set_add(aSet, List_head(aList)), List_tail(aList))
-            
-    def endConditionFulfilled(fulfilledClusters: Set[Int], stimulusColors: List[Int]): Bool :=
-        static if (List_size(stimulusColors) == 0) then
-            true
+    
+    
+    def endConditionFulfilled(timeEventStreams: Int, timeEndOfStreams: Int, fulfilledClusters: Set[Int], stimulusColors: List[Int]): Bool :=
+        static if (timeEndOfStreams >= timeEventStreams) then
+            static if (List_size(stimulusColors) == 0) then
+                true
+            else
+                Set_contains(fulfilledClusters, List_head(stimulusColors)) &&
+                    endConditionFulfilled(timeEventStreams, timeEndOfStreams, fulfilledClusters, List_tail(stimulusColors))
         else
-            Set_contains(fulfilledClusters, List_head(stimulusColors)) &&
-                endConditionFulfilled(fulfilledClusters, List_tail(stimulusColors))
+            true
     
     # Stored Information #
     def stimulusColors: Events[List[Int]] := merge(
@@ -159,9 +163,10 @@ def outputSynchronizationConstraint[A](eventStreamIndices: Events[Map[Int, Int]]
 
     # Evaluation and output #
         # each started synchronization cluster is younger than tolerance or fulfilled
+    #allPreviousTrue(slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled))
     allPreviousTrue(slift3(storedClustersBeforeRemove, tolerance, evalTimes, constraintFulfilled) &&
         # on end of streams-> all stimulus colors had synchronization cluster
-        merge(on(endOfStreams,  slift(allFulfilled, stimulusColors, endConditionFulfilled)), true))
+        merge(slift4(defaultTime(eventStreamIndices), defaultTime(endOfStreams), allFulfilled, stimulusColors, endConditionFulfilled), true))
 }
 
 def outputSynchronizationConstraint2[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int,
