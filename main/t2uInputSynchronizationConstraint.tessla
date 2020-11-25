@@ -25,24 +25,45 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
                         Map_add(Map_get(latestEventTimes, Map_headKey(eventStreamIndices)), Map_headValue(eventStreamIndices), timeNow)), 
                     timeNow, Map_tail(eventStreamIndices))
     # time of the oldest event of the given color
-    def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
-        static if (Map_size(latestEvents) == 0) then
+    def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
+        static if (Map_size(latestEvents) == 0 || List_size(remainingKeys) == 0) then
             infty
         else
-            if (Map_contains(Map_headValue(latestEvents), color)) then
-                min(Map_get(Map_headValue(latestEvents), color), timeOldestEvent(Map_tail(latestEvents), color))
+            if (Map_contains(Map_get(latestEvents, List_head(remainingKeys)), color)) then
+                min(Map_get(Map_get(latestEvents, List_head(remainingKeys)), color),
+                    timeOldestEvent(latestEvents, color, List_tail(remainingKeys)))
             else
                 -infty
+    
+    
+    
+ #   def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
+ #       static if (Map_size(latestEvents) == 0) then
+ #           infty
+ #       else
+ #           if (Map_contains(Map_headValue(latestEvents), color)) then
+ #               min(Map_get(Map_headValue(latestEvents), color), timeOldestEvent(Map_tail(latestEvents), color))
+ #           else
+ #               -infty
 
     # time of the youngest event of the given color
-    def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
-        static if (Map_size(latestEvents) == 0) then
+    def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
+        static if (Map_size(latestEvents) == 0 || List_size(remainingKeys) == 0) then
             -infty
         else
-            if (Map_contains(Map_headValue(latestEvents), color)) then
-                max(Map_get(Map_headValue(latestEvents), color), timeYoungestEvent(Map_tail(latestEvents), color))
+            if (Map_contains(Map_get(latestEvents, List_head(remainingKeys)), color)) then
+                max(Map_get(Map_get(latestEvents, List_head(remainingKeys)), color),
+                    timeYoungestEvent(latestEvents, color, List_tail(remainingKeys)))
             else
                 infty
+ #   def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
+ #       static if (Map_size(latestEvents) == 0) then
+ #           -infty
+ #       else
+ #           if (Map_contains(Map_headValue(latestEvents), color)) then
+ #               max(Map_get(Map_headValue(latestEvents), color), timeYoungestEvent(Map_tail(latestEvents), color))
+ #           else
+ #               infty
 
 
     # checks, if the synchronization cluster for the given color is fulfilled
@@ -51,7 +72,7 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
             true
         else
             clusterFulfilled(Map_tail(latestEventTimes), color, tolerance) && 
-            timeOldestEvent(latestEventTimes, color) + tolerance >= timeYoungestEvent(latestEventTimes, color)
+            timeOldestEvent(latestEventTimes, color, Map_keys(latestEventTimes)) + tolerance >= timeYoungestEvent(latestEventTimes, color, Map_keys(latestEventTimes))
         
     #stored information
     
