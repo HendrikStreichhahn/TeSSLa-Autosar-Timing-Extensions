@@ -269,4 +269,226 @@ def outputSynchronizationConstraint5[A](stimulus: Events[Int], response1: Events
                                                    else Map_empty[Int, Int])
     outputSynchronizationConstraint(eventsNow, 5, tolerance, endOfStreams)
 }
+
+def outputSynchronizationConstraint6[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+        tolerance: Int, endOfStreams: Events[A]): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus),
+        merge(time(response1),
+        merge(time(response2),
+        merge(time(response3),
+        merge(time(response4),
+        merge(time(response5),
+            time(response6)))))))
+
+    def eventsNow = 
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(stimulus)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, stimulus), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(response1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, response1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, response2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, response3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, response4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response5) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 5, response5), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response6) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 6, response6), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    outputSynchronizationConstraint(eventsNow, 6, tolerance, endOfStreams)
+}
+
+def outputSynchronizationConstraint7[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+        response7: Events[Int], tolerance: Int, endOfStreams: Events[A]): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus),
+        merge(time(response1),
+        merge(time(response2),
+        merge(time(response3),
+        merge(time(response4),
+        merge(time(response5),
+        merge(time(response6),
+            time(response7))))))))
+
+    def eventsNow = 
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(stimulus)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, stimulus), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(response1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, response1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, response2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, response3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, response4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response5) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 5, response5), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response6) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 6, response6), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response7) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 7, response7), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    outputSynchronizationConstraint(eventsNow, 7, tolerance, endOfStreams)
+}
+
+def outputSynchronizationConstraint8[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+        response7: Events[Int], response8: Events[Int], tolerance: Int, endOfStreams: Events[A]): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus),
+        merge(time(response1),
+        merge(time(response2),
+        merge(time(response3),
+        merge(time(response4),
+        merge(time(response5),
+        merge(time(response6),
+        merge(time(response7),
+            time(response8)))))))))
+
+    def eventsNow = 
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(stimulus)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, stimulus), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(response1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, response1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, response2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, response3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, response4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response5) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 5, response5), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response6) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 6, response6), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response7) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 7, response7), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response8) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 8, response8), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    outputSynchronizationConstraint(eventsNow, 8, tolerance, endOfStreams)
+}
+
+def outputSynchronizationConstraint9[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+        response7: Events[Int], response8: Events[Int], response9: Events[Int], tolerance: Int,
+        endOfStreams: Events[A]): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus),
+        merge(time(response1),
+        merge(time(response2),
+        merge(time(response3),
+        merge(time(response4),
+        merge(time(response5),
+        merge(time(response6),
+        merge(time(response7),
+        merge(time(response8),
+            time(response9))))))))))
+
+    def eventsNow = 
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(stimulus)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, stimulus), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(response1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, response1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, response2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, response3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, response4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response5) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 5, response5), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response6) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 6, response6), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response7) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 7, response7), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response8) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 8, response8), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response9) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 9, response9), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    outputSynchronizationConstraint(eventsNow, 9, tolerance, endOfStreams)
+}
+
+def outputSynchronizationConstraint10[A](stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+        response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+        response7: Events[Int], response8: Events[Int], response9: Events[Int], response10: Events[Int],
+        tolerance: Int, endOfStreams: Events[A]): Events[Bool] := {
+    def timeNow = 
+        merge(time(stimulus),
+        merge(time(response1),
+        merge(time(response2),
+        merge(time(response3),
+        merge(time(response4),
+        merge(time(response5),
+        merge(time(response6),
+        merge(time(response7),
+        merge(time(response8),
+        merge(time(response9),
+            time(response10)))))))))))
+
+    def eventsNow = 
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+        Map_attachIntIntLifted(
+            if (defaultTime(stimulus)  >= timeNow) then merge(Map_add(Map_empty[Int, Int], 0, stimulus), Map_empty[Int, Int]) 
+                                                   else Map_empty[Int, Int],
+            if (defaultTime(response1) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 1, response1), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response2) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 2, response2), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response3) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 3, response3), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response4) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 4, response4), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response5) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 5, response5), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response6) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 6, response6), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response7) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 7, response7), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response8) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 8, response8), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response9) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 9, response9), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int]),
+            if (defaultTime(response10) >= timeNow) then merge(Map_add(Map_empty[Int, Int], 10, response10), Map_empty[Int, Int])
+                                                   else Map_empty[Int, Int])
+    outputSynchronizationConstraint(eventsNow, 10, tolerance, endOfStreams)
+}
         

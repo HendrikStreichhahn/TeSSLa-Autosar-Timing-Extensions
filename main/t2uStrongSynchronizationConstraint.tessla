@@ -149,3 +149,120 @@ def StrongSynchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2:
                           if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
         5, tolerance)
 }
+
+
+def StrongSynchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+        events5: Events[E], events6: Events[F], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+        events1, events2), events3), events4), events5), events6))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
+        6, tolerance)
+}
+
+
+def StrongSynchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+        events5: Events[E], events6: Events[F], events7: Events[G], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+        events1, events2), events3), events4), events5), events6), events7))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
+        7, tolerance)
+}
+
+def StrongSynchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+        events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+        events1, events2), events3), events4), events5), events6), events7), events8))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
+                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List_empty[Int]),
+        8, tolerance)
+}
+
+def StrongSynchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+        events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+        events1, events2), events3), events4), events5), events6), events7), events8), events9))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
+                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List_empty[Int]),
+                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List_empty[Int]),
+        9, tolerance)
+}
+
+def StrongSynchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+        events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[Bool]:={
+    def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+        events1, events2), events3), events4), events5), events6), events7), events8), events9), events10))
+
+    StrongSynchronizationConstraint(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
+                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List_empty[Int]),
+                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List_empty[Int]),
+                          if (defaultTime(events10) >= timeNow) then buildList(1, 10) else List_empty[Int]),
+        10, tolerance)
+}
