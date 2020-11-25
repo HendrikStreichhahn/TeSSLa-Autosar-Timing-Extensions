@@ -46,8 +46,9 @@ public class TimeMeasureAll{
         //measureReactionConstraint("results/ReactionResult.txt", 10000);
         //measureAgeConstraint("results/AgeResult.txt", 10000);
         //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
-        //measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
-        
+        //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
+        measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
+        measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
         
     }
     
@@ -799,6 +800,36 @@ public class TimeMeasureAll{
         writeResults(outputFileName, results, params);
     }
     
+    private static void measureOutputSynchronizationConstraint2(String outputFileName, int traceSize){
+        final String TESSLAFILEPATH = "tmp/OutputSynchronizationConstraintTimeMeasure2.tessla";
+        final int traceCount = 54;
+        SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
+        String[] params = new String[traceCount];
+        int i = 0;
+        int clusterDistance = 2;
+        for (int streamCount = 2; streamCount <= 10; streamCount++)//4
+            for (int tolerance = 10; tolerance <= 25; tolerance+= 3){
+                    System.out.println("OutputSynchronizationConstraint Trace " + (i+1) + " of "
+                        + traceCount);
+                    params[i] = "responseCount: " + streamCount + " tolerance: " + tolerance + 
+                        " clusterDistance: " + clusterDistance;
+                    TimeMeasureOutputSynchronizationConstraint constraint =
+                        new TimeMeasureOutputSynchronizationConstraint(streamCount, clusterDistance,
+                            tolerance);
+                    TraceSet trace = constraint.generateTrace(traceSize);
+                    //generate TesslaFile
+                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+                        System.out.println(TESSLAFILEPATH + " could not be created!");
+                    //measure time per event
+                    results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
+                    if (results[i] == null)
+                        return;
+                    i++;
+                }
+        //save results to file
+        writeResults(outputFileName, results, params);
+    }
+    
     
     private static void measureInputSynchronizationConstraint(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/InputSynchronizationConstraintTimeMeasure.tessla";
@@ -810,6 +841,36 @@ public class TimeMeasureAll{
             for (int tolerance = 10; tolerance <= 25; tolerance+= 3)//5
                 for (int clusterDistance = 2; clusterDistance <= 2*tolerance;       //5
                         clusterDistance*=2){
+                    System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
+                        + traceCount);
+                    params[i] = "stimulusCount: " + streamCount + " tolerance: " + tolerance + 
+                        " clusterDistance: " + clusterDistance;
+                    TimeMeasureInputSynchronizationConstraint constraint =
+                        new TimeMeasureInputSynchronizationConstraint(streamCount, clusterDistance,
+                            tolerance);
+                    TraceSet trace = constraint.generateTrace(traceSize);
+                    //generate TesslaFile
+                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+                        System.out.println(TESSLAFILEPATH + " could not be created!");
+                    //measure time per event
+                    results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
+                    if (results[i] == null)
+                        return;
+                    i++;
+                }
+        //save results to file
+        writeResults(outputFileName, results, params);
+    }
+    
+        private static void measureInputSynchronizationConstraint2(String outputFileName, int traceSize){
+        final String TESSLAFILEPATH = "tmp/InputSynchronizationConstraintTimeMeasure2.tessla";
+        final int traceCount = 54;
+        SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
+        String[] params = new String[traceCount];
+        int i = 0;
+        int clusterDistance = 2;
+        for (int streamCount = 2; streamCount <= 10; streamCount++)//4
+            for (int tolerance = 10; tolerance <= 25; tolerance+= 3){
                     System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
                         + traceCount);
                     params[i] = "stimulusCount: " + streamCount + " tolerance: " + tolerance + 
