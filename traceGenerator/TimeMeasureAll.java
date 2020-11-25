@@ -23,7 +23,7 @@ public class TimeMeasureAll{
     
     public static void main(String[] args){
         //measureJustOutput("results/justOutput.txt", 10000);
-        //measureDelayConstraint("results/DelayResult.txt", 10000);
+        measureDelayConstraint("results/DelayResult.txt", 10000);
         //measureStrongDelayConstraint("results/StrongDelayResult.txt", 10000);
         //measureRepeatConstraint("results/RepeatResult.txt", 10000);
         //measureRepetitionConstraint("results/RepetitionResult.txt", 10000);// nochmal laufen lassen
@@ -38,7 +38,7 @@ public class TimeMeasureAll{
         //measurePatternConstraint1("results/Pattern1Result.txt", 10000);
         //measurePatternConstraint2("results/Pattern2Result.txt", 10000);//should be fixed 
         //measurePatternConstraint3("results/Pattern3Result.txt", 10000);//should be fixed 
-        measureArbitraryConstraint("results/ArbitraryResult.txt", 10000);
+        //measureArbitraryConstraint("results/ArbitraryResult.txt", 10000);
         //measureArbitraryConstraint1("results/Arbitrary1Result.txt", 10000);
         //measureArbitraryConstraint2("results/Arbitrary2Result.txt", 10000);
         //measureArbitraryConstraint3("results/Arbitrary3Result.txt", 10000);
@@ -46,7 +46,7 @@ public class TimeMeasureAll{
         //measureReactionConstraint("results/ReactionResult.txt", 10000);
         //measureAgeConstraint("results/AgeResult.txt", 10000);
         //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
-        measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
+        //measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
         
         
     }

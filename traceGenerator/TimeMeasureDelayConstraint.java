@@ -16,7 +16,7 @@ public class TimeMeasureDelayConstraint extends TimeMeasureConstraint{
         //Trace generieren
         DelayConstraintGenerator trace = new DelayConstraintGenerator();
         //generate trace, repeat until fulfilled trace generated
-        while (!trace.generateTestTrace(eventCount, sourceDistance, sourceDistance+1, lower, upper)){
+        while (!trace.generateTestTrace(eventCount, sourceDistance, sourceDistance, lower, upper)){
             trace = new DelayConstraintGenerator();
             System.out.println("trace regenerated");
         }

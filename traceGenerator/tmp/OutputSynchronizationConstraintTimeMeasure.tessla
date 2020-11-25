@@ -3,5 +3,8 @@ in stimulus: Events[Int]
 in endOfStreams: Events[Int]
 in response1: Events[Int]
 in response2: Events[Int]
-def constraint := outputSynchronizationConstraint2(stimulus, response1, response2, 10, endOfStreams)
+in response3: Events[Int]
+in response4: Events[Int]
+in response5: Events[Int]
+def constraint := outputSynchronizationConstraint5(stimulus, response1, response2, response3, response4, response5, 25, endOfStreams)
 out constraint
