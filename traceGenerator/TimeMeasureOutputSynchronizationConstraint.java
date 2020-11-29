@@ -25,25 +25,51 @@ public class TimeMeasureOutputSynchronizationConstraint extends TimeMeasureConst
         return trace;
     }
     
+    private String writeInput(){
+        String result = "";
+        result+= "include \"" + PATHTOOUTPUTSYNCH + "\"\n";
+        result+= "in stimulus: Events[Int]\n";
+        result+= "in endOfStreams: Events[Int]\n";
+        for (int i = 1; i <= streamCount; i++)
+            result+= "in response" + i + ": Events[Int]\n";
+        return result;
+    }
+    
+    private String writeTimeNow(int i){
+        if (i == 0)
+            return "time(stimulus)";
+        else
+            return "merge(time(response" + i + ")," + writeTimeNow(i-1) + ")";
+    }
+    
+    private String writeEventsNow(int i){
+        if (i == 1)
+            return "if (defaultTime(response"+i+") >= timeNow) then merge(Map_add(Map_empty[Int, Int], "+i+", response"+i+"), Map_empty[Int, Int]) else Map_empty[Int, Int],";
+        else
+            return "Map_attachIntIntLifted(" + writeEventsNow(i-1) + "if (defaultTime(response"+i+") >= timeNow) then merge(Map_add(Map_empty[Int, Int], "+i+", response"+i+"), Map_empty[Int, Int]) else Map_empty[Int, Int]),";
+    }
+    
+    private String writeEventsNow(){
+        return "Map_attachIntIntLifted(" + writeEventsNow(streamCount) + "if (defaultTime(stimulus) >= timeNow) then merge(Map_add(Map_empty[Int, Int], "+0+", stimulus), Map_empty[Int, Int]) else Map_empty[Int, Int])";
+    }
+    
+    
+    
     public boolean generateTeSSLaFile(String fileName){
         try {
             FileWriter fileWriter = new FileWriter(fileName);
-            fileWriter.write("include \"" + PATHTOOUTPUTSYNCH + "\"\n");
-            fileWriter.write("in stimulus: Events[Int]\n");
-            fileWriter.write("in endOfStreams: Events[Int]\n");
-            for (int i = 1; i <= streamCount; i++)
-                fileWriter.write("in response" + i + ": Events[Int]\n");
-            fileWriter.write("def constraint := outputSynchronizationConstraint" + streamCount +
-                "(stimulus, ");
-            for (int i = 1; i <= streamCount; i++)
-                fileWriter.write("response"+i+", ");
-            fileWriter.write(tolerance + ", endOfStreams)\n");
-            fileWriter.write("out constraint\n");
+            fileWriter.write(writeInput());
+            fileWriter.write("def timeNow = " + writeTimeNow(streamCount)+ "\n");
+            fileWriter.write("def eventsNow = " + writeEventsNow()+ "\n");
+
+            //output
+            fileWriter.write("def constraint :=  outputSynchronizationConstraint(eventsNow, " + streamCount +" ," + tolerance + ", endOfStreams)\n");    
+            fileWriter.write("out constraint");
             fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
-        }
+        }                                      
         return true;
     }
 }
