@@ -48,7 +48,9 @@ public class TimeMeasureAll{
         //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
         //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
         //measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
-        measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
+        //measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
+        
+        measureCheckEventChain("results/CheckEventChainResult.txt", 10000);
         
     }
     
@@ -888,6 +890,30 @@ public class TimeMeasureAll{
                         return;
                     i++;
                 }
+        //save results to file
+        writeResults(outputFileName, results, params);
+    }
+    
+    private static void measureCheckEventChain(String outputFileName, int traceSize){
+        final String TESSLAFILEPATH = "tmp/CheckEventChainTimeMeasure.tessla";
+        final int traceCount = 100;
+        SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
+        String[] params = new String[traceCount];
+        for (int i = 0; i < traceCount; i++){
+            System.out.println("CheckEventChain Trace " + (i+1) + " of "
+                        + traceCount);
+             params[i] =  "Trace " + (i+1);
+             TimeMeasureCheckEventChain constraint =
+                new TimeMeasureCheckEventChain();
+            TraceSet trace = constraint.generateTrace(traceSize);
+            //generate TesslaFile
+            if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+                System.out.println(TESSLAFILEPATH + " could not be created!");
+            //measure time per event
+            results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
+            if (results[i] == null)
+                return;
+        }
         //save results to file
         writeResults(outputFileName, results, params);
     }
