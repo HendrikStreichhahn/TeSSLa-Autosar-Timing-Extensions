@@ -895,25 +895,29 @@ public class TimeMeasureAll{
     }
     
     private static void measureCheckEventChain(String outputFileName, int traceSize){
+        
         final String TESSLAFILEPATH = "tmp/CheckEventChainTimeMeasure.tessla";
-        final int traceCount = 100;
+        final int traceCount = 102;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
-        for (int i = 0; i < traceCount; i++){
-            System.out.println("CheckEventChain Trace " + (i+1) + " of "
-                        + traceCount);
-             params[i] =  "Trace " + (i+1);
-             TimeMeasureCheckEventChain constraint =
-                new TimeMeasureCheckEventChain();
-            TraceSet trace = constraint.generateTrace(traceSize);
-            //generate TesslaFile
-            if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                System.out.println(TESSLAFILEPATH + " could not be created!");
-            //measure time per event
-            results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-            if (results[i] == null)
-                return;
-        }
+        int i = 0;
+        for (int minimum = 100; minimum <= 1000; minimum += 100)
+            for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
+                int maximum = minimum;
+                System.out.println("CheckEventChain Trace " + (i+1) + " of " + traceCount);
+                params[i] = "stimulusDistance: " + stimulusDistance + " minimum: " + minimum + " maximum: " + maximum;
+                TimeMeasureCheckEventChain constraint = new TimeMeasureCheckEventChain(minimum,
+                    maximum, stimulusDistance, stimulusDistance);
+                TraceSet trace = constraint.generateTrace(traceSize);
+                //generate TesslaFile
+                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+                    System.out.println(TESSLAFILEPATH + " could not be created!");
+                //measure time per event
+                results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
+                if (results[i] == null)
+                    return;
+                i++;
+            } 
         //save results to file
         writeResults(outputFileName, results, params);
     }

@@ -2,20 +2,10 @@ import java.util.Random;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class TimeMeasureCheckEventChain extends TimeMeasureConstraint{
+public class TimeMeasureCheckEventChain extends TimeMeasureReactionConstraint{
     
-    public TimeMeasureCheckEventChain(){
-    }
-    
-    public TraceSet generateTrace(int eventCount){
-        //Trace generieren
-        ReactionConstraintGenerator trace = new ReactionConstraintGenerator();
-        //generate trace, repeat until fulfilled trace generated
-        while (!trace.generateTestTrace(eventCount, 1,100,10,10)){
-            trace = new ReactionConstraintGenerator();
-            //System.out.println("trace regenerated");
-        }
-        return trace;
+    public TimeMeasureCheckEventChain(int minimum, int maximum, int minStimulusDist, int maxStimulusDist){
+        super(minimum, maximum, minStimulusDist, maxStimulusDist);
     }
     
     public boolean generateTeSSLaFile(String fileName){
