@@ -12,21 +12,38 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
     # adds stimulus events to stored events    
     def addEventsToEmptylatestEventTimes(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
             eventStreamIndices: Map[Int, Int]): Map[Int, Map[Int, Int]] :=
-        static if (Map_size(eventStreamIndices) == 0) then
+        addEventsToEmptylatestEventTimesRec(latestEventTimes, timeNow, eventStreamIndices, Map_keys(eventStreamIndices));
+       # static if (Map_size(eventStreamIndices) == 0) then
+       #     latestEventTimes
+       # else
+       #     # if resoponse stream -> don't insert
+       #     static if (Map_headKey(eventStreamIndices) == 0) then
+       #         addEventsToEmptylatestEventTimes(latestEventTimes, timeNow, Map_tail(eventStreamIndices))
+       #     else
+       #         # insert head of map and recursive call
+       #         addEventsToEmptylatestEventTimes(
+       #             Map_add(latestEventTimes, Map_headKey(eventStreamIndices), 
+       #                 Map_add(Map_get(latestEventTimes, Map_headKey(eventStreamIndices)), Map_headValue(eventStreamIndices), timeNow)), 
+       #             timeNow, Map_tail(eventStreamIndices))
+                    
+    def addEventsToEmptylatestEventTimesRec(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
+            eventStreamIndices: Map[Int, Int], remainingKeys: List[Int]): Map[Int, Map[Int, Int]] :=
+        static if (List_size(remainingKeys) == 0) then
             latestEventTimes
         else
             # if resoponse stream -> don't insert
-            static if (Map_headKey(eventStreamIndices) == 0) then
-                addEventsToEmptylatestEventTimes(latestEventTimes, timeNow, Map_tail(eventStreamIndices))
+            static if (List_head(remainingKeys) == 0) then
+                addEventsToEmptylatestEventTimesRec(latestEventTimes, timeNow, eventStreamIndices, List_tail(remainingKeys))
             else
                 # insert head of map and recursive call
-                addEventsToEmptylatestEventTimes(
-                    Map_add(latestEventTimes, Map_headKey(eventStreamIndices), 
-                        Map_add(Map_get(latestEventTimes, Map_headKey(eventStreamIndices)), Map_headValue(eventStreamIndices), timeNow)), 
-                    timeNow, Map_tail(eventStreamIndices))
+                addEventsToEmptylatestEventTimesRec(
+                    Map_add(latestEventTimes, List_head(remainingKeys),
+                        Map_add(Map_get(latestEventTimes, List_head(remainingKeys)), Map_get(eventStreamIndices, List_head(remainingKeys)), timeNow)), 
+                    timeNow, eventStreamIndices, List_tail(remainingKeys))
     # time of the oldest event of the given color
     def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
-        static if (Map_size(latestEvents) == 0 || List_size(remainingKeys) == 0) then
+        #static if (Map_size(latestEvents) == 0 || List_size(remainingKeys) == 0) then
+        static if (List_size(remainingKeys) == 0) then
             infty
         else
             if (Map_contains(Map_get(latestEvents, List_head(remainingKeys)), color)) then
@@ -48,7 +65,8 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
 
     # time of the youngest event of the given color
     def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
-        static if (Map_size(latestEvents) == 0 || List_size(remainingKeys) == 0) then
+        #static if (Map_size(latestEvents) == 0 || List_size(remainingKeys) == 0) then
+        static if (List_size(remainingKeys) == 0) then
             -infty
         else
             if (Map_contains(Map_get(latestEvents, List_head(remainingKeys)), color)) then
@@ -67,12 +85,20 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
 
 
     # checks, if the synchronization cluster for the given color is fulfilled
-    def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =
-        static if (Map_size(latestEventTimes) == 0) then
+    def clusterFulfilledABC(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =
+        clusterFulfilledRec(latestEventTimes, Map_keys(latestEventTimes), color, tolerance)
+        #static if (Map_size(latestEventTimes) == 0) then
+        #    true
+        #else
+        #    timeOldestEvent(latestEventTimes, color, Map_keys(latestEventTimes)) + tolerance >= timeYoungestEvent(latestEventTimes, color, Map_keys(latestEventTimes)) &&
+        #    clusterFulfilled(Map_tail(latestEventTimes), color, tolerance)
+            
+    def clusterFulfilledRec(latestEventTimes: Map[Int, Map[Int, Int]], remainingKeys: List[Int], color: Int, tolerance: Int) : Bool =
+        static if (List_size(remainingKeys) == 0) then
             true
         else
-            clusterFulfilled(Map_tail(latestEventTimes), color, tolerance) && 
-            timeOldestEvent(latestEventTimes, color, Map_keys(latestEventTimes)) + tolerance >= timeYoungestEvent(latestEventTimes, color, Map_keys(latestEventTimes))
+            timeOldestEvent(latestEventTimes, color, remainingKeys) + tolerance >= timeYoungestEvent(latestEventTimes, color, remainingKeys) &&
+            clusterFulfilledRec(latestEventTimes, List_tail(remainingKeys), color, tolerance)
         
     #stored information
     
@@ -87,7 +113,8 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
         # 'now' has stimulus event
         # response event-> matching stimulus cluster exists
         if Map_contains(eventStreamIndices, 0) then
-            slift4(latestEventTimes, Map_get(eventStreamIndices, 0), tolerance, time(eventStreamIndices), clusterFulfilled)
+            #slift4(latestEventTimes, Map_get(eventStreamIndices, 0), tolerance, time(eventStreamIndices), clusterFulfilledABC)
+            slift3(latestEventTimes, Map_get(eventStreamIndices, 0), tolerance, clusterFulfilledABC)
         else
             true
     )
