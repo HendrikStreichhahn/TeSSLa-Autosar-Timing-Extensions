@@ -86,17 +86,17 @@ def allPreviousTrue(events: Events[Bool]): Events[Bool] :={
     storage
 }
 
-@liftable
-def Map_headValue[A, B](aMap: Map[A, B]): B :=
-    Map_get(aMap, List_head(Map_keys(aMap)))
+#@liftable
+#def Map_headValue[A, B](aMap: Map[A, B]): B :=
+#    Map_get(aMap, List_head(Map_keys(aMap)))
 
-@liftable    
-def Map_headKey[A, B](aMap: Map[A, B]): A :=
-    List_head(Map_keys(aMap))
+#@liftable    
+#def Map_headKey[A, B](aMap: Map[A, B]): A :=
+#    List_head(Map_keys(aMap))
 
-@liftable
-def Map_tail[A, B](aMap: Map[A, B]): Map[A, B] :=
-    Map_remove(aMap, Map_headKey(aMap))
+#@liftable
+#def Map_tail[A, B](aMap: Map[A, B]): Map[A, B] :=
+#    Map_remove(aMap, Map_headKey(aMap))
 
 def List_containsInt(list: List[Int], val: Int): Bool :=
     static if List_size(list) == 0 then
