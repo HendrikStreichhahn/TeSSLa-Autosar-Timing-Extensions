@@ -30,6 +30,6 @@
 50: response1 = 8
 50: response2 = 8
 50: response3 = 8
-#fail -> stimulus after respose
+#violation of event chain, no fail of OutputSynchronizationConstraint
 60: stimulus = 1
-70: endOfStreams
+70: response1 = 100

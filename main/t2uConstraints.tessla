@@ -4,40 +4,40 @@ def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, uppe
     def unfinishedSourceTimesNewSource: Events[List[Int]] := 
         # 'now' has source event
         if (defaultTime(source) >= defaultTime(target)) then
-            merge(List_append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                  List_empty[Int])
+            merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
+                  List.empty[Int])
         else
-            merge(last(unfinishedSourceTimes, mergeUnit(source, target)), List_empty[Int])
+            merge(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
     #
     def unfinishedSourceTimes: Events[List[Int]]:=
         # 'now' has target event
         if (defaultTime(source) <= defaultTime(target) &&
                 # List has source event without matching target
-                List_size(unfinishedSourceTimesNewSource) > 0 &&
+                List.size(unfinishedSourceTimesNewSource) > 0 &&
                 # target event now matches with oldest source event
-                List_head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                List_head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
             #remove matched target events
             merge(slift(unfinishedSourceTimesNewSource, defaultTime(target) - lower + 1, 
 					removeItemsSmallerThanAFromListFront),
-				List_empty[Int])
+				List.empty[Int])
         else
-            merge(unfinishedSourceTimesNewSource, List_empty[Int])
+            merge(unfinishedSourceTimesNewSource, List.empty[Int])
       
 	def evaluateTimes = mergeUnit(mergeUnit(source, target),
-        safeDelay(if (List_size(unfinishedSourceTimes) == 0) then
+        safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
 				infty
 			else
-				List_head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
+				List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
 			mergeUnit(source, target)))
             
     stillFulfillabe(
         # no unfinished source events -> current true
-        if (List_size(unfinishedSourceTimes) == 0) then
+        if (List.size(unfinishedSourceTimes) == 0) then
             {value= true, final= false}
         else
             # oldest source event can still be finished-> current false
-            if (time(evaluateTimes) <= List_head(unfinishedSourceTimes) + upper) then
+            if (time(evaluateTimes) <= List.head(unfinishedSourceTimes) + upper) then
                 {value= false, final= false}
             # oldest source event is too old -> final false
             else
@@ -49,37 +49,37 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
     def unfinishedSourceTimes: Events[List[Int]] :=
         #event now is source event
         if (defaultTime(source) > defaultTime(target)) then
-            merge(List_append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                  List_empty[Int])
+            merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
+                  List.empty[Int])
         else if (defaultTime(source) < defaultTime(target)) then
-            merge(List_tail(last(unfinishedSourceTimes, mergeUnit(source, target))), List_empty[Int])
+            merge(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), List.empty[Int])
         else # defaultTime(source) == defaultTime(target)
-            merge(List_append(List_tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
-                  List_empty[Int])
+            merge(List.append(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
+                  List.empty[Int])
     # delay
     def evaluateTimes = mergeUnit(mergeUnit(source, target),
-        safeDelay(if (List_size(unfinishedSourceTimes) == 0) then#
+        safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
 				infty
 			else
-				List_head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
+				List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
 			mergeUnit(source, target)))
 	# output
     stillFulfillabe(
         # no unmatched source event-> current true
-        if (List_size(last(unfinishedSourceTimes, evaluateTimes)) == 0) then
+        if (List.size(last(unfinishedSourceTimes, evaluateTimes)) == 0) then
             {value= true, final= false}
         else
             # now just source events
             if (defaultTime(source) > defaultTime(target)) then
                 # oldest stored event not too old
-                if (time(evaluateTimes) <= List_head(last(unfinishedSourceTimes, evaluateTimes)) + upper) then
+                if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper) then
                     {value= false, final= false}
                 else
                     {value= false, final= true}
             else
                 # oldest stored event in right distance
-                if (time(evaluateTimes) <= List_head(last(unfinishedSourceTimes, evaluateTimes)) + upper &&
-                        defaultTime(target) >= List_head(last(unfinishedSourceTimes, evaluateTimes)) + lower ) then
+                if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper &&
+                        defaultTime(target) >= List.head(last(unfinishedSourceTimes, evaluateTimes)) + lower ) then
                     {value= false, final= false}
                 else
                     {value= false, final= true})
@@ -109,41 +109,41 @@ def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events
 def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedBoolean] := {
     # lower bound for current x
     def lowerBoundXNow: Events[Int] =
-        if (List_size(last(LowerBoundX, e)) < span) then
+        if (List.size(last(LowerBoundX, e)) < span) then
             time(e)-jitter
         else
-            max(List_head(last(LowerBoundX, e)), time(e)-jitter)
+            max(List.head(last(LowerBoundX, e)), time(e)-jitter)
     # upper bound for current x
     def upperBoundXNow: Events[Int] =
-        if (List_size(last(UpperBoundX, e)) < span) then
+        if (List.size(last(UpperBoundX, e)) < span) then
             time(e)
         else
-            min(List_head(last(UpperBoundX, e)), time(e))
+            min(List.head(last(UpperBoundX, e)), time(e))
 
     # lower bound for span next x
     def LowerBoundX: Events[List[Int]]:= merge(
-        if (List_size(last(LowerBoundX, e)) < span) then
-           List_append(last(LowerBoundX, e), lowerBoundXNow + lower)
+        if (List.size(last(LowerBoundX, e)) < span) then
+           List.append(last(LowerBoundX, e), lowerBoundXNow + lower)
         else
-            List_append(last(List_tail(LowerBoundX), e), lowerBoundXNow + lower),
-        List_empty[Int]
+            List.append(last(List.tail(LowerBoundX), e), lowerBoundXNow + lower),
+        List.empty[Int]
     )
         
      # upper bound for span next x
     def UpperBoundX: Events[List[Int]]:= merge(
-        if (List_size(last(UpperBoundX, e)) < span) then
-            List_append(last(UpperBoundX, e), upperBoundXNow+upper)
+        if (List.size(last(UpperBoundX, e)) < span) then
+            List.append(last(UpperBoundX, e), upperBoundXNow+upper)
         else
-            List_append(last(List_tail(UpperBoundX), e), upperBoundXNow + upper),
-        List_empty[Int]
+            List.append(last(List.tail(UpperBoundX), e), upperBoundXNow + upper),
+        List.empty[Int]
     )
     def evaluateTimes = mergeUnit(e,
-        safeDelay((if (List_size(UpperBoundX) == 0) then 0 else List_head(UpperBoundX)) +
+        safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
                 jitter - time(e)+1, e))
     # Evaluation        
     stillFulfillabe(
         #first event or correct distance to X
-        if (List_size(LowerBoundX) == 0 && List_size(UpperBoundX) == 0) ||
+        if (List.size(LowerBoundX) == 0 && List.size(UpperBoundX) == 0) ||
                 lowerBoundXNow <= time(evaluateTimes) &&
                 upperBoundXNow + jitter >= time(evaluateTimes) then
             {value= true, final= false}
@@ -152,7 +152,7 @@ def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jit
 }
 
 def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
-        lower: Int, upper: Int): Events[Bool] :={
+        lower: Int, upper: Int): Events[fourValuedBoolean] :={
     # timestamps, when the constraint is evaluated
     def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
     def evaluateTimes: Events[Unit] := 
@@ -165,11 +165,22 @@ def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preemp
     # evaluation
     def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
     # 'now' is end event
-    allPreviousTrue(if (time(evaluateTimes) == defaultTime(end)) then
-        lower <= execTime && execTime <= upper
-    else
+    #allPreviousTrue(if (time(evaluateTimes) == defaultTime(end)) then
+    #    lower <= execTime && execTime <= upper
+    #else
         #ignore lower
-        execTime <= upper)
+    #    execTime <= upper)
+        
+    stillFulfillabe(
+        #first event or correct distance to X
+        if (if (time(evaluateTimes) == defaultTime(end)) then
+                lower <= execTime && execTime <= upper
+            else
+                #ignore lower
+                execTime <= upper) then
+            {value= true, final= false}
+        else
+            {value= false, final= true})
 }
 
 def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedBoolean] :=
@@ -189,12 +200,12 @@ def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: 
     sporadicConstraint(events, period, period, jitter, minDist)
 
 def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[fourValuedBoolean] :=
-    static if (List_size(minDist) > 1 && List_size(maxDist) > 1) then
-        slift(arbitraryConstraintRec(e, List_tail(minDist), List_tail(maxDist), ctr+1),
-            repeatConstraint(e, List_head(minDist), List_head(maxDist), ctr),
+    static if (List.size(minDist) > 1 && List.size(maxDist) > 1) then
+        slift(arbitraryConstraintRec(e, List.tail(minDist), List.tail(maxDist), ctr+1),
+            repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr),
             fourValuedConjunction)
     else
-        repeatConstraint(e, List_head(minDist), List_head(maxDist), ctr)
+        repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr)
 
 def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[fourValuedBoolean] :=
     arbitraryConstraintRec(e, minDist, maxDist, 1)
@@ -204,36 +215,35 @@ def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: I
         fourValuedConjunction)
 
 def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedBoolean] := {
-    @liftable
-    def aModuloBOr1if1(a: Int, b: Int): Int:=
+    liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
         if b == 1 then 1 else a % b;
     # upper bound for latest e
     def lowerBoundX: Events[Int] :=  merge (
         # increase by period and adjust by offset and jitter
-        if (aModuloBOr1if1(count(e), Map_size(offset))== 1 && !isFirst(e)) then
+        if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e)) then
             max(last(lowerBoundX, e) + periodX,
-                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))-jitter) 
+                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter) 
         #adjust by offset and jitter
         else
             max(last(lowerBoundX, e),
-                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))-jitter),
-        time(e) - Map_get(offset, (count(e)-1) % Map_size(offset)) - jitter)
+                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter),
+        time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)) - jitter)
         
     def upperBoundX: Events[Int] :=  merge (
         # increase by period and adjust by offset and jitter
-        if (aModuloBOr1if1(count(e), Map_size(offset))== 1 && !isFirst(e))  then
+        if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e))  then
             min(last(upperBoundX, e) + periodX,
-                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))) 
+                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))) 
         else
         # adjust by offset and jitter
             min(last(upperBoundX, e),
-                time(e) - Map_get(offset, (count(e)-1) % Map_size(offset))),
-        time(e) - Map_get(offset, (count(e)-1) % Map_size(offset)))
-    def evaluateTimes= mergeUnit(e, safeDelay(upperBoundX + (if count(e) % Map_size(offset) == 0 then periodX else 0) +
-        Map_get(offset, count(e) % Map_size(offset)) + jitter - time(e) + 1, e))
+                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))),
+        time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)))
+    def evaluateTimes= mergeUnit(e, safeDelay(upperBoundX + (if count(e) % Map.size(offset) == 0 then periodX else 0) +
+        Map.get(offset, count(e) % Map.size(offset)) + jitter - time(e) + 1, e))
     #evaluate
-    slift(if (lowerBoundX + Map_get(offset, (count(e)-1) % Map_size(offset)) <= time(evaluateTimes) &&
-                time(evaluateTimes) <= upperBoundX + Map_get(offset, (count(e)-1) % Map_size(offset)) + jitter) then
+    slift(if (lowerBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) <= time(evaluateTimes) &&
+                time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) + jitter) then
             {value= true, final= false}
         else
             {value= false, final= true},
@@ -246,18 +256,18 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
     # Map with unmatched stimulus events after stimulus
     def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
         if defaultTime(stimulus) >= defaultTime(response) &&
-                !Map_contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
-            Map_add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, defaultTime(stimulus))
+                !Map.contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
+            Map.add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, defaultTime(stimulus))
         else
             last(unmatchedStimulusEvents, merge(stimulus, response)),
-        Map_empty[Int, Int])
+        Map.empty[Int, Int])
     # Map with unmatched stimulus events after response
     def unmatchedStimulusEvents := merge (
         if (defaultTime(stimulus) <= defaultTime(response) &&
-                Map_contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
-                Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                Map_get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-            Map_remove(unmatchedStimulusEventsNewStimulus, response)
+                Map.contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
+                Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+                Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+            Map.remove(unmatchedStimulusEventsNewStimulus, response)
         else
             unmatchedStimulusEventsNewStimulus,
         unmatchedStimulusEventsNewStimulus)
@@ -269,7 +279,7 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
                 
     #evaluation
     # all unmatched stimulus events can still be matched
-    stillFulfillabe(if (Map_size(unmatchedStimulusEvents) == 0) then
+    stillFulfillabe(if (Map.size(unmatchedStimulusEvents) == 0) then
         {value= true, final= false}
     else
         if (slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes)) then
@@ -284,37 +294,37 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
     def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
             colorTimeStamps: Map[Int, Int], timeBound: Int): List[Int] :=
         # list empty
-        static if (List_size(latestStimulusColors) == 0) then
+        if (List.size(latestStimulusColors) == 0) then
             latestStimulusColors
         else
             # oldest event not too old-> return current list
-            if (Map_contains(colorTimeStamps, List_head(latestStimulusColors)) &&
-                    Map_get(colorTimeStamps, List_head(latestStimulusColors)) >= timeBound) then
+            if (Map.contains(colorTimeStamps, List.head(latestStimulusColors)) &&
+                    Map.get(colorTimeStamps, List.head(latestStimulusColors)) >= timeBound) then
                 latestStimulusColors
             else
                 # recursive call without oldest color
-                removeOldStimulusColorsFromList(List_tail(latestStimulusColors), colorTimeStamps, timeBound)
+                removeOldStimulusColorsFromList(List.tail(latestStimulusColors), colorTimeStamps, timeBound)
     
     #removes colors, that were before timeBound, from the map
     def removeOldStimulusColorsFromSet(latestStimulusColors: List[Int],
             colorTimeStamps: Map[Int, Int], timeBound: Int): Map[Int, Int] :=
-        static if (List_size(latestStimulusColors) == 0) then
+        if (List.size(latestStimulusColors) == 0) then
             colorTimeStamps
         else
              # oldest event not too old-> return current map
-            if (Map_contains(colorTimeStamps, List_head(latestStimulusColors)) &&
-                    Map_get(colorTimeStamps, List_head(latestStimulusColors)) >= timeBound)  then
+            if (Map.contains(colorTimeStamps, List.head(latestStimulusColors)) &&
+                    Map.get(colorTimeStamps, List.head(latestStimulusColors)) >= timeBound)  then
                 colorTimeStamps
             else
                 # recursive call without oldest color
-                removeOldStimulusColorsFromSet(List_tail(latestStimulusColors),
-                    Map_remove(colorTimeStamps, List_head(latestStimulusColors)), timeBound)
+                removeOldStimulusColorsFromSet(List.tail(latestStimulusColors),
+                    Map.remove(colorTimeStamps, List.head(latestStimulusColors)), timeBound)
 
 
     # map with unmatched stimulus events after stimulus
     def stimulusEventsNewStimulus : Events[Map[Int, Int]] := 
             if (defaultTime(stimulus) >= defaultTime(response)) then
-                Map_add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
+                Map.add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
             else
                 last(stimulusEvents, merge(stimulus, response))
     #remove events that are too old
@@ -324,22 +334,22 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
                 stimulusEventsNewStimulus,
                 time(merge(stimulus, response)) - maxTimeDiff,
                 removeOldStimulusColorsFromSet),
-        Map_empty[Int, Int])
+        Map.empty[Int, Int])
     
     def stimulusColorsYoungerThanMax: Events[List[Int]]:= merge(
-        slift3(List_append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
+        slift3(List.append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
             stimulusEvents, 
             time(merge(stimulus, response)) - maxTimeDiff,
             removeOldStimulusColorsFromList),
-        List_empty[Int])
+        List.empty[Int])
         
     #evaluation
     # 'now' has response event => time matches to unmatched stimulus event
     stillFulfillabe(
         if ((!(defaultTime(stimulus) <= defaultTime(response))) || 
-            Map_contains(stimulusEventsNewStimulus, merge(response, -1)) &&
-            Map_get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-            Map_get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+            Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
+            Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+            Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
         {value= true, final= false}
         else
             {value= false, final= true})
@@ -348,12 +358,12 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
 def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedBoolean]:= {
     # colors, that occured in response-> not allows in stimulus anymore
     def previousResponseColors: Events[Set[Int]]:=
-        merge(Set_add(last(previousResponseColors, response), response), Set_empty[Int])
+        merge(Set.add(last(previousResponseColors, response), response), Set.empty[Int])
     stillFulfillabe(
         if on(merge(stimulus, response),
             # stimulus event-> color didn't occur in response earlier
                 if (defaultTime(stimulus) >= defaultTime(response)) then 
-                    !Set_contains(previousResponseColors, stimulus)
+                    !Set.contains(previousResponseColors, stimulus)
                 else
                     true) then
             {value= true, final= false}

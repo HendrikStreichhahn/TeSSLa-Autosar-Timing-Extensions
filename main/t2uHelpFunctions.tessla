@@ -2,8 +2,7 @@ def infty : Int := 9223372036854775807
 
 type fourValuedBoolean = {value: Bool, final: Bool}
 
-@liftable
-def fourValuedConjunction(a: fourValuedBoolean, b: fourValuedBoolean):=
+liftable def fourValuedConjunction(a: fourValuedBoolean, b: fourValuedBoolean):=
     if ((!a.value && a.final) || (!b.value && b.final)) then
         {value= false, final= true}
     else
@@ -32,34 +31,34 @@ def defaultTime[T](stream: Events[T]): Events[Int]:=
     
 # smallest value in map
 def mapMinimumValueRec(aMap: Map[Int, Int], keys: List[Int]) : Int :=
-    static if (List_size(keys) == 0) then
+    if (List.size(keys) == 0) then
         infty
     else
-        min(Map_get(aMap, List_head(keys)),
-            mapMinimumValueRec(aMap, List_tail(keys)))
+        min(Map.get(aMap, List.head(keys)),
+            mapMinimumValueRec(aMap, List.tail(keys)))
 
 # smallest value in map
 def mapMinimumValue(aMap: Map[Int, Int]) : Int :=
-    mapMinimumValueRec(aMap, Map_keys(aMap))
+    mapMinimumValueRec(aMap, Map.keys(aMap))
     
 # checks, if all values in Int->Bool map are true
 def mapAllTrue(aMap: Map[Int, Bool]): Bool :=
-    mapAllTrueRec(aMap, Map_keys(aMap))
+    mapAllTrueRec(aMap, Map.keys(aMap))
 
 # checks, if all values in int->bool map within the key list are true
 def mapAllTrueRec(aMap: Map[Int, Bool], keys: List[Int]): Bool :=
-    static if (Map_size(aMap) == 0 || List_size(keys) == 0) then
+    if (Map.size(aMap) == 0 || List.size(keys) == 0) then
         true
     else
-        mapAllTrueRec(aMap, List_tail(keys)) && Map_get(aMap, List_head(keys))
+        mapAllTrueRec(aMap, List.tail(keys)) && Map.get(aMap, List.head(keys))
    
         
 # attaches right list to left list, preserving the order
 def List_attach[T](ListLeft: List[T], ListRight: List[T]): List[T] :=
-    static if List_size(ListRight) <= 0 then
+    if List.size(ListRight) <= 0 then
         ListLeft
     else
-        List_attach(List_append(ListLeft, List_head(ListRight)), List_tail(ListRight))
+        List_attach(List.append(ListLeft, List.head(ListRight)), List.tail(ListRight))
         
 def List_attachInt(ListLeft: List[Int], ListRight: List[Int]): List[Int] :=
         List_attach(ListLeft, ListRight);
@@ -69,13 +68,13 @@ def List_attachIntLifted(ListLeft: Events[List[Int]], ListRight: Events[List[Int
 
 
 def List_remove(aList: List[Int], val: Int): List[Int] :=
-    static if (List_size(aList) == 0) then
+    if (List.size(aList) == 0) then
         aList
     else
-        static if (List_head(aList) == val) then
-            List_remove(List_tail(aList), val)
+        if (List.head(aList) == val) then
+            List_remove(List.tail(aList), val)
         else
-            List_prepend(List_head(aList), List_remove(List_tail(aList), val));
+            List.prepend(List.head(aList), List_remove(List.tail(aList), val));
         
 
 # FREMDQUELLTEXT => abgewandelte Form von resetCount
@@ -115,44 +114,44 @@ def stillFulfillabe(events: Events[fourValuedBoolean]): Events[fourValuedBoolean
 
 #@liftable
 def Map_headValue[A, B](aMap: Map[A, B]): B :=
-    Map_get(aMap, List_head(Map_keys(aMap)))
+    Map.get(aMap, List.head(Map.keys(aMap)))
 
 #@liftable    
 def Map_headKey[A, B](aMap: Map[A, B]): A :=
-    List_head(Map_keys(aMap))
+    List.head(Map.keys(aMap))
 
 #@liftable
 def Map_tail[A, B](aMap: Map[A, B]): Map[A, B] :=
-    Map_remove(aMap, Map_headKey(aMap))
+    Map.remove(aMap, Map_headKey(aMap))
 
 def List_containsInt(list: List[Int], val: Int): Bool :=
-    static if List_size(list) == 0 then
+    if List.size(list) == 0 then
         false
     else
-        (List_head(list) == val) || List_containsInt(List_tail(list), val)
+        (List.head(list) == val) || List_containsInt(List.tail(list), val)
 
 # all elements of listA are in listB
 def aSublistEqBInt(listA: List[Int], listB: List[Int]): Bool :=
-    static if (List_size(listA) == 0) then
+    if (List.size(listA) == 0) then
         true
     else
-        List_containsInt(listB, List_head(listA)) && aSublistEqBInt(List_tail(listA), listB)
+        List_containsInt(listB, List.head(listA)) && aSublistEqBInt(List.tail(listA), listB)
     
 def Set_addList[A](set: Set[A], list: List[A]): Set[A] :=
-    static if (List_size(list) == 0) then
+    if (List.size(list) == 0) then
         set
     else
-        Set_addList(Set_add(set, List_head(list)), List_tail(list))
+        Set_addList(Set.add(set, List.head(list)), List.tail(list))
         
 def Set_addListInt(set: Set[Int], list: List[Int]): Set[Int] :=
     Set_addList(set, list)
     
 def Map_attach[A, B](MapLeft: Map[A, B], MapRight: Map[A, B]): Map[A, B] :=
-    static if (Map_size(MapRight) <= 0) then
+    if (Map.size(MapRight) <= 0) then
         MapLeft
     else
-        Map_attach(Map_add(MapLeft, List_head(Map_keys(MapRight)), Map_get(MapRight, List_head(Map_keys(MapRight)))),
-            Map_remove(MapRight, List_head(Map_keys(MapRight))))
+        Map_attach(Map.add(MapLeft, List.head(Map.keys(MapRight)), Map.get(MapRight, List.head(Map.keys(MapRight)))),
+            Map.remove(MapRight, List.head(Map.keys(MapRight))))
 
 def Map_attachIntInt(MapLeft: Map[Int, Int], MapRight: Map[Int, Int]): Map[Int, Int] :=
     Map_attach(MapLeft, MapRight)
@@ -162,17 +161,17 @@ def Map_attachIntIntLifted(MapLeft: Events[Map[Int, Int]], MapRight: Events[Map[
     
 # creates a list of A, initialized with init
 def buildList[A](size: Int, init: A): List[A] :=
-    static if (size <= 0) then
-        List_empty[A]
+    if (size <= 0) then
+        List.empty[A]
     else
-        List_append(buildList(size-1, init), init)
+        List.append(buildList(size-1, init), init)
         
 def buildMap[A](size: Int, init: A): Map[Int, A] :=
-    static if (size <= 0) then
-        Map_empty[Int, A]
+    if (size <= 0) then
+        Map.empty[Int, A]
     else {
         def recBuildMap = buildMap(size-1, init)
-        Map_add(recBuildMap, Map_size(recBuildMap)+1, init)
+        Map.add(recBuildMap, Map.size(recBuildMap)+1, init)
     }
 
 # delay, but delay is infty, if delay value is negative
@@ -180,22 +179,22 @@ def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
     delay(if(delays > 0) then delays else infty, resets)
 	
 def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
-	static if (List_size(list) == 0) then
+	if (List.size(list) == 0) then
 		list
 	else
-		static if List_head(list) < A then
-			removeItemsSmallerThanAFromListFront(List_tail(list), A)
+		if List.head(list) < A then
+			removeItemsSmallerThanAFromListFront(List.tail(list), A)
 		else
 			list
 
 def removeEntrysValueSmallerThanAFromMap(aMap: Map[Int, Int], value: Int) : Map[Int, Int] :=
-    removeEntrysValueSmallerThanAFromMapRec(aMap, value, Map_keys(aMap))
+    removeEntrysValueSmallerThanAFromMapRec(aMap, value, Map.keys(aMap))
     
 def removeEntrysValueSmallerThanAFromMapRec(aMap: Map[Int, Int], value: Int, remainingKeys: List[Int]): Map[Int, Int] :=
-    static if (List_size(remainingKeys) == 0) then
+    if (List.size(remainingKeys) == 0) then
         aMap
     else 
-        if Map_get(aMap, List_head(remainingKeys)) < value then
-            removeEntrysValueSmallerThanAFromMapRec(Map_remove(aMap, List_head(remainingKeys)), value, List_tail(remainingKeys))
+        if Map.get(aMap, List.head(remainingKeys)) < value then
+            removeEntrysValueSmallerThanAFromMapRec(Map.remove(aMap, List.head(remainingKeys)), value, List.tail(remainingKeys))
         else
-            removeEntrysValueSmallerThanAFromMapRec(aMap, value, List_tail(remainingKeys))
+            removeEntrysValueSmallerThanAFromMapRec(aMap, value, List.tail(remainingKeys))

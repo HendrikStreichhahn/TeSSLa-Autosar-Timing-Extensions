@@ -1,0 +1,22 @@
+#no fail
+1: stimulus = 1
+
+5: response1 = 1
+5: response2 = 1
+5: response3 = 1
+
+10: response1 = 2
+10: response2 = 2
+
+25: stimulus = 3
+35: response1 = 3
+35: response2 = 3
+35: response3 = 3
+
+45: stimulus = 4
+55: response1 = 4
+55: response2 = 4
+#fail-> response 3 missing
+
+100: response1 = 100
+

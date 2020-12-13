@@ -10,4 +10,4 @@
 #fail at 18-> delay für color 1
 25: response3 = 1
 
-70: endOfStreams
+70: response1 = 100

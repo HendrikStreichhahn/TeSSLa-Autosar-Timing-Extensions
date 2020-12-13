@@ -7,12 +7,12 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
 
     def addEvents(existingEvents: List[SynchronizationEventInfo], newEventStreamIndices: List[Int], timeNow: Int) :
             List[SynchronizationEventInfo]:=
-        static if (List_size(newEventStreamIndices) == 0) then
+        if (List.size(newEventStreamIndices) == 0) then
             existingEvents
         else
-            addEvents(List_append(existingEvents,
-                    buildSynchronizationEventInfo(List_head(newEventStreamIndices), timeNow, false)),
-                List_tail(newEventStreamIndices), timeNow)
+            addEvents(List.append(existingEvents,
+                    buildSynchronizationEventInfo(List.head(newEventStreamIndices), timeNow, false)),
+                List.tail(newEventStreamIndices), timeNow)
         
     # checks, if the events between timeNow and (timeNow-tolerance) fulfills the cluster
     def clusterFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): Bool :=
@@ -22,35 +22,35 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
     def fillIndecesList(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int,
             indicesList: Map[Int, Bool]): Map[Int, Bool] :=
         # no more events to check-> return indiceslist
-        static if (List_size(events) == 0) then
+        if (List.size(events) == 0) then
             indicesList
         else
             # recursive call with tail of events and updated indicesList
-            fillIndecesList(List_tail(events), timeNow, tolerance,
+            fillIndecesList(List.tail(events), timeNow, tolerance,
                 # time of event fits-> set to true
-                if (List_head(events).eventTime + tolerance >= timeNow) then
-                    Map_add(indicesList, List_head(events).streamIndex, true)
+                if (List.head(events).eventTime + tolerance >= timeNow) then
+                    Map.add(indicesList, List.head(events).streamIndex, true)
                 else
                     indicesList)
 
     # sets all Events in list to fulfilled, if not too old
     def setEventsToFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): 
             List[SynchronizationEventInfo] :=
-        static if (List_size(events) == 0) then
+        if (List.size(events) == 0) then
             events
         else
-            # set list_head to fulfilled, if not too old
-            List_prepend(
-                if (List_head(events).eventTime + tolerance >= timeNow) then
-                    buildSynchronizationEventInfo(List_head(events).streamIndex, List_head(events).eventTime, true)
+            # set List.head to fulfilled, if not too old
+            List.prepend(
+                if (List.head(events).eventTime + tolerance >= timeNow) then
+                    buildSynchronizationEventInfo(List.head(events).streamIndex, List.head(events).eventTime, true)
                 else
-                    List_head(events),
-                setEventsToFulfilled(List_tail(events), timeNow, tolerance, streamCount))
+                    List.head(events),
+                setEventsToFulfilled(List.tail(events), timeNow, tolerance, streamCount))
 
     #set fulfilled state of events to true, if fulfilled
     def updateFullfilledEvents(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int):
             List[SynchronizationEventInfo]:=
-        static if (clusterFulfilled(events, timeNow, tolerance, streamCount)) then
+        if (clusterFulfilled(events, timeNow, tolerance, streamCount)) then
             setEventsToFulfilled(events, timeNow, tolerance, streamCount)
         else
             events
@@ -58,36 +58,36 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
     # creates a List with all events, that are older than tolerance
     def eventsToRemove(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int):
             List[SynchronizationEventInfo] :=
-        static if (List_size(events) == 0) then
+        if (List.size(events) == 0) then
             events
         else
             # head of List too old
-            if(timeNow - List_head(events).eventTime > tolerance) then
+            if(timeNow - List.head(events).eventTime > tolerance) then
                 # add head of list to return list
-                List_prepend(List_head(events), eventsToRemove(List_tail(events), timeNow, tolerance))
+                List.prepend(List.head(events), eventsToRemove(List.tail(events), timeNow, tolerance))
             else
                 # rest of list can't be older-> return empty
-                List_empty[SynchronizationEventInfo]
+                List.empty[SynchronizationEventInfo]
 
     # removes all events, that are older than tolerance
     def removeEvents(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int):
             List[SynchronizationEventInfo] :=
-        static if (List_size(events) == 0) then
+        if (List.size(events) == 0) then
             events
         else
             # head of List too old
-            if(timeNow - List_head(events).eventTime > tolerance) then
-                removeEvents(List_tail(events), timeNow, tolerance)
+            if(timeNow - List.head(events).eventTime > tolerance) then
+                removeEvents(List.tail(events), timeNow, tolerance)
             else
                 # rest of list can't be older-> return unchanged
                 events
 
     def noUnfulfilledRemoved(removedEvents: List[SynchronizationEventInfo]) : Bool :=
-        static if (List_size(removedEvents) == 0) then
+        if (List.size(removedEvents) == 0) then
             true
         else
-            noUnfulfilledRemoved(List_tail(removedEvents)) &&
-                List_head(removedEvents).fulfilled
+            noUnfulfilledRemoved(List.tail(removedEvents)) &&
+                List.head(removedEvents).fulfilled
     # insert new events and set cluster to fulfilled, if possible
    def storedEventsBeforeRemove: Events[List[SynchronizationEventInfo]] :=
         slift4(slift3(last(storedEvents, eventIndices), eventIndices, time(eventIndices), addEvents),
@@ -95,16 +95,16 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
     # remove old events from list
     def storedEvents: Events[List[SynchronizationEventInfo]] := merge(
         slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents),
-        List_empty[SynchronizationEventInfo])
+        List.empty[SynchronizationEventInfo])
 		
 	def timeOldestUnfulfilledEvent(storedEvents: List[SynchronizationEventInfo]): Int :=
-		static if (List_size(storedEvents) == 0) then
+		if (List.size(storedEvents) == 0) then
 			infty
 		else
-            if !List_head(storedEvents).fulfilled then
-                List_head(storedEvents).eventTime
+            if !List.head(storedEvents).fulfilled then
+                List.head(storedEvents).eventTime
             else
-                timeOldestUnfulfilledEvent(List_tail(storedEvents))
+                timeOldestUnfulfilledEvent(List.tail(storedEvents))
 	
 	def evaluateTimes = mergeUnit(eventIndices,
         safeDelay(slift1(storedEvents, timeOldestUnfulfilledEvent) + tolerance - time(eventIndices)+1, eventIndices))
@@ -127,8 +127,8 @@ def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tol
     def timeNow: Events[Int] := time(mergeUnit(events1, events2))
 
     synchronizationConstraint(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
         2, tolerance)
 }
 
@@ -138,9 +138,9 @@ def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], 
 
     synchronizationConstraint(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
         3, tolerance)
 }
 
@@ -151,10 +151,10 @@ def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B
     synchronizationConstraint(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
         4, tolerance)
 }
 
@@ -167,11 +167,11 @@ def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Event
         List_attachIntLifted(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
         5, tolerance)
 }
 
@@ -185,12 +185,12 @@ def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Ev
         List_attachIntLifted(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
         6, tolerance)
 }
 
@@ -206,13 +206,13 @@ def synchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2:
         List_attachIntLifted(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
         7, tolerance)
 }
 
@@ -228,14 +228,14 @@ def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], event
         List_attachIntLifted(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
-                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
+                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List.empty[Int]),
         8, tolerance)
 }
 
@@ -252,15 +252,15 @@ def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], ev
         List_attachIntLifted(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
-                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List_empty[Int]),
-                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
+                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List.empty[Int]),
+                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List.empty[Int]),
         9, tolerance)
 }
 
@@ -278,15 +278,15 @@ def synchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A]
         List_attachIntLifted(
         List_attachIntLifted(
         List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List_empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List_empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List_empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List_empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List_empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List_empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List_empty[Int]),
-                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List_empty[Int]),
-                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List_empty[Int]),
-                          if (defaultTime(events10) >= timeNow) then buildList(1, 10) else List_empty[Int]),
+        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
+                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
+                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
+                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
+                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
+                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
+                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
+                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List.empty[Int]),
+                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List.empty[Int]),
+                          if (defaultTime(events10) >= timeNow) then buildList(1, 10) else List.empty[Int]),
         10, tolerance)
 }
