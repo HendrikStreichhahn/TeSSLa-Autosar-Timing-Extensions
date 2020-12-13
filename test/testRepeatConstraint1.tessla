@@ -6,21 +6,4 @@ def lower = 5
 def upper = 6
 def span = 2
 
-#out repeatConstraint(e, lower, upper, span)
-
-#def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[Bool] := {
-	def latestSpanEventTimes := nLastTime(e, span)
-	def latestSpanButOneEventTimes := nLastTime(e, span-1)
-    def evaluateTimes = mergeUnit(e, 
-            safeDelay((merge(latestSpanButOneEventTimes, firstEvent(time(e)))+ upper) - time(e)+1,e))
-
-    def output := allPreviousTrue(on(evaluateTimes,
-        if (count(e) <= span) then
-            firstEvent(time(e)) + upper > time(evaluateTimes)
-        else
-            default((lower <= (time(evaluateTimes) - latestSpanEventTimes) &&
-                        time(evaluateTimes) - latestSpanEventTimes <= upper),
-            true)))
-#}
-
-out output
+out repeatConstraint(e, lower, upper, span)

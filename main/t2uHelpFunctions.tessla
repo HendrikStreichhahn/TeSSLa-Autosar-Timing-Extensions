@@ -1,5 +1,20 @@
 def infty : Int := 9223372036854775807
 
+type fourValuedBoolean = {value: Bool, final: Bool}
+
+@liftable
+def fourValuedConjunction(a: fourValuedBoolean, b: fourValuedBoolean):=
+    if ((!a.value && a.final) || (!b.value && b.final)) then
+        {value= false, final= true}
+    else
+        if ((!a.value && !a.final) || (!b.value && !b.final)) then
+            {value= false, final= false}
+        else
+            if ((a.value && !a.final) || (b.value && !b.final)) then
+                {value= true, final= false}
+            else
+                {value= true, final= true}
+
 # returns the time of the n-last event
 def nLastTime[A](e: Events[A], n: Int): Events[Int] :=
     static if (n <= 0) then
@@ -86,17 +101,29 @@ def allPreviousTrue(events: Events[Bool]): Events[Bool] :={
     storage
 }
 
+#{value: Bool, final: Bool}
+def stillFulfillabe(events: Events[fourValuedBoolean]): Events[fourValuedBoolean] :={
+    def storage: Events[Bool] := merge(
+        last(storage, events) && events != {value= false, final= true},
+        true)
+
+    if storage then
+        events
+    else
+        {value= false, final= true}
+}
+
 #@liftable
-#def Map_headValue[A, B](aMap: Map[A, B]): B :=
-#    Map_get(aMap, List_head(Map_keys(aMap)))
+def Map_headValue[A, B](aMap: Map[A, B]): B :=
+    Map_get(aMap, List_head(Map_keys(aMap)))
 
 #@liftable    
-#def Map_headKey[A, B](aMap: Map[A, B]): A :=
-#    List_head(Map_keys(aMap))
+def Map_headKey[A, B](aMap: Map[A, B]): A :=
+    List_head(Map_keys(aMap))
 
 #@liftable
-#def Map_tail[A, B](aMap: Map[A, B]): Map[A, B] :=
-#    Map_remove(aMap, Map_headKey(aMap))
+def Map_tail[A, B](aMap: Map[A, B]): Map[A, B] :=
+    Map_remove(aMap, Map_headKey(aMap))
 
 def List_containsInt(list: List[Int], val: Int): Bool :=
     static if List_size(list) == 0 then
@@ -172,4 +199,3 @@ def removeEntrysValueSmallerThanAFromMapRec(aMap: Map[Int, Int], value: Int, rem
             removeEntrysValueSmallerThanAFromMapRec(Map_remove(aMap, List_head(remainingKeys)), value, List_tail(remainingKeys))
         else
             removeEntrysValueSmallerThanAFromMapRec(aMap, value, List_tail(remainingKeys))
-
