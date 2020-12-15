@@ -64,7 +64,8 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
             # head of List too old
             if(timeNow - List.head(events).eventTime > tolerance) then
                 # add head of list to return list
-                List.prepend(List.head(events), eventsToRemove(List.tail(events), timeNow, tolerance))
+                #List.prepend(List.head(events), eventsToRemove(List.tail(events), timeNow, tolerance))
+                List.append(eventsToRemove(List.tail(events), timeNow, tolerance), List.head(events))
             else
                 # rest of list can't be older-> return empty
                 List.empty[SynchronizationEventInfo]
@@ -86,8 +87,8 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
         if (List.size(removedEvents) == 0) then
             true
         else
-            noUnfulfilledRemoved(List.tail(removedEvents)) &&
-                List.head(removedEvents).fulfilled
+            List.head(removedEvents).fulfilled &&
+            noUnfulfilledRemoved(List.tail(removedEvents))
     # insert new events and set cluster to fulfilled, if possible
    def storedEventsBeforeRemove: Events[List[SynchronizationEventInfo]] :=
         slift4(slift3(last(storedEvents, eventIndices), eventIndices, time(eventIndices), addEvents),
@@ -116,7 +117,8 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
             {value= true, final= false}
         else
             #check, if all removed events are fulfilled(had a cluster)-> current false, but not final
-            if (slift1(slift3(storedEventsBeforeRemove, time(evaluateTimes), tolerance, eventsToRemove), noUnfulfilledRemoved)) then
+            #if (slift1(slift3(storedEventsBeforeRemove, time(evaluateTimes), tolerance, eventsToRemove), noUnfulfilledRemoved)) then
+            if (slift1(storedEventsBeforeRemove, timeOldestUnfulfilledEvent) >= time(evaluateTimes) - tolerance) then
                 {value= false, final= false}
             else
                 {value= false, final= true})
