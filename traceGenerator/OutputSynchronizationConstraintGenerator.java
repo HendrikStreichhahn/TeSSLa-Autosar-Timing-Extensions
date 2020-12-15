@@ -4,8 +4,9 @@ public class OutputSynchronizationConstraintGenerator extends TraceSet{
 
     public OutputSynchronizationConstraintGenerator(int streamCount){
 		// init Traces
-		traces = new Trace[streamCount+1];
+		traces = new Trace[streamCount+2];
         traces[0] = new Trace("stimulus");
+        traces[traces.length-1] = new Trace("empty");
         for (int i = 1; i <= streamCount; i++)
             traces[i] = new Trace("response" + i);
 	}
