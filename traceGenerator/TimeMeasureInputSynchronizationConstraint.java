@@ -65,13 +65,13 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
     
     private String writeEventsNow(int i){
         if (i == 1)
-            return "if (defaultTime(stimulus"+i+") >= timeNow) then merge(Map_add(Map_empty[Int, Int], "+i+", stimulus"+i+"), Map_empty[Int, Int]) else Map_empty[Int, Int],";
+            return "if (defaultTime(stimulus"+i+") >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+i+", stimulus"+i+"), Map.empty[Int, Int]) else Map.empty[Int, Int],";
         else
-            return "Map_attachIntIntLifted(" + writeEventsNow(i-1) + "if (defaultTime(stimulus"+i+") >= timeNow) then merge(Map_add(Map_empty[Int, Int], "+i+", stimulus"+i+"), Map_empty[Int, Int]) else Map_empty[Int, Int]),";
+            return "Map_attachIntIntLifted(" + writeEventsNow(i-1) + "if (defaultTime(stimulus"+i+") >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+i+", stimulus"+i+"), Map.empty[Int, Int]) else Map.empty[Int, Int]),";
     }
     
     private String writeEventsNow(){
-        return "Map_attachIntIntLifted(" + writeEventsNow(streamCount) + "if (defaultTime(response) >= timeNow) then merge(Map_add(Map_empty[Int, Int], "+0+", response), Map_empty[Int, Int]) else Map_empty[Int, Int])";
+        return "Map_attachIntIntLifted(" + writeEventsNow(streamCount) + "if (defaultTime(response) >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+0+", response), Map.empty[Int, Int]) else Map.empty[Int, Int])";
     }
     
     public boolean generateTeSSLaFile(String fileName){

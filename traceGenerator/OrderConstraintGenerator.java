@@ -4,10 +4,9 @@ public class OrderConstraintGenerator extends TraceSet{
     
     public OrderConstraintGenerator(){
 		// init Traces
-		traces = new Trace[3];
+		traces = new Trace[2];
         traces[0] = new Trace("source");
         traces[1] = new Trace("target");
-        traces[2] = new Trace("endOfObservation");
 	}
     
     public Trace[] getTraces(){
@@ -31,7 +30,6 @@ public class OrderConstraintGenerator extends TraceSet{
             }
             eventCount-= 2;
         }
-        traces[2].insertEvent(new Event(targetTime + maxDistSourceTarget +1, 0));
         return true;
 	}
 }

@@ -6,5 +6,7 @@ in stimulus2: Events[Int]
 in stimulus3: Events[Int]
 in stimulus4: Events[Int]
 in stimulus5: Events[Int]
-def constraint := inputSynchronizationConstraint5( stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, response, 25)
+def timeNow = merge(time(stimulus5),merge(time(stimulus4),merge(time(stimulus3),merge(time(stimulus2),merge(time(stimulus1),time(response))))))
+def eventsNow = Map_attachIntIntLifted(Map_attachIntIntLifted(Map_attachIntIntLifted(Map_attachIntIntLifted(Map_attachIntIntLifted(if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int]) else Map.empty[Int, Int],if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int]) else Map.empty[Int, Int]),if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int]) else Map.empty[Int, Int]),if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int]) else Map.empty[Int, Int]),if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int]) else Map.empty[Int, Int]),if (defaultTime(response) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) else Map.empty[Int, Int])
+def constraint :=  inputSynchronizationConstraint(eventsNow, 5 ,25)
 out constraint

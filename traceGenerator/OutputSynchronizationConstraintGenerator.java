@@ -4,11 +4,10 @@ public class OutputSynchronizationConstraintGenerator extends TraceSet{
 
     public OutputSynchronizationConstraintGenerator(int streamCount){
 		// init Traces
-		traces = new Trace[streamCount+2];
+		traces = new Trace[streamCount+1];
         traces[0] = new Trace("stimulus");
         for (int i = 1; i <= streamCount; i++)
             traces[i] = new Trace("response" + i);
-        traces[traces.length - 1] = new Trace("endOfStreams");
 	}
 
 	public boolean generateTestTrace(int eventCount, int tolerance, int clusterDistance){
@@ -41,7 +40,6 @@ public class OutputSynchronizationConstraintGenerator extends TraceSet{
             eventCount-= traces.length - 1;
             clr++;
         }
-        traces[traces.length - 1].insertEvent(new Event(timeNow + tolerance + clusterDistance, 0));
         return true;
 	}
 }

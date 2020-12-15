@@ -26,8 +26,7 @@ public class TimeMeasureOrderConstraint extends TimeMeasureConstraint{
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in source: Events[Int]\n");
             fileWriter.write("in target: Events[Int]\n");
-            fileWriter.write("in endOfObservation: Events[Int]\n");
-            fileWriter.write("def constraint := orderConstraint(source, target, endOfObservation)\n");
+            fileWriter.write("def constraint := orderConstraint(source, target)\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();
         } catch (IOException e) {

@@ -86,11 +86,11 @@ public abstract class TimeMeasureConstraint{
         if (keys.length != vals.length)
             return null;
         if (keys.length == 0)
-            return "Map_empty[Int, Int]";
+            return "Map.empty[Int, Int]";
         String res = "";
         for (int i = 0; i < keys.length; i++)
-            res+= "Map_add(";
-        res+= "Map_empty[Int, Int]";
+            res+= "Map.add(";
+        res+= "Map.empty[Int, Int]";
         for (int i = 0; i < keys.length; i++)
             res+= ", " + keys[i] + ", " + vals[i] + ")";
         return res;
@@ -100,11 +100,11 @@ public abstract class TimeMeasureConstraint{
         if (vals.length != vals.length)
             return null;
         if (vals.length == 0)
-            return "List_empty[Int]";
+            return "List.empty[Int]";
         String res = "";
         for (int i = 0; i < vals.length; i++)
-            res+= "List_append(";
-        res+= "List_empty[Int]";
+            res+= "List.append(";
+        res+= "List.empty[Int]";
         for (int i = 0; i < vals.length; i++)
             res+= ", " + vals[i] + ")";
         return res;

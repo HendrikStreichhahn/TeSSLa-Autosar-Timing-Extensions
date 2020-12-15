@@ -1,4 +1,4 @@
 include "../../main/t2uConstraints.tessla"
 in event: Events[Int]
-def constraint := patternConstraint(event, 99, Map_add(Map_add(Map_empty[Int, Int], 0, 4), 1, 9), 4, 1)
+def constraint := patternConstraint(event, 99, Map.add(Map.add(Map.empty[Int, Int], 0, 4), 1, 9), 4, 1)
 out constraint
