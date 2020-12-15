@@ -86,24 +86,41 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
 }
 
 def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedBoolean] := {
-	#stored state
-	def latestSpanEventTimes := nLastTime(e, span)
-	def latestSpanButOneEventTimes := nLastTime(e, span-1)
-	# delay
-    def evaluateTimes = mergeUnit(e, 
-            safeDelay((merge(latestSpanButOneEventTimes, firstEvent(time(e)))+ upper) - time(e)+1,e))
 
-    stillFulfillabe(
-        if on(evaluateTimes,
-                    #time distance is right
-                merge(default((lower <= (time(evaluateTimes) - latestSpanEventTimes) &&
-                                time(evaluateTimes) - latestSpanEventTimes <= upper),
-                        true),
-                    # time distance to first event not too large-> when until now less than span event occurred
-                    firstEvent(time(e)) + upper > time(evaluateTimes))) then
-            {value= true, final= false}
+    #stored state
+    def latestSpanEventTimes: Events[List[Int]]:=
+        merge(List.append(
+            if (List.size(last(latestSpanEventTimes, e)) > span) then
+                List.tail(last(latestSpanEventTimes, defaultTime(e)))
+            else
+                last(latestSpanEventTimes, e), defaultTime(e)),
+            List.empty[Int])
+    
+    # delay
+    def delayPeriod :=
+        if (defaultTime(e) == defaultTime(firstEvent(e))) then
+            List.head(latestSpanEventTimes) + upper - time(e) + 1
         else
-            {value= false, final= true})
+            List.head(List.tail(latestSpanEventTimes)) + upper - time(e) + 1
+    
+    def evaluateTimes := 
+        mergeUnit(e, safeDelay(delayPeriod, e))
+    
+    stillFulfillabe(
+        # more than span events occured-> distance to span-1^th event is relevant
+        if (List.size(latestSpanEventTimes) > span) then
+            if List.head(latestSpanEventTimes) + lower <= time(evaluateTimes) &&
+                    List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
+                {value= true, final= false}
+            else
+                {value= false, final= true}
+        else
+            # less than span events occurred-> first event must be younger than upper
+            if List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
+                {value= true, final= false}
+            else
+                {value= false, final= true})
+    
 }
         
 def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedBoolean] := {

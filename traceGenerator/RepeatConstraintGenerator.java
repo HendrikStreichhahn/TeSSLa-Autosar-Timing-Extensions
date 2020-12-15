@@ -16,14 +16,12 @@ public class RepeatConstraintGenerator extends TraceSet{
 	public boolean generateTestTrace(int eventCount, int lower, int upper, int span){
         Random rand = new Random();
         
-        int startTime = upper;//rand.nextInt(upper);
-        
         int spanDistance = lower/(span);
         
         LinkedList<Integer> spanLast = new LinkedList<Integer>();
         for (int i = 0; i < span; i++){
-            spanLast.add(spanDistance * i);
-            traces[0].insertEvent(new Event(spanDistance * i, 0));
+            spanLast.add(spanDistance * (i+1));
+            traces[0].insertEvent(new Event(spanDistance * (i+1), 0));
         }
         
         for (int i = span; i < eventCount; i++){

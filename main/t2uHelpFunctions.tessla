@@ -50,7 +50,7 @@ def mapAllTrueRec(aMap: Map[Int, Bool], keys: List[Int]): Bool :=
     if (Map.size(aMap) == 0 || List.size(keys) == 0) then
         true
     else
-        mapAllTrueRec(aMap, List.tail(keys)) && Map.get(aMap, List.head(keys))
+        Map.get(aMap, List.head(keys)) && mapAllTrueRec(aMap, List.tail(keys))
    
         
 # attaches right list to left list, preserving the order

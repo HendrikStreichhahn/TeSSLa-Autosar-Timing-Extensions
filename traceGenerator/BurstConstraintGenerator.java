@@ -9,7 +9,7 @@ public class BurstConstraintGenerator extends TraceSet{
 
 	public boolean generateTestTrace(int eventCount, int length, int maxOccurrences){
         Random rand = new Random();
-        int timeNow= rand.nextInt(length);
+        int timeNow= rand.nextInt(length)+1;
         int clr = 0;
         
         while(eventCount > 0){
