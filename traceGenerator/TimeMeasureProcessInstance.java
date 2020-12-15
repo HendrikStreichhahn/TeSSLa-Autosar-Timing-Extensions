@@ -68,7 +68,7 @@ public class TimeMeasureProcessInstance {
             //System.out.println(stdinString.replace('\n', ' ') + "=>" + answer);
             if (debugOutput || answer.contains("{final = true, value = false}")){
                 System.out.println(answer);
-                //System.exit(-1);
+                System.exit(-1);
             }
                 
         }

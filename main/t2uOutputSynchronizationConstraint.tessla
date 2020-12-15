@@ -144,11 +144,11 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
         safeDelay(slift1(storedClusters, startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
     
     #no unfinished synchronization clusters and no unmatched Stimulus colors
-    stillFulfillabe(if (Set.size(unmatchedStimulusColors) == 0 && Map.size(storedClustersBeforeRemove) == 0) then
+    stillFulfillabe(if (Set.size(unmatchedStimulusColors) == 0 && Map.size(storedClusters) == 0) then
         {value= true, final= false}
     else
         # unfulfilled stimulus colors exist, all clusters are still fulfillable-> current false
-        if startTimeOldestCluster(storedClustersBeforeRemove) + tolerance > evalTimes then
+        if startTimeOldestCluster(storedClusters) + tolerance > evalTimes then
             {value= false, final= false}
         else
             {value= false, final= true})
