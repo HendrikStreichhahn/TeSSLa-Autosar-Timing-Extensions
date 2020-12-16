@@ -45,8 +45,8 @@ public class TimeMeasureAll{
         //measureReactionConstraint("results/ReactionResult.txt", 10000);
         //measureAgeConstraint("results/AgeResult.txt", 10000);
         //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
-        measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
-        //TODO  measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
+        //measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
+        measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
         //measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
         
         //measureCheckEventChain("results/CheckEventChainResult.txt", 10000);
@@ -233,7 +233,7 @@ public class TimeMeasureAll{
     
     private static void measureSynchronizationConstraint2(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/SynchronizationConstraintTimeMeasure2.tessla";
-        int numTraces = 76;
+        int numTraces = 72;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
         String[] params = new String[numTraces];
         int i = 0;
@@ -241,8 +241,8 @@ public class TimeMeasureAll{
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
             for (int tolerance = 1; tolerance <= 100; tolerance+=30){//4
                 int clusterDistance = 2*tolerance;
-                 for (int maxEventsPerCluster = 1; maxEventsPerCluster <= tolerance;       //3
-                            maxEventsPerCluster*= 2){
+                 for (int maxEventsPerCluster = 1; maxEventsPerCluster < tolerance;       //3
+                            maxEventsPerCluster+= 10){
                         System.out.println("Synchronization2 Trace " + (i+1) + " of " + numTraces);
                         params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
                             " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
@@ -808,7 +808,7 @@ public class TimeMeasureAll{
         String[] params = new String[traceCount];
         int i = 0;
         int clusterDistance = 2;
-        for (int streamCount = 2; streamCount <= 202; streamCount+=20)//4
+        for (int streamCount = 2; streamCount <= 102; streamCount+=10)//4
             for (int tolerance = 10; tolerance <= 25; tolerance+= 3){
                     System.out.println("OutputSynchronizationConstraint Trace " + (i+1) + " of "
                         + traceCount);
@@ -823,6 +823,7 @@ public class TimeMeasureAll{
                         System.out.println(TESSLAFILEPATH + " could not be created!");
                     //measure time per event
                     results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
+                    System.out.println(results[i]);
                     if (results[i] == null)
                         return;
                     i++;
