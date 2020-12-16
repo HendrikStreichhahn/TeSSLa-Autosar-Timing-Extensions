@@ -7,7 +7,7 @@ type outputSynchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, 
 def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int): Events[fourValuedBoolean]:= {
     ##### Help funtions #####
     # add an empty cluster to storedClusters
-    def addNewCluster(storedClusters: Map[Int, outputSynchronizationCluster], newColor: Int, time: Int, responseStreamCount: Int): 
+        def addNewCluster(storedClusters: Map[Int, outputSynchronizationCluster], newColor: Int, time: Int, responseStreamCount: Int): 
             Map[Int, outputSynchronizationCluster] :=
         Map.add(storedClusters, newColor, buildOutputSynchronizationCluster(time, responseStreamCount))
     
@@ -79,20 +79,20 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
 
     # searches for all fulfilled clusters in Map and returns their colors in a list
     #   storedClusters: Map with stored clusters (color -> cluster)
-    liftable def fulfilledClustersInMapRec(storedClusters: Map[Int, outputSynchronizationCluster], aList: List[Int]): List[Int] :=
-        if (Map.size(storedClusters) == 0) then
+    liftable def fulfilledClustersInMapRec(storedClusters: Map[Int, outputSynchronizationCluster], aList: List[Int], keys: List[Int]): List[Int] :=
+        if (List.size(keys) == 0) then
             aList
         else
-            fulfilledClustersInMapRec(Map_tail(storedClusters), 
-                if (clusterFulfilled(Map_headValue(storedClusters).fulfilledStreams)) then
-                    List.append(aList, Map_headKey(storedClusters))
+            fulfilledClustersInMapRec(storedClusters, 
+                if (clusterFulfilled(Map.get(storedClusters, List.head(keys)).fulfilledStreams)) then
+                    List.append(aList, List.head(keys))
                 else
-                    aList)
+                    aList, List.tail(keys))
 
     # searches for all fulfilled clusters in Map and returns their colors in a list
     #   storedClusters: Map with stored clusters (color -> cluster)
     liftable def fulfilledClustersInMap(storedClusters: Map[Int, outputSynchronizationCluster]): List[Int] :=
-        fulfilledClustersInMapRec(storedClusters, List.empty[Int])
+        fulfilledClustersInMapRec(storedClusters, List.empty[Int], Map.keys(storedClusters))
     
     #removes clusters from Map
     def removeClusters(storedClusters: Map[Int, outputSynchronizationCluster], colorsToRemove: List[Int]): 
@@ -101,23 +101,14 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
             storedClusters
         else
             removeClusters(Map.remove(storedClusters, List.head(colorsToRemove)), List.tail(colorsToRemove))
-    
-    # all clusters younger than tolerance or fullfilled
-    def clusterFulfillable(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster], tolerance: Int, timeNow: Int):
-            Bool :=
-        if (Map.size(storedClustersBeforeRemove) == 0) then
-            true
-        else
-            clusterFulfillable(Map_tail(storedClustersBeforeRemove), tolerance, timeNow) &&
-                (clusterFulfilled(Map_headValue(storedClustersBeforeRemove).fulfilledStreams) ||
-                Map_headValue(storedClustersBeforeRemove).startTime + tolerance >= timeNow)
                 
-    liftable def startTimeOldestCluster(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster]): Int :=
-        if (Map.size(storedClustersBeforeRemove) == 0) then
+    liftable def startTimeOldestCluster(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster],
+            keys: List[Int]): Int :=
+        if (List.size(keys) == 0) then
             infty
         else
-            min(Map_headValue(storedClustersBeforeRemove).startTime,
-                startTimeOldestCluster(Map_tail(storedClustersBeforeRemove)))
+            min(Map.get(storedClustersBeforeRemove, List.head(keys)).startTime,
+                startTimeOldestCluster(storedClustersBeforeRemove, List.tail(keys)))
 
     # Stored Information #
     def unmatchedStimulusColors: Events[Set[Int]] := merge(
@@ -141,14 +132,14 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
     
     # delay
     def evalTimes = time(mergeUnit(eventStreamIndices,
-        safeDelay(slift1(storedClusters, startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
+        safeDelay(slift(storedClusters, Map.keys(storedClusters), startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
     
     #no unfinished synchronization clusters and no unmatched Stimulus colors
     stillFulfillabe(if (Set.size(unmatchedStimulusColors) == 0 && Map.size(storedClusters) == 0) then
         {value= true, final= false}
     else
         # unfulfilled stimulus colors exist, all clusters are still fulfillable-> current false
-        if startTimeOldestCluster(storedClusters) + tolerance > evalTimes then
+        if startTimeOldestCluster(storedClusters, Map.keys(storedClusters)) + tolerance > evalTimes then
             {value= false, final= false}
         else
             {value= false, final= true})

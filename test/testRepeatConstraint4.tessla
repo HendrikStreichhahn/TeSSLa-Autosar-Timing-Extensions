@@ -1,0 +1,9 @@
+include "../main/t2uConstraints.tessla"
+
+in e: Events[Unit]
+
+def lower = 5000
+def upper = 6000
+def span = 175
+
+out repeatConstraint(e, lower, upper, span)

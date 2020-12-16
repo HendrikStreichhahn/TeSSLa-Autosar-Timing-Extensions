@@ -15,4 +15,3 @@ def test = outputSynchronizationConstraint3(stimulus, response1, response2, resp
 #def test = outputSynchronizationConstraint2(stimulus, response1, response2, tolerance) 
 
 out test
-
