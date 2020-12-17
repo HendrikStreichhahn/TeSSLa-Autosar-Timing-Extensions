@@ -24,36 +24,36 @@ public class TimeMeasureAll{
     public static void main(String[] args){
         //measureDelayConstraint("results/DelayResult.txt", 10000);
         //measureStrongDelayConstraint("results/StrongDelayResult.txt", 10000);
-        measureRepeatConstraint("results/RepeatResult.txt", 10000);
+        //measureRepeatConstraint("results/RepeatResult.txt", 10000);
         //measureRepetitionConstraint("results/RepetitionResult.txt", 10000);// nochmal laufen lassen
-        //measureSynchronizationConstraint("results/SynchronizationResult.txt", 10000);
+        measureSynchronizationConstraint("results/SynchronizationResult.txt", 10000);
         //measureSynchronizationConstraint2("results/SynchronizationResult2.txt", 10000);
         //measureStrongSynchronizationConstraint("results/StrongSynchronizationResult.txt", 10000);//should be fixed 
         //measureExecutionTimeConstraint("results/ExecutionTimeResult.txt", 10000);
         //measureOrderConstraint("results/OrderResult.txt", 10000);
         //measureSporadicConstraint("results/SporadicResult.txt", 10000);
         //measurePeriodicConstraint("results/PeriodicResult.txt", 10000);
-        measurePatternConstraint("results/PatternResult.txt", 10000);
-        measurePatternConstraint1("results/Pattern1Result.txt", 10000);
-        measurePatternConstraint2("results/Pattern2Result.txt", 10000);//should be fixed 
-        measurePatternConstraint3("results/Pattern3Result.txt", 10000);//should be fixed 
-        measureArbitraryConstraint("results/ArbitraryResult.txt", 10000);
-        measureArbitraryConstraint1("results/Arbitrary1Result.txt", 10000);
-        measureArbitraryConstraint2("results/Arbitrary2Result.txt", 10000);
-        measureArbitraryConstraint3("results/Arbitrary3Result.txt", 10000);
-        measureBurstConstraint("results/BurstResult.txt", 10000);
+        //measurePatternConstraint("results/PatternResult.txt", 10000);
+        //measurePatternConstraint1("results/Pattern1Result.txt", 10000);
+        //measurePatternConstraint2("results/Pattern2Result.txt", 10000);//should be fixed 
+        //measurePatternConstraint3("results/Pattern3Result.txt", 10000);//should be fixed 
+        //measureArbitraryConstraint("results/ArbitraryResult.txt", 10000);
+        //measureArbitraryConstraint1("results/Arbitrary1Result.txt", 10000);
+        //measureArbitraryConstraint2("results/Arbitrary2Result.txt", 10000);
+        //measureArbitraryConstraint3("results/Arbitrary3Result.txt", 10000);
+        //measureBurstConstraint("results/BurstResult.txt", 10000);
         //measureReactionConstraint("results/ReactionResult.txt", 10000);
         //measureAgeConstraint("results/AgeResult.txt", 10000);
-        measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
-        measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
-        measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
-        measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
+        //measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
+        //measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
+        //measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
+        //measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
         
         //measureCheckEventChain("results/CheckEventChainResult.txt", 10000);
         
     }
     
-    static final String PATHTOTESSLA = "java -Xmx1024m -Xss1024m -jar ../tessla-assembly-1.2.2.jar interpreter";
+    static final String PATHTOTESSLA = "java11 -Xmx1024m -Xss1024m -jar ../../tessla-assembly-1.2.2.jar interpreter";
     
     private static void measureJustOutput(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/JustOutputTimeMeasure.tessla";
@@ -207,10 +207,11 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
         String[] params = new String[numTraces];
         int i = 0;
-        int maxEventsPerCluster = 2;
+        //int maxEventsPerCluster = 2;
         int clusterDistance = 200;
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
             for (int tolerance = 5; tolerance <= 155; tolerance+=10){
+                        int maxEventsPerCluster = tolerance/2;
                         System.out.println("Synchronization Trace " + (i+1) + " of " + numTraces);
                         params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
                             " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
@@ -803,16 +804,15 @@ public class TimeMeasureAll{
     }
     
     private static void measureOutputSynchronizationConstraint2(String outputFileName, int traceSize){
-        traceSize = 1000;
         final String TESSLAFILEPATH = "tmp/OutputSynchronizationConstraintTimeMeasure2.tessla";
-        final int traceCount = 66;
+        final int traceCount = 48;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
         int i = 0;
-        int clusterDistance = 2;
-        for (int streamCount = 2; streamCount <= 102; streamCount+=10)//4
+        int clusterDistance = 16;
+        for (int streamCount = 2; streamCount <= 16; streamCount+=2)//4
             for (int tolerance = 10; tolerance <= 25; tolerance+= 3){
-                    System.out.println("OutputSynchronizationConstraint Trace " + (i+1) + " of "
+                    System.out.println("OutputSynchronizationConstraint2 Trace " + (i+1) + " of "
                         + traceCount);
                     params[i] = "responseCount: " + streamCount + " tolerance: " + tolerance + 
                         " clusterDistance: " + clusterDistance;
@@ -869,12 +869,12 @@ public class TimeMeasureAll{
     
         private static void measureInputSynchronizationConstraint2(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/InputSynchronizationConstraintTimeMeasure2.tessla";
-        final int traceCount = 66;
+        final int traceCount = 48;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
         int i = 0;
         int clusterDistance = 2;
-        for (int streamCount = 2; streamCount <= 102; streamCount+=10)//4
+        for (int streamCount = 2; streamCount <= 16; streamCount+=2)//4
             for (int tolerance = 10; tolerance <= 25; tolerance+= 3){
                     System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
                         + traceCount);

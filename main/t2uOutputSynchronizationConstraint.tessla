@@ -38,42 +38,42 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
         else
             events
             
-    def updateSynchronizationClusters(storedClusters: Map[Int, outputSynchronizationCluster], events: Map[Int, Int],
-            unmatchedStimulusColors: Set[Int], timeNow: Int, responseStreamCount: Int): Map[Int, outputSynchronizationCluster] := {
+    def updateSynchronizationClusters(storedClusters: Map[Int, outputSynchronizationCluster], events: Map[Int, Int], eventKeys: List[Int],
+            unmatchedStimulusColors: Set[Int], timeNow: Int): Map[Int, outputSynchronizationCluster] := {
         # set the given stream in cluster to true
         def setStreamInSynchronizationCluster(cluster: outputSynchronizationCluster, stream: Int): outputSynchronizationCluster = {
                 startTime = cluster.startTime,
                 fulfilledStreams = Map.add(cluster.fulfilledStreams, stream, true)
             }
         
-        if Map.size(events) == 0 then
+        if List.size(eventKeys) == 0 then
             storedClusters
         else
             updateSynchronizationClusters(
                 # set stream to fulfilled in Cluster
-                if (Map.contains(storedClusters, Map_headValue(events)) || Set.contains(unmatchedStimulusColors, Map_headValue(events))) then
-                    Map.add(storedClusters, Map_headValue(events),
+                if (Map.contains(storedClusters, Map.get(events, List.head(eventKeys))) || Set.contains(unmatchedStimulusColors, Map.get(events, List.head(eventKeys)))) then
+                    Map.add(storedClusters, Map.get(events, List.head(eventKeys)),
                         setStreamInSynchronizationCluster(
                             Map.get(
                                 # add new cluster, if needed
-                                if ((!Map.contains(storedClusters, Map_headValue(events))) && Set.contains(unmatchedStimulusColors, Map_headValue(events))) then
-                                    addNewCluster(storedClusters, Map_headValue(events), timeNow, responseStreamCount)
+                                if ((!Map.contains(storedClusters, Map.get(events, List.head(eventKeys)))) && Set.contains(unmatchedStimulusColors, Map.get(events, List.head(eventKeys)))) then
+                                    addNewCluster(storedClusters, Map.get(events, List.head(eventKeys)), timeNow, responseStreamCount)
                                 else
                                     storedClusters,
-                                Map_headValue(events)),
-                            Map_headKey(events)))
+                                Map.get(events, List.head(eventKeys))),
+                            List.head(eventKeys)))
                     else
                         storedClusters,
-                Map_tail(events), unmatchedStimulusColors, timeNow, responseStreamCount)
+                events, List.tail(eventKeys), unmatchedStimulusColors, timeNow)
         }
     
     # check, if all streams are fulfilled in this cluster. Ignores timing
-    def clusterFulfilled(fulfilledStreams: Map[Int, Bool]): Bool :=
-        if (Map.size(fulfilledStreams) == 0) then
+    def clusterFulfilled(fulfilledStreams: Map[Int, Bool], keys: List[Int]): Bool :=
+        if (List.size(keys) == 0) then
             true
         else
-            if (Map_headValue(fulfilledStreams)) then
-                clusterFulfilled(Map_tail(fulfilledStreams))
+            if (Map.get(fulfilledStreams,  List.head(keys))) then
+                clusterFulfilled(fulfilledStreams, List.tail(keys))
             else
                 false
 
@@ -84,7 +84,7 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
             aList
         else
             fulfilledClustersInMapRec(storedClusters, 
-                if (clusterFulfilled(Map.get(storedClusters, List.head(keys)).fulfilledStreams)) then
+                if (clusterFulfilled(Map.get(storedClusters, List.head(keys)).fulfilledStreams, Map.keys(Map.get(storedClusters, List.head(keys)).fulfilledStreams))) then
                     List.append(aList, List.head(keys))
                 else
                     aList, List.tail(keys))
@@ -121,8 +121,8 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
         Set.empty[Int])
 
     def storedClustersBeforeRemove : Events[Map[Int, outputSynchronizationCluster]] := 
-        merge(slift5(last(storedClusters, time(eventStreamIndices)), removeStimulusEvents(eventStreamIndices), prev(unmatchedStimulusColors),
-        time(eventStreamIndices), responseStreamCount, updateSynchronizationClusters),
+        merge(slift5(last(storedClusters, time(eventStreamIndices)), removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)), prev(unmatchedStimulusColors),
+        time(eventStreamIndices), updateSynchronizationClusters),
         Map.empty[Int, outputSynchronizationCluster])
     
     # stored clusters after removing the clusters, which were fulfilled in this timestamp
