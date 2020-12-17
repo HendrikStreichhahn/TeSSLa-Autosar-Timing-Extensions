@@ -13,18 +13,6 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
     def addEventsToEmptylatestEventTimes(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
             eventStreamIndices: Map[Int, Int]): Map[Int, Map[Int, Int]] :=
         addEventsToEmptylatestEventTimesRec(latestEventTimes, timeNow, eventStreamIndices, Map.keys(eventStreamIndices));
-       # static if (Map.size(eventStreamIndices) == 0) then
-       #     latestEventTimes
-       # else
-       #     # if resoponse stream -> don't insert
-       #     static if (Map.headKey(eventStreamIndices) == 0) then
-       #         addEventsToEmptylatestEventTimes(latestEventTimes, timeNow, Map.tail(eventStreamIndices))
-       #     else
-       #         # insert head of map and recursive call
-       #         addEventsToEmptylatestEventTimes(
-       #             Map.add(latestEventTimes, Map.headKey(eventStreamIndices), 
-       #                 Map.add(Map.get(latestEventTimes, Map.headKey(eventStreamIndices)), Map.headValue(eventStreamIndices), timeNow)), 
-       #             timeNow, Map.tail(eventStreamIndices))
                     
     def addEventsToEmptylatestEventTimesRec(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
             eventStreamIndices: Map[Int, Int], remainingKeys: List[Int]): Map[Int, Map[Int, Int]] :=
@@ -51,17 +39,6 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
                     timeOldestEvent(latestEvents, color, List.tail(remainingKeys)))
             else
                 -infty
-    
-    
-    
- #   def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
- #       static if (Map.size(latestEvents) == 0) then
- #           infty
- #       else
- #           if (Map.contains(Map.headValue(latestEvents), color)) then
- #               min(Map.get(Map.headValue(latestEvents), color), timeOldestEvent(Map.tail(latestEvents), color))
- #           else
- #               -infty
 
     # time of the youngest event of the given color
     def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
@@ -74,15 +51,6 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
                     timeYoungestEvent(latestEvents, color, List.tail(remainingKeys)))
             else
                 infty
- #   def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int): Int :=
- #       static if (Map.size(latestEvents) == 0) then
- #           -infty
- #       else
- #           if (Map.contains(Map.headValue(latestEvents), color)) then
- #               max(Map.get(Map.headValue(latestEvents), color), timeYoungestEvent(Map.tail(latestEvents), color))
- #           else
- #               infty
-
 
     # checks, if the synchronization cluster for the given color is fulfilled
     def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =
@@ -108,7 +76,7 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
         merge(slift3(last(latestEventTimes, time(eventStreamIndices)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes),
             buildEmptylatestEventTimes(stimulusStreamCount))
     
-    
+    #evaluation
     stillFulfillabe(
         if (Map.contains(eventStreamIndices, 0)) then
             if slift3(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, clusterFulfilled) then
@@ -117,17 +85,6 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
                 {value= false, final= true}
         else
             {value= true, final= false})
-    
-    #evaluation
-#    allPreviousTrue(
-#        # 'now' has stimulus event
-#        # response event-> matching stimulus cluster exists
-#        if Map.contains(eventStreamIndices, 0) then
-#            #slift4(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, time(eventStreamIndices), clusterFulfilledABC)
-#            slift3(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, clusterFulfilled)
-#        else
-#            true
-#    )
 
 }
 
@@ -138,16 +95,11 @@ def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus2),
             time(response)))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 2, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    
+    inputSynchronizationConstraint(eventResponse2, 2, tolerance)
 }
 
 def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -158,19 +110,12 @@ def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus3),
             time(response))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 3, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    
+    inputSynchronizationConstraint(eventResponse3, 3, tolerance)
 }
 
 def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -182,22 +127,13 @@ def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus4),
             time(response)))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 4, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    
+    inputSynchronizationConstraint(eventResponse4, 4, tolerance)
 }
 
 def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -210,25 +146,14 @@ def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus5),
             time(response))))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 5, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+    
+    inputSynchronizationConstraint(eventResponse5, 5, tolerance)
 }
 
 def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -243,28 +168,15 @@ def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus6),
             time(response)))))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus6) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 6, stimulus6), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 6, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+    def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+    
+    inputSynchronizationConstraint(eventResponse6, 6, tolerance)
 }
 
 def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -280,31 +192,16 @@ def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus7),
             time(response))))))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus6) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 6, stimulus6), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus7) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 7, stimulus7), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 7, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+    def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+    def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+    
+    inputSynchronizationConstraint(eventResponse7, 7, tolerance)
 }
 
 def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -321,34 +218,17 @@ def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus8),
             time(response)))))))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus6) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 6, stimulus6), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus7) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 7, stimulus7), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus8) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 8, stimulus8), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 8, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+    def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+    def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+    def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
+    
+    inputSynchronizationConstraint(eventResponse8, 8, tolerance)
 }
 
 def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -366,37 +246,18 @@ def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[In
         merge(time(stimulus9),
             time(response))))))))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus6) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 6, stimulus6), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus7) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 7, stimulus7), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus8) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 8, stimulus8), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus9) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 9, stimulus9), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 9, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+    def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+    def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+    def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
+    def eventResponse9:= if (defaultTime(stimulus9)  >= timeNow) then Map.add(eventResponse8, 9, default(stimulus9, -1)) else eventResponse8
+    
+    inputSynchronizationConstraint(eventResponse9, 9, tolerance)
 }
 
 def inputSynchronizationConstraint10(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
@@ -416,38 +277,16 @@ def inputSynchronizationConstraint10(stimulus1: Events[Int], stimulus2: Events[I
         merge(time(stimulus10),
             time(response)))))))))))
 
-    def eventStreamIndices: Events[Map[Int, Int]]:=
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-        Map_attachIntIntLifted(
-            if (defaultTime(response)  >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, response), Map.empty[Int, Int]) 
-                                                   else Map.empty[Int, Int],
-            if (defaultTime(stimulus1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, stimulus1), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, stimulus2), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus3) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 3, stimulus3), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus4) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 4, stimulus4), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus5) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 5, stimulus5), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus6) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 6, stimulus6), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus7) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 7, stimulus7), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus8) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 8, stimulus8), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus9) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 9, stimulus9), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int]),
-            if (defaultTime(stimulus10) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 10, stimulus10), Map.empty[Int, Int])
-                                                   else Map.empty[Int, Int])
-    inputSynchronizationConstraint(eventStreamIndices, 10, tolerance)
+    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+    def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+    def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+    def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+    def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
+    def eventResponse9:= if (defaultTime(stimulus9)  >= timeNow) then Map.add(eventResponse8, 9, default(stimulus9, -1)) else eventResponse8
+    def eventResponse10:= if (defaultTime(stimulus10)  >= timeNow) then Map.add(eventResponse9, 10, default(stimulus10, -1)) else eventResponse9
+    inputSynchronizationConstraint(eventResponse10, 10, tolerance)
 }

@@ -42,14 +42,18 @@ public class TimeMeasureOutputSynchronizationConstraint extends TimeMeasureConst
     }
     
     private String writeEventsNow(int i){
+        if (i == 0)
+            return "def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]";
         if (i == 1)
-            return "if (defaultTime(response"+i+") >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+i+", response"+i+"), Map.empty[Int, Int]) else Map.empty[Int, Int],";
+            return writeEventsNow(i-1)+ "\n" +
+                "def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus";
         else
-            return "Map_attachIntIntLifted(" + writeEventsNow(i-1) + "if (defaultTime(response"+i+") >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+i+", response"+i+"), Map.empty[Int, Int]) else Map.empty[Int, Int]),";
+            return writeEventsNow(i-1) + "\n" +
+                "def eventResponse"+i+":= if (defaultTime(response"+i+")  >= timeNow) then Map.add(eventResponse"+(i-1)+", "+i+", default(response"+i+", -1)) else eventResponse"+(i-1);
     }
     
     private String writeEventsNow(){
-        return "Map_attachIntIntLifted(" + writeEventsNow(streamCount) + "if (defaultTime(stimulus) >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+0+", stimulus), Map.empty[Int, Int]) else Map.empty[Int, Int])";
+        return writeEventsNow(streamCount) + "\ndef eventsNow:= eventResponse" + streamCount;
     }
     
     
@@ -59,7 +63,7 @@ public class TimeMeasureOutputSynchronizationConstraint extends TimeMeasureConst
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write(writeInput());
             fileWriter.write("def timeNow = " + writeTimeNow(streamCount)+ "\n");
-            fileWriter.write("def eventsNow = " + writeEventsNow()+ "\n");
+            fileWriter.write(writeEventsNow()+ "\n");
 
             //output
             fileWriter.write("def constraint :=  outputSynchronizationConstraint(eventsNow, " + streamCount +" ," + tolerance + ")\n");    

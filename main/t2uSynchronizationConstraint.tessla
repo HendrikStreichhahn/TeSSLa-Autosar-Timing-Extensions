@@ -127,73 +127,158 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
 def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
         Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(events1, events2))
+    
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, List.empty[Int])
+        else
+            List.empty[Int]
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-        2, tolerance)
+    synchronizationConstraint(eventList2, 2, tolerance)
 }
 
 def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
         Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, List.empty[Int])
+        else
+            List.empty[Int]
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-        3, tolerance)
+    synchronizationConstraint(eventList, 3, tolerance)
 }
 
 def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4))
+    
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, List.empty[Int])
+        else
+            List.empty[Int]
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-        4, tolerance)
+    synchronizationConstraint(eventList, 4, tolerance)
 }
 
 def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
         events1, events2), events3), events4), events5))
+     
+    def eventList5:= 
+        if (defaultTime(events5) >= timeNow) then
+            List.prepend(5, List.empty[Int])
+        else
+            List.empty[Int]
+     
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, eventList5)
+        else
+            eventList5
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
-        5, tolerance)
+    synchronizationConstraint(eventList, 5, tolerance)
 }
 
 def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
         events1, events2), events3), events4), events5), events6))
+        
+    def eventList6:= 
+        if (defaultTime(events6) >= timeNow) then
+            List.prepend(6, List.empty[Int])
+        else
+            List.empty[Int]
+    
+    def eventList5:= 
+        if (defaultTime(events5) >= timeNow) then
+            List.prepend(5, eventList6)
+        else
+            eventList6
+     
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, eventList5)
+        else
+            eventList5
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
-        6, tolerance)
+    synchronizationConstraint(eventList, 6, tolerance)
 }
 
 
@@ -202,93 +287,233 @@ def synchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2:
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
         events1, events2), events3), events4), events5), events6), events7))
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
-        7, tolerance)
+    def eventList7:= 
+        if (defaultTime(events7) >= timeNow) then
+            List.prepend(7, List.empty[Int])
+        else
+            List.empty[Int]
+        
+    def eventList6:= 
+        if (defaultTime(events6) >= timeNow) then
+            List.prepend(6, eventList7)
+        else
+            eventList7
+    
+    def eventList5:= 
+        if (defaultTime(events5) >= timeNow) then
+            List.prepend(5, eventList6)
+        else
+            eventList6
+     
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, eventList5)
+        else
+            eventList5
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
+
+    synchronizationConstraint(eventList, 7, tolerance)
 }
 
 def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
         events1, events2), events3), events4), events5), events6), events7), events8))
+     
+    def eventList8:= 
+        if (defaultTime(events8) >= timeNow) then
+            List.prepend(8, List.empty[Int])
+        else
+            List.empty[Int]
+     
+    def eventList7:= 
+        if (defaultTime(events7) >= timeNow) then
+            List.prepend(7, eventList8)
+        else
+            eventList8
+        
+    def eventList6:= 
+        if (defaultTime(events6) >= timeNow) then
+            List.prepend(6, eventList7)
+        else
+            eventList7
+    
+    def eventList5:= 
+        if (defaultTime(events5) >= timeNow) then
+            List.prepend(5, eventList6)
+        else
+            eventList6
+     
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, eventList5)
+        else
+            eventList5
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
-                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List.empty[Int]),
-        8, tolerance)
+    synchronizationConstraint(eventList, 8, tolerance)
 }
 
 def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
         events1, events2), events3), events4), events5), events6), events7), events8), events9))
+        
+    def eventList9:= 
+        if (defaultTime(events9) >= timeNow) then
+            List.prepend(9, List.empty[Int])
+        else
+            List.empty[Int]
+    
+    def eventList8:= 
+        if (defaultTime(events8) >= timeNow) then
+            List.prepend(8, eventList9)
+        else
+            eventList9
+     
+    def eventList7:= 
+        if (defaultTime(events7) >= timeNow) then
+            List.prepend(7, eventList8)
+        else
+            eventList8
+        
+    def eventList6:= 
+        if (defaultTime(events6) >= timeNow) then
+            List.prepend(6, eventList7)
+        else
+            eventList7
+    
+    def eventList5:= 
+        if (defaultTime(events5) >= timeNow) then
+            List.prepend(5, eventList6)
+        else
+            eventList6
+     
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, eventList5)
+        else
+            eventList5
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
-                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List.empty[Int]),
-                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List.empty[Int]),
-        9, tolerance)
+    synchronizationConstraint(eventList, 9, tolerance)
 }
 
 def synchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
         events1, events2), events3), events4), events5), events6), events7), events8), events9), events10))
+    
+    def eventList10:= 
+        if (defaultTime(events10) >= timeNow) then
+            List.prepend(10, List.empty[Int])
+        else
+            List.empty[Int]    
+    
+    def eventList9:= 
+        if (defaultTime(events9) >= timeNow) then
+            List.prepend(9, eventList10)
+        else
+            eventList10
+    
+    def eventList8:= 
+        if (defaultTime(events8) >= timeNow) then
+            List.prepend(8, eventList9)
+        else
+            eventList9
+     
+    def eventList7:= 
+        if (defaultTime(events7) >= timeNow) then
+            List.prepend(7, eventList8)
+        else
+            eventList8
+        
+    def eventList6:= 
+        if (defaultTime(events6) >= timeNow) then
+            List.prepend(6, eventList7)
+        else
+            eventList7
+    
+    def eventList5:= 
+        if (defaultTime(events5) >= timeNow) then
+            List.prepend(5, eventList6)
+        else
+            eventList6
+     
+    def eventList4:= 
+        if (defaultTime(events4) >= timeNow) then
+            List.prepend(4, eventList5)
+        else
+            eventList5
+    
+    def eventList3:= 
+        if (defaultTime(events3) >= timeNow) then
+            List.prepend(3, eventList4)
+        else
+            eventList4
+        
+    def eventList2:= 
+        if (defaultTime(events2) >= timeNow) then
+            List.prepend(2, eventList3)
+        else
+            eventList3
+            
+    def eventList:= 
+        if (defaultTime(events1) >= timeNow) then
+            List.prepend(1, eventList2)
+        else
+            eventList2
 
-    synchronizationConstraint(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(
-        List_attachIntLifted(if (defaultTime(events1) >= timeNow) then buildList(1, 1) else List.empty[Int],
-                          if (defaultTime(events2) >= timeNow) then buildList(1, 2) else List.empty[Int]),
-                          if (defaultTime(events3) >= timeNow) then buildList(1, 3) else List.empty[Int]),
-                          if (defaultTime(events4) >= timeNow) then buildList(1, 4) else List.empty[Int]),
-                          if (defaultTime(events5) >= timeNow) then buildList(1, 5) else List.empty[Int]),
-                          if (defaultTime(events6) >= timeNow) then buildList(1, 6) else List.empty[Int]),
-                          if (defaultTime(events7) >= timeNow) then buildList(1, 7) else List.empty[Int]),
-                          if (defaultTime(events8) >= timeNow) then buildList(1, 8) else List.empty[Int]),
-                          if (defaultTime(events9) >= timeNow) then buildList(1, 9) else List.empty[Int]),
-                          if (defaultTime(events10) >= timeNow) then buildList(1, 10) else List.empty[Int]),
-        10, tolerance)
+    synchronizationConstraint(eventList, 10, tolerance)
 }

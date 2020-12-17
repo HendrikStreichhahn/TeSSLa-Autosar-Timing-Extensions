@@ -24,28 +24,6 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
         return trace;
     }
     
-  /*  public boolean generateTeSSLaFile(String fileName){
-        try {
-            FileWriter fileWriter = new FileWriter(fileName);
-            fileWriter.write("include \"" + PATHTOINPUTSYNCH + "\"\n");
-            fileWriter.write("in response: Events[Int]\n");
-            fileWriter.write("in endOfStreams: Events[Int]\n");
-            for (int i = 1; i <= streamCount; i++)
-                fileWriter.write("in stimulus" + i + ": Events[Int]\n");
-            fileWriter.write("def constraint := inputSynchronizationConstraint" + streamCount +
-                "( ");
-            for (int i = 1; i <= streamCount; i++)
-                fileWriter.write("stimulus"+i+", ");
-            fileWriter.write("response, " + tolerance+ ")\n");
-            fileWriter.write("out constraint\n");
-            fileWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }*/
-    
     private String writeInput(){
         String result = "";
         result+= "include \"" + PATHTOINPUTSYNCH + "\"\n";
@@ -64,14 +42,18 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
     }
     
     private String writeEventsNow(int i){
+        if (i == 0)
+            return "def eventResponse:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]";
         if (i == 1)
-            return "if (defaultTime(stimulus"+i+") >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+i+", stimulus"+i+"), Map.empty[Int, Int]) else Map.empty[Int, Int],";
+            return writeEventsNow(i-1)+ "\n" +
+                "def eventStimulus1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventResponse, 1, default(stimulus1, -1)) else eventResponse";
         else
-            return "Map_attachIntIntLifted(" + writeEventsNow(i-1) + "if (defaultTime(stimulus"+i+") >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+i+", stimulus"+i+"), Map.empty[Int, Int]) else Map.empty[Int, Int]),";
+            return writeEventsNow(i-1) + "\n" +
+                "def eventStimulus"+i+":= if (defaultTime(stimulus"+i+")  >= timeNow) then Map.add(eventStimulus"+(i-1)+", "+i+", default(stimulus"+i+", -1)) else eventStimulus"+(i-1);
     }
     
     private String writeEventsNow(){
-        return "Map_attachIntIntLifted(" + writeEventsNow(streamCount) + "if (defaultTime(response) >= timeNow) then merge(Map.add(Map.empty[Int, Int], "+0+", response), Map.empty[Int, Int]) else Map.empty[Int, Int])";
+        return writeEventsNow(streamCount) + "\ndef eventsNow:= eventStimulus" + streamCount;
     }
     
     public boolean generateTeSSLaFile(String fileName){
@@ -79,7 +61,7 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write(writeInput());
             fileWriter.write("def timeNow = " + writeTimeNow(streamCount)+ "\n");
-            fileWriter.write("def eventsNow = " + writeEventsNow()+ "\n");
+            fileWriter.write(writeEventsNow()+ "\n");
 
             //output
             fileWriter.write("def constraint :=  inputSynchronizationConstraint(eventsNow, " + streamCount +" ," + tolerance + ")\n");    
