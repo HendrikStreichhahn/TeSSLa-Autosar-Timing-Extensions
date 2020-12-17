@@ -1,5 +1,9 @@
 include "t2uHelpFunctions.tessla"
 
+# State information for currently active snchronization clusters
+#   xTime: startTime of the cluster (timestamp of first event in this cluster)
+#   fulfilledStreams.key:   Indices of all streams
+#   fulfilledStreams.value: event in this stream for this cluster?
 type synchronizationCluster = {xTime: Int, fulfilledStreams: Map[Int, Bool]}
 
 def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedBoolean]:= {
@@ -9,12 +13,6 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
         
     def buildSynchronizationCluster(time: Int, streamCount: Int): synchronizationCluster :=
         {xTime = time, fulfilledStreams = buildMap(streamCount, false)}
-        
-    def getXTime(cluster: synchronizationCluster): Int :=
-        cluster.xTime
-        
-    def getXTimeLifted(cluster: Events[synchronizationCluster]): Events[Int] :=
-        slift1(cluster, getXTime)
 
     #checks if a cluster exists, where the event would fit
     def existsMatchingCluster(
@@ -31,6 +29,7 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
             else
                 true
 
+    #checks, if all streams had an event in this cluster
     def clusterFulfilled(fulfilledStreams: Map[Int, Bool], keys: List[Int]): Bool :=
         # list is empty
         if (Map.size(fulfilledStreams) == 0 || List.size(keys) == 0) then
@@ -42,7 +41,7 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
                 clusterFulfilled(fulfilledStreams, List.tail(keys))
             else
                 false
-                
+    #removes all fulfilled clusters from the list
     def removeFulfilled(activeClusters: List[synchronizationCluster]) : List[synchronizationCluster] :=
         if (List.size(activeClusters) == 0) then
             activeClusters
@@ -52,7 +51,7 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
                 removeFulfilled(List.tail(activeClusters))
             else
                 List.prepend(List.head(activeClusters), removeFulfilled(List.tail(activeClusters)))
-            
+    #updates the synchronization clusters by the given event
     def addEventToClusterList(activeClusters: List[synchronizationCluster], eventStreamIndex: Int):
             List[synchronizationCluster]:= 
         # new event doesn't fit in head of list-> check next one
@@ -72,17 +71,18 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
             # recursive call-> do for all events in list
             addEventsToClusters(
                 # remove clusters, that don't take more events
-                    addEventToClusterList(#List.empty[synchronizationCluster], 
-                        List_attach(activeClusters, if existsMatchingCluster(activeClusters, List.head(eventIndices))
-                                                        then List.empty[synchronizationCluster]
-                                                        else List.append(List.empty[synchronizationCluster],
-                                                            buildSynchronizationCluster(time, streamCount))),
+                    addEventToClusterList(#List.empty[synchronizationCluster],
+                        if (existsMatchingCluster(activeClusters, List.head(eventIndices))) then
+                            activeClusters
+                        else
+                            List.append(activeClusters, buildSynchronizationCluster(time, streamCount)),
                     List.head(eventIndices)), 
                 List.tail(eventIndices), time, streamCount)
     
+    # timestamps, in which the evaluation occurs
     def evaluateTimes: Events[Int] := time(mergeUnit(eventIndices,
         safeDelay(if (List.size(activeClusters) != 0) then
-                     getXTimeLifted(List.head(activeClusters))+ tolerance - time(eventIndices)+1
+                     List.head(activeClusters).xTime+ tolerance - time(eventIndices)+1
                  else
                     infty, eventIndices)))
                     
@@ -94,13 +94,16 @@ def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount
         slift1(activeClustersNewEvent, removeFulfilled), 
         List.empty[synchronizationCluster])
     
-    stillFulfillabe(if (List.size(activeClusters) == 0) then
-        {value= true, final= false}
-    else
-        if getXTimeLifted(List.head(activeClusters)) + tolerance >= evaluateTimes then
-            {value= false, final= false}
+    stillFulfillabe(
+        # no unfinished clusters-> currently true
+        if (List.size(activeClusters) == 0) then
+            {value= true, final= false}
         else
-            {value= false, final= true})
+            # unfinished clusters are not too old-> currently false
+            if List.head(activeClusters).xTime + tolerance >= evaluateTimes then
+                {value= false, final= false}
+            else
+                {value= false, final= true})
 }
 
 def StrongSynchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):

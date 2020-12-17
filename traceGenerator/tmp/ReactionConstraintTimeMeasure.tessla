@@ -1,5 +1,0 @@
-include "../../main/t2uConstraints.tessla"
-in stimulus: Events[Int]
-in response: Events[Int]
-def constraint := reactionConstraint(stimulus, response, 1000, 1000)
-out constraint

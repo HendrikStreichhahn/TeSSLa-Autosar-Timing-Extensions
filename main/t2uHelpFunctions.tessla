@@ -14,16 +14,6 @@ liftable def fourValuedConjunction(a: fourValuedBoolean, b: fourValuedBoolean):=
             else
                 {value= true, final= true}
 
-# returns the time of the n-last event
-def nLastTime[A](e: Events[A], n: Int): Events[Int] :=
-    static if (n <= 0) then
-        time(e)
-    else
-        last(nLastTime(e, n-1), e)
-        
-# returns the time of the n-last event
-def nLastTimeOrFirstTime[A](e: Events[A], n: Int): Events[Int] :=
-    merge(nLastTime(e, n), firstEvent(time(e)))
 
 # time of the event, or 0, if there wasn't an event before
 def defaultTime[T](stream: Events[T]): Events[Int]:=
@@ -51,22 +41,9 @@ def mapAllTrueRec(aMap: Map[Int, Bool], keys: List[Int]): Bool :=
         true
     else
         Map.get(aMap, List.head(keys)) && mapAllTrueRec(aMap, List.tail(keys))
-   
-        
-# attaches right list to left list, preserving the order
-def List_attach[T](ListLeft: List[T], ListRight: List[T]): List[T] :=
-    if List.size(ListRight) <= 0 then
-        ListLeft
-    else
-        List_attach(List.append(ListLeft, List.head(ListRight)), List.tail(ListRight))
-        
-def List_attachInt(ListLeft: List[Int], ListRight: List[Int]): List[Int] :=
-        List_attach(ListLeft, ListRight);
-        
-def List_attachIntLifted(ListLeft: Events[List[Int]], ListRight: Events[List[Int]]): Events[List[Int]] :=
-    slift(ListLeft, ListRight, List_attachInt)
 
 
+# remove all elementsm that equal val, from the list
 def List_remove(aList: List[Int], val: Int): List[Int] :=
     if (List.size(aList) == 0) then
         aList
@@ -93,14 +70,7 @@ def resetSum[A](events: Events[Int], reset: Events[A]): Events[Int] = sum where 
     0)
 }
 
-def allPreviousTrue(events: Events[Bool]): Events[Bool] :={
-    def storage: Events[Bool] := merge(
-        last(storage, events) && events,
-        true)
-    storage
-}
-
-#{value: Bool, final: Bool}
+# once {value= false, final= true}-> always {value= false, final= true}
 def stillFulfillabe(events: Events[fourValuedBoolean]): Events[fourValuedBoolean] :={
     def storage: Events[Bool] := merge(
         last(storage, events) && events != {value= false, final= true},
@@ -112,60 +82,7 @@ def stillFulfillabe(events: Events[fourValuedBoolean]): Events[fourValuedBoolean
         {value= false, final= true}
 }
 
-#@liftable
-def Map_headValue[A, B](aMap: Map[A, B]): B :=
-    Map.get(aMap, List.head(Map.keys(aMap)))
-
-#@liftable    
-def Map_headKey[A, B](aMap: Map[A, B]): A :=
-    List.head(Map.keys(aMap))
-
-#@liftable
-def Map_tail[A, B](aMap: Map[A, B]): Map[A, B] :=
-    Map.remove(aMap, Map_headKey(aMap))
-
-def List_containsInt(list: List[Int], val: Int): Bool :=
-    if List.size(list) == 0 then
-        false
-    else
-        (List.head(list) == val) || List_containsInt(List.tail(list), val)
-
-# all elements of listA are in listB
-def aSublistEqBInt(listA: List[Int], listB: List[Int]): Bool :=
-    if (List.size(listA) == 0) then
-        true
-    else
-        List_containsInt(listB, List.head(listA)) && aSublistEqBInt(List.tail(listA), listB)
-    
-def Set_addList[A](set: Set[A], list: List[A]): Set[A] :=
-    if (List.size(list) == 0) then
-        set
-    else
-        Set_addList(Set.add(set, List.head(list)), List.tail(list))
-        
-def Set_addListInt(set: Set[Int], list: List[Int]): Set[Int] :=
-    Set_addList(set, list)
-    
-def Map_attach[A, B](MapLeft: Map[A, B], MapRight: Map[A, B]): Map[A, B] :=
-    if (Map.size(MapRight) <= 0) then
-        MapLeft
-    else
-        Map_attach(Map.add(MapLeft, List.head(Map.keys(MapRight)), Map.get(MapRight, List.head(Map.keys(MapRight)))),
-            Map.remove(MapRight, List.head(Map.keys(MapRight))))
-
-def Map_attachIntInt(MapLeft: Map[Int, Int], MapRight: Map[Int, Int]): Map[Int, Int] :=
-    Map_attach(MapLeft, MapRight)
-    
-def Map_attachIntIntLifted(MapLeft: Events[Map[Int, Int]], MapRight: Events[Map[Int, Int]]): Events[Map[Int, Int]] :=
-    slift(MapLeft, MapRight, Map_attachIntInt)
-    
-# creates a list of A, initialized with init
-def buildList[A](size: Int, init: A): List[A] :=
-    if (size <= 0) then
-        List.empty[A]
-    else
-        List.append(buildList(size-1, init), init)
-        
+# builds a map with [1, init], [2, init], ..., [size, init]  
 def buildMap[A](size: Int, init: A): Map[Int, A] :=
     if (size <= 0) then
         Map.empty[Int, A]
@@ -178,6 +95,8 @@ def buildMap[A](size: Int, init: A): Map[Int, A] :=
 def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
     delay(if(delays > 0) then delays else infty, resets)
 	
+#removes all list elements, that are smaller than A from the list
+# list must be in ascending order
 def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
 	if (List.size(list) == 0) then
 		list
@@ -186,15 +105,3 @@ def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
 			removeItemsSmallerThanAFromListFront(List.tail(list), A)
 		else
 			list
-
-def removeEntrysValueSmallerThanAFromMap(aMap: Map[Int, Int], value: Int) : Map[Int, Int] :=
-    removeEntrysValueSmallerThanAFromMapRec(aMap, value, Map.keys(aMap))
-    
-def removeEntrysValueSmallerThanAFromMapRec(aMap: Map[Int, Int], value: Int, remainingKeys: List[Int]): Map[Int, Int] :=
-    if (List.size(remainingKeys) == 0) then
-        aMap
-    else 
-        if Map.get(aMap, List.head(remainingKeys)) < value then
-            removeEntrysValueSmallerThanAFromMapRec(Map.remove(aMap, List.head(remainingKeys)), value, List.tail(remainingKeys))
-        else
-            removeEntrysValueSmallerThanAFromMapRec(aMap, value, List.tail(remainingKeys))

@@ -2,12 +2,16 @@ include "t2uConstraints.tessla"
 
 def buildOutputSynchronizationCluster(time: Int, streamCount: Int) : outputSynchronizationCluster =
     {startTime = time, fulfilledStreams = buildMap(streamCount, false)}
-
+# State information for currently active snchronization clusters
+#   startTime: startTime of the cluster (timestamp of first event in this cluster)
+#   fulfilledStreams.key:   Indices of all streams
+#   fulfilledStreams.value: event in this stream for this cluster?
 type outputSynchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, Bool]}
+
 def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int): Events[fourValuedBoolean]:= {
     ##### Help funtions #####
     # add an empty cluster to storedClusters
-        def addNewCluster(storedClusters: Map[Int, outputSynchronizationCluster], newColor: Int, time: Int, responseStreamCount: Int): 
+    def addNewCluster(storedClusters: Map[Int, outputSynchronizationCluster], newColor: Int, time: Int, responseStreamCount: Int): 
             Map[Int, outputSynchronizationCluster] :=
         Map.add(storedClusters, newColor, buildOutputSynchronizationCluster(time, responseStreamCount))
     
@@ -37,7 +41,7 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
             Map.remove(events, 0)
         else
             events
-            
+    #updates the stored synchronization clusters by all events in this timestamp (update or creation of new cluster)
     def updateSynchronizationClusters(storedClusters: Map[Int, outputSynchronizationCluster], events: Map[Int, Int], eventKeys: List[Int],
             unmatchedStimulusColors: Set[Int], timeNow: Int): Map[Int, outputSynchronizationCluster] := {
         # set the given stream in cluster to true
@@ -111,6 +115,8 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
                 startTimeOldestCluster(storedClustersBeforeRemove, List.tail(keys)))
 
     # Stored Information #
+    
+    #stimulus colors without matching target event
     def unmatchedStimulusColors: Events[Set[Int]] := merge(
             removeListFromSet(
                 if (Map.contains(eventStreamIndices, 0)) then
@@ -120,6 +126,7 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
                 mapValuesToList(removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)))),
         Set.empty[Int])
 
+    # synchronization clusters with new stimulus events
     def storedClustersBeforeRemove : Events[Map[Int, outputSynchronizationCluster]] := 
         merge(slift5(last(storedClusters, time(eventStreamIndices)), removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)), prev(unmatchedStimulusColors),
         time(eventStreamIndices), updateSynchronizationClusters),
@@ -130,7 +137,7 @@ def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], r
         slift(storedClustersBeforeRemove, slift1(storedClustersBeforeRemove, fulfilledClustersInMap), removeClusters),
         Map.empty[Int, outputSynchronizationCluster])
     
-    # delay
+    # timestamps, in which the evaluation occurs
     def evalTimes = time(mergeUnit(eventStreamIndices,
         safeDelay(slift(storedClusters, Map.keys(storedClusters), startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
     

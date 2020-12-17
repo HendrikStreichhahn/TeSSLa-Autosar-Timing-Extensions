@@ -3,6 +3,8 @@ include "t2uConstraints.tessla"
 def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
         Events[fourValuedBoolean]:= {
     # Help functions
+    
+    #builds the starting point for the state Map
     def buildEmptylatestEventTimes(stimulusStreamCount: Int): Map[Int, Map[Int, Int]] :=
         if (stimulusStreamCount == 0) then
             Map.empty[Int, Map[Int, Int]]
@@ -55,11 +57,6 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
     # checks, if the synchronization cluster for the given color is fulfilled
     def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =
         clusterFulfilledRec(latestEventTimes, Map.keys(latestEventTimes), color, tolerance)
-        #static if (Map.size(latestEventTimes) == 0) then
-        #    true
-        #else
-        #    timeOldestEvent(latestEventTimes, color, Map.keys(latestEventTimes)) + tolerance >= timeYoungestEvent(latestEventTimes, color, Map.keys(latestEventTimes)) &&
-        #    clusterFulfilled(Map.tail(latestEventTimes), color, tolerance)
             
     def clusterFulfilledRec(latestEventTimes: Map[Int, Map[Int, Int]], remainingKeys: List[Int], color: Int, tolerance: Int) : Bool =
         if (List.size(remainingKeys) == 0) then
@@ -78,12 +75,14 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
     
     #evaluation
     stillFulfillabe(
+        # response event-> valid cluster of the same color must exists
         if (Map.contains(eventStreamIndices, 0)) then
             if slift3(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, clusterFulfilled) then
                 {value= true, final= false}
             else
                 {value= false, final= true}
         else
+            # no response event-> invalid trace
             {value= true, final= false})
 
 }

@@ -1,8 +1,0 @@
-include "../../main/t2uOutputSynchronizationConstraint.tessla"
-in stimulus: Events[Int]
-in response1: Events[Int]
-in response2: Events[Int]
-def timeNow = merge(time(response2),merge(time(response1),time(stimulus)))
-def eventsNow = Map_attachIntIntLifted(Map_attachIntIntLifted(if (defaultTime(response1) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 1, response1), Map.empty[Int, Int]) else Map.empty[Int, Int],if (defaultTime(response2) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 2, response2), Map.empty[Int, Int]) else Map.empty[Int, Int]),if (defaultTime(stimulus) >= timeNow) then merge(Map.add(Map.empty[Int, Int], 0, stimulus), Map.empty[Int, Int]) else Map.empty[Int, Int])
-def constraint :=  outputSynchronizationConstraint(eventsNow, 2 ,10)
-out constraint

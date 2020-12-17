@@ -1,10 +1,17 @@
 include "t2uHelpFunctions.tessla"
 
+# state information for each event:
+#   streamIndex: index of the stream, in which the event occurred
+#   eventTime: timestamp of the event
+#   fulfilled: found a synchronization cluster for this event?
 type SynchronizationEventInfo = {streamIndex: Int, eventTime: Int, fulfilled: Bool}
+
 def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedBoolean]:= {
+
     def buildSynchronizationEventInfo(streamInd: Int, evtTime: Int, flflld: Bool) : SynchronizationEventInfo:=
         {streamIndex= streamInd, eventTime= evtTime, fulfilled= flflld}
 
+    # add events from one timestamp to the state
     def addEvents(existingEvents: List[SynchronizationEventInfo], newEventStreamIndices: List[Int], timeNow: Int) :
             List[SynchronizationEventInfo]:=
         if (List.size(newEventStreamIndices) == 0) then
@@ -107,6 +114,7 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
             else
                 timeOldestUnfulfilledEvent(List.tail(storedEvents))
 	
+    # timestamps, in which the evaluation occurs
 	def evaluateTimes = mergeUnit(eventIndices,
         safeDelay(slift1(storedEvents, timeOldestUnfulfilledEvent) + tolerance - time(eventIndices)+1, eventIndices))
         
@@ -140,7 +148,7 @@ def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tol
         else
             eventList2
 
-    synchronizationConstraint(eventList2, 2, tolerance)
+    synchronizationConstraint(eventList, 2, tolerance)
 }
 
 def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
