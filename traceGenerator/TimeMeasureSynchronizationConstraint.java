@@ -34,6 +34,26 @@ public class TimeMeasureSynchronizationConstraint extends TimeMeasureConstraint{
         return trace;
     }
     
+    private String writeTimeNow(int i){
+        if (i == 0)
+            return "time(event" + i + ")";
+        else
+            return "merge(time(event" + i + ")," + writeTimeNow(i-1) + ")";
+    }
+    
+    private String writeEventsNow(int i){
+        if (i == 0)
+            return "def eventList"+i+":= if (defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",List.empty[Int]) else List.empty[Int]";
+        else
+            return writeEventsNow(i-1) + "\n" +
+                "def eventList"+i+":= if (defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",eventList"+(i-1)+") else eventList"+(i-1);
+    }
+    
+    private String writeEventsNow(){
+        return writeEventsNow(streamCount) + "\ndef";
+    }
+    
+    
     public boolean generateTeSSLaFile(String fileName){
         try {
             FileWriter fileWriter = new FileWriter(fileName);
@@ -41,12 +61,13 @@ public class TimeMeasureSynchronizationConstraint extends TimeMeasureConstraint{
             
             for (int i = 0; i < streamCount; i++)
                 fileWriter.write("in event" + i + ": Events[Int]\n");
-            fileWriter.write("def tolerance =" + tolerance + "\n");
             
-            fileWriter.write("def constraint := synchronizationConstraint"+ streamCount + "(");
-            for (int i = 0; i < streamCount; i++)
-                fileWriter.write("event" + i + ", ");
-            fileWriter.write("tolerance)\n");
+            fileWriter.write("def tolerance =" + tolerance + "\n");
+            fileWriter.write("def timeNow:="+writeTimeNow(streamCount-1)+"\n");
+            fileWriter.write(writeEventsNow(streamCount-1)+"\n");
+            fileWriter.write("def eventsNow:=eventList"+(streamCount-1)+"\n");
+            
+            fileWriter.write("def constraint := synchronizationConstraint(eventsNow, "+streamCount+","+tolerance +")\n");
 
             fileWriter.write("out constraint\n");
             fileWriter.close();
