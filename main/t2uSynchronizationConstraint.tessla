@@ -12,6 +12,7 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
         {streamIndex= streamInd, eventTime= evtTime, fulfilled= flflld}
 
     # add events from one timestamp to the state
+    # O(|events|)
     def addEvents(existingEvents: List[SynchronizationEventInfo], newEventStreamIndices: List[Int], timeNow: Int) :
             List[SynchronizationEventInfo]:=
         if (List.size(newEventStreamIndices) == 0) then
@@ -22,23 +23,30 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
                 List.tail(newEventStreamIndices), timeNow)
         
     # checks, if the events between timeNow and (timeNow-tolerance) fulfills the cluster
-    def clusterFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): Bool :=
-        mapAllTrue(fillIndecesList(events, timeNow, tolerance, buildMap(streamCount, false)))
-
-
-    def fillIndecesList(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int,
-            indicesList: Map[Int, Bool]): Map[Int, Bool] :=
-        # no more events to check-> return indiceslist
-        if (List.size(events) == 0) then
-            indicesList
-        else
-            # recursive call with tail of events and updated indicesList
-            fillIndecesList(List.tail(events), timeNow, tolerance,
-                # time of event fits-> set to true
-                if (List.head(events).eventTime + tolerance >= timeNow) then
-                    Map.add(indicesList, List.head(events).streamIndex, true)
+    # O(List_length)= O(tolerance*|events|)
+    def clusterFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): Bool := {
+        # creates a set with [1, 2, ..., size]
+        def fillSet(count: Int): Set[Int]:=
+            if count == 0 then
+                Set.empty[Int]
+            else
+                Set.add(fillSet(count-1), count)
+        
+        def checkCluster(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, reaminingIndices: Set[Int]):Bool:=
+            if Set.size(reaminingIndices) == 0 then
+                true
+            else
+                if (List.size(events) == 0) then
+                    false
                 else
-                    indicesList)
+                    if (List.head(events).eventTime + tolerance >= timeNow) && (Set.contains(reaminingIndices, List.head(events).streamIndex)) then
+                        checkCluster(List.tail(events), timeNow, tolerance, Set.remove(reaminingIndices, List.head(events).streamIndex))
+                    else
+                        checkCluster(List.tail(events), timeNow, tolerance, reaminingIndices)
+
+        checkCluster(events, timeNow, tolerance, fillSet(streamCount))
+    }
+
 
     # sets all Events in list to fulfilled, if not too old
     def setEventsToFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): 
