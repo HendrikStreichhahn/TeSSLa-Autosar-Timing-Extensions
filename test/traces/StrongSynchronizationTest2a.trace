@@ -1,0 +1,21 @@
+#cluster 1
+1 : events1
+2 : events2
+3 : events3
+4 : events4
+
+#cluster 2 (one missing)
+10: events1
+10: events2
+10: events3
+#fail-> events4 is missing
+
+
+# cluster 3
+34: events1
+34: events2
+34: events3
+34: events4
+
+# events1 cluster 2-> too late, but should be still true
+35: events4
