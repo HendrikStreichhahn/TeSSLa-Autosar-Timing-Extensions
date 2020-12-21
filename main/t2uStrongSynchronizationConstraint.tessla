@@ -1,109 +1,74 @@
 include "t2uHelpFunctions.tessla"
 
 # State information for currently active snchronization clusters
-#   xTime: startTime of the cluster (timestamp of first event in this cluster)
+#   startTime: startTime of the cluster (timestamp of first event in this cluster)
 #   fulfilledStreams.key:   Indices of all streams
 #   fulfilledStreams.value: event in this stream for this cluster?
-type synchronizationCluster = {xTime: Int, fulfilledStreams: Map[Int, Bool]}
+type synchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, Bool]}
 
 def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedBoolean]:= {
 
-    def SynchronizationCluster(aTime: Int, aFulfilledStreams: Map[Int, Bool]): synchronizationCluster :=
-        {xTime = aTime, fulfilledStreams = aFulfilledStreams}
-        
-    def buildSynchronizationCluster(time: Int, streamCount: Int): synchronizationCluster :=
-        {xTime = time, fulfilledStreams = buildMap(streamCount, false)}
-
-    #checks if a cluster exists, where the event would fit
-    def existsMatchingCluster(
-            activeClusters: List[synchronizationCluster],   # List of actice clusters
-            eventStreamIndex: Int): Bool:=                        # the index of the stream, where the event has occurred
-        # list empty-> no matching cluster found
+    # inserts one events to the active clusters. Creates new cluster, if needed.
+    # insertes only, if cluster not too old
+    # runtime: list.length(activeClusters)
+    liftable def insertEvent(activeClusters: List[synchronizationCluster], eventIndex: Int, timeNow: Int): List[synchronizationCluster] :=
+        # no more clusters to check -> create new cluster
         if (List.size(activeClusters) == 0) then
-            false
+            List.append(activeClusters, {startTime= timeNow, 
+                fulfilledStreams= Map.add(buildMap(streamCount, false), eventIndex, true)})
         else
-            # var in map is true-> stream has already event in stream
-            if (Map.get(List.head(activeClusters).fulfilledStreams, eventStreamIndex)) then
-                existsMatchingCluster(List.tail(activeClusters), eventStreamIndex)
-            # var in map is false-> event does fit in this cluster
+            # stream index already was in head cluster or too old-> check next one
+            if (Map.get(List.head(activeClusters).fulfilledStreams, eventIndex) ||
+                    List.head(activeClusters).startTime + tolerance < timeNow) then
+                List.prepend(List.head(activeClusters), insertEvent(List.tail(activeClusters), eventIndex, timeNow))
+            #found matching cluster-> set stream in this cluster to true
             else
-                true
-
-    #checks, if all streams had an event in this cluster
-    def clusterFulfilled(fulfilledStreams: Map[Int, Bool], keys: List[Int]): Bool :=
-        # list is empty
-        if (Map.size(fulfilledStreams) == 0 || List.size(keys) == 0) then
-            true
-        else
-            # now checked stream is fulfilled
-            if Map.get(fulfilledStreams, List.head(keys)) then
-                # all following streams are fulfilled
-                clusterFulfilled(fulfilledStreams, List.tail(keys))
-            else
-                false
-    #removes all fulfilled clusters from the list
-    def removeFulfilled(activeClusters: List[synchronizationCluster]) : List[synchronizationCluster] :=
-        if (List.size(activeClusters) == 0) then
-            activeClusters
-        else
-            if clusterFulfilled(List.head(activeClusters).fulfilledStreams,
-                    Map.keys(List.head(activeClusters).fulfilledStreams)) then
-                removeFulfilled(List.tail(activeClusters))
-            else
-                List.prepend(List.head(activeClusters), removeFulfilled(List.tail(activeClusters)))
-    #updates the synchronization clusters by the given event
-    def addEventToClusterList(activeClusters: List[synchronizationCluster], eventStreamIndex: Int):
-            List[synchronizationCluster]:= 
-        # new event doesn't fit in head of list-> check next one
-        if Map.get(List.head(activeClusters).fulfilledStreams, eventStreamIndex) then
-            List.prepend(List.head(activeClusters),
-                addEventToClusterList(List.tail(activeClusters), eventStreamIndex))
-        else
-            #set event to fulfilled
-            List.prepend(SynchronizationCluster(List.head(activeClusters).xTime, 
-                        Map.add(List.head(activeClusters).fulfilledStreams, eventStreamIndex, true)),
-                List.tail(activeClusters))
-                
-    def addEventsToClusters(activeClusters: List[synchronizationCluster], eventIndices: List[Int], time: Int, streamCount: Int) : List[synchronizationCluster]:=
+                List.prepend({startTime= List.head(activeClusters).startTime, 
+                            fulfilledStreams= Map.add(List.head(activeClusters).fulfilledStreams, eventIndex, true)},
+                    List.tail(activeClusters))
+    
+    # inserts all events from eventIndices to the active clusters.
+    # runtime: List.length(eventIndices) * list.length(activeClusters)
+    liftable def insertEventsList(activeClusters: List[synchronizationCluster], eventIndices: List[Int], timeNow: Int): List[synchronizationCluster] :=
         if (List.size(eventIndices) == 0) then
             activeClusters
         else
-            # recursive call-> do for all events in list
-            addEventsToClusters(
-                # remove clusters, that don't take more events
-                    addEventToClusterList(#List.empty[synchronizationCluster],
-                        if (existsMatchingCluster(activeClusters, List.head(eventIndices))) then
-                            activeClusters
-                        else
-                            List.append(activeClusters, buildSynchronizationCluster(time, streamCount)),
-                    List.head(eventIndices)), 
-                List.tail(eventIndices), time, streamCount)
+            insertEventsList(insertEvent(activeClusters, List.head(eventIndices), timeNow), 
+                List.tail(eventIndices), timeNow)
     
-    # timestamps, in which the evaluation occurs
-    def evaluateTimes: Events[Int] := time(mergeUnit(eventIndices,
-        safeDelay(if (List.size(activeClusters) != 0) then
-                     List.head(activeClusters).xTime+ tolerance - time(eventIndices)+1
+    # runtime: min(tolerance, List.length(eventIndices) * list.length(activeClusters))
+    liftable def removeFulfilledClusters(activeClusters: List[synchronizationCluster]): List[synchronizationCluster]:=
+        #head of list is fulfilled-> remove and check next list entry
+        if (List.size(activeClusters) != 0 && mapAllTrue(List.head(activeClusters).fulfilledStreams)) then
+            removeFulfilledClusters(List.tail(activeClusters))
+        # head of list is unfulfilled-> don't remove, rest can't be fulfilled either
+        else
+            activeClusters
+            
+    #state
+    # list of active clusters
+    def activeClusters: Events[List[synchronizationCluster]]:=
+        merge(removeFulfilledClusters(insertEventsList(last(activeClusters, eventIndices),
+                eventIndices, time(eventIndices))),
+            List.empty[synchronizationCluster])
+    #delay
+    def evalTimes:= 
+        time(mergeUnit(eventIndices,
+            safeDelay(if (List.size(activeClusters) != 0) then
+                     List.head(activeClusters).startTime+ tolerance - time(eventIndices)+1
                  else
                     infty, eventIndices)))
-                    
-    #active clusters with new events
-    def activeClustersNewEvent : Events[List[synchronizationCluster]] :=
-        slift4(last(activeClusters, eventIndices), eventIndices, evaluateTimes, streamCount, addEventsToClusters)
-    # active clusters after removing of full clusters
-    def activeClusters: Events[List[synchronizationCluster]] := merge(
-        slift1(activeClustersNewEvent, removeFulfilled), 
-        List.empty[synchronizationCluster])
     
-    stillFulfillabe(
-        # no unfinished clusters-> currently true
-        if (List.size(activeClusters) == 0) then
-            {value= true, final= false}
+    #no unfulfilled clusters-> current true
+    stillFulfillabe(if List.size(activeClusters) == 0 then
+        {value= true, final= false}
+    else
+        # unfulfilled clusters exists, but not too old-> current false
+        if (List.head(activeClusters).startTime + tolerance > evalTimes) then
+            {value= false, final= false}
         else
-            # unfinished clusters are not too old-> currently false
-            if List.head(activeClusters).xTime + tolerance >= evaluateTimes then
-                {value= false, final= false}
-            else
-                {value= false, final= true})
+            # unfulfilled clusters are too old-> def. false
+            {value= false, final= true})
 }
 
 def StrongSynchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
