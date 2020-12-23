@@ -1,7 +1,0 @@
-include "../main/t2uConstraints.tessla"
-
-in event: Events[Int]
-
-def constraint =  repeatConstraint(event, 100, 200, 2)
-
-out on(event, constraint)

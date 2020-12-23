@@ -1,7 +1,0 @@
-include "../main/t2uConstraints.tessla"
-
-in x: Events[Unit]
-
-def constraint = burstConstraint(x, 10, 3, 1)
-
-out filter(constraint, !constraint)
