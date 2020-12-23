@@ -86,10 +86,8 @@ def stillFulfillabe(events: Events[fourValuedBoolean]): Events[fourValuedBoolean
 def buildMap[A](size: Int, init: A): Map[Int, A] :=
     if (size <= 0) then
         Map.empty[Int, A]
-    else {
-        def recBuildMap = buildMap(size-1, init)
-        Map.add(recBuildMap, Map.size(recBuildMap)+1, init)
-    }
+    else
+        Map.add(buildMap(size-1, init), size, init)
 
 # delay, but delay is infty, if delay value is negative
 def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
