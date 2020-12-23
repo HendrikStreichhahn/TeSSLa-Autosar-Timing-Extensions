@@ -1,0 +1,12 @@
+10: stimulus = 1
+10: response = 1
+
+15: stimulus = 2
+15: response = 2
+
+16: stimulus = 3
+16: response = 3
+
+#fail
+20: stimulus = 5
+21: response = 4

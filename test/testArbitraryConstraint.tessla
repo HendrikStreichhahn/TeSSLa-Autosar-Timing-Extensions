@@ -2,7 +2,7 @@ include "../main/t2uConstraints.tessla"
 
 in x: Events[Unit]
 
-def minDist: List[Int] := List_append(List_append(List_empty[Int], 1), 5)
-def maxDist: List[Int] := List_append(List_append(List_empty[Int], 5), 6)
+def minDist: List[Int] := List.append(List.append(List.empty[Int], 1), 5)
+def maxDist: List[Int] := List.append(List.append(List.empty[Int], 5), 6)
 
 out arbitraryConstraint(x, minDist, maxDist)

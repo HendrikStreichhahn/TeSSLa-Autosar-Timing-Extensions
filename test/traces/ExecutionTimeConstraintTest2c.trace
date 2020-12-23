@@ -1,0 +1,35 @@
+
+1: start
+1: end
+
+4: start
+4: end
+
+5: start
+6: end
+
+10: start
+10: preempt
+10: resume
+10: end
+
+20: start
+20: preempt
+20: resume
+21: end
+
+30: start
+30: preempt
+31: resume
+31: end
+
+40: start
+41: preempt
+41: resume
+41: end
+
+#fail-> too long
+50: start
+50: preempt
+51: resume
+53: end

@@ -1,0 +1,16 @@
+
+1: source
+6: target
+
+10: source
+15: target
+
+20: source
+25: target
+
+#fail at 36-> 34 too early
+# strongDelay-> fail at 34
+30: source
+34: target
+
+50: a

@@ -1,0 +1,9 @@
+include "../main/t2uSynchronizationConstraint.tessla"
+
+
+in events1: Events[Unit]
+in events2: Events[Unit]
+
+def tolerance = 0
+
+out synchronizationConstraint2(events1, events2, tolerance)

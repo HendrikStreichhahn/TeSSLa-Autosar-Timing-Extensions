@@ -1,0 +1,7 @@
+#minimal distance
+5: stimulus = 1
+10: response = 1
+
+#minimal distance not followed -> fails
+50: stimulus = 2
+101: response = 2

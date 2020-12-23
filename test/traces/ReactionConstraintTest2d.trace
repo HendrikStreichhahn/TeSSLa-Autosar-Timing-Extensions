@@ -1,0 +1,15 @@
+#no fail
+
+1: response = 1
+
+
+2: response = 2
+
+
+4: response = 3
+
+
+8: response = 4
+
+
+16: response = 5

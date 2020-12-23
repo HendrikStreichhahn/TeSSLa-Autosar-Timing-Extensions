@@ -1,3 +1,4 @@
+# no fail
 1: stimulus = 1
 2: stimulus = 2
 3: stimulus = 3
@@ -22,4 +23,3 @@
 19: response2 = 7
 50: response1 = 8
 50: response2 = 8
-70: endOfStreams

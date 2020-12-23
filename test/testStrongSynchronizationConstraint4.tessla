@@ -1,0 +1,11 @@
+include "../main/t2uStrongSynchronizationConstraint.tessla"
+
+
+in events1: Events[Unit]
+in events2: Events[Unit]
+in events3: Events[Unit]
+in events4: Events[Unit]
+
+def tolerance = 3
+
+out StrongSynchronizationConstraint4(events1, events2, events3, events4, tolerance)

@@ -1,0 +1,25 @@
+#no fail
+1: events1
+1: events2
+1: events3
+1: events4
+
+2: events1
+2: events2
+2: events3
+3: events4
+
+3: events1
+3: events2
+4: events3
+4: events4
+
+4: events1
+5: events2
+5: events3
+5: events4
+
+6: events1
+6: events2
+6: events3
+6: events4

@@ -1,0 +1,8 @@
+#no fail (always at lower bound)
+1 : x
+2 : x
+4 : x
+6 : x
+8 : x
+# fail -> max 1 violated
+11 : x

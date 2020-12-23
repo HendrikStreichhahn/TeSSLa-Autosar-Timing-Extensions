@@ -1,0 +1,6 @@
+#no fail
+
+1 : stimulus1 = 1
+1 : stimulus2 = 1
+
+100: response = 1

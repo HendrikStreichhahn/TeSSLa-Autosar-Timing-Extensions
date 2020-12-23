@@ -1,0 +1,13 @@
+# no fail
+1: stimulus1 = 1
+1: stimulus2 = 1
+1: stimulus3 = 1
+1: stimulus4 = 1
+1: stimulus5 = 1
+1: stimulus6 = 1
+1: stimulus7 = 1
+1: stimulus8 = 1
+1: stimulus9 = 1
+1: stimulus10 = 1
+
+100: response = 1

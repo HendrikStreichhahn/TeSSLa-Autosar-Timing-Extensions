@@ -1,0 +1,9 @@
+include "../main/t2uInputSynchronizationConstraint.tessla"
+
+in response: Events[Int]
+in stimulus1: Events[Int]
+in stimulus2: Events[Int]
+
+def tolerance: Int = 10
+
+out inputSynchronizationConstraint2(stimulus1, stimulus2, response, tolerance)

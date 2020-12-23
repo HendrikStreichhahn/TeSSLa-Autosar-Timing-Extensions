@@ -1,0 +1,15 @@
+1: stimulus = 1
+1: response = 1
+
+2: stimulus = 2
+2: response = 2
+
+4: stimulus = 3
+4: response = 3
+
+#fail-> too early
+7: response = 4
+8: stimulus = 4
+
+16: stimulus = 5
+16: response = 5

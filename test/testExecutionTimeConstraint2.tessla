@@ -1,0 +1,11 @@
+include "../main/t2uConstraints.tessla"
+
+in start: Events[Unit]
+in preempt: Events[Unit]
+in resume: Events[Unit]
+in end: Events[Unit]
+
+def lower = 0
+def upper = 1
+
+out executionTimeConstraint(start, end, preempt, resume, lower, upper)

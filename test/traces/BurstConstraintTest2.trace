@@ -1,0 +1,12 @@
+# Parameters : 
+# length: 10
+# maxOccurences: 4
+# minimum: 2
+1  : x
+3  : x
+5  : x
+7  : x
+#fail-> too many items
+10  : x
+15  : x
+18  : x

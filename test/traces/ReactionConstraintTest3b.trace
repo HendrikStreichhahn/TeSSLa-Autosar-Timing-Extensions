@@ -1,0 +1,22 @@
+1: stimulus = 1
+2: stimulus = 2
+3: stimulus = 3
+4: stimulus = 4
+5: stimulus = 5
+6: stimulus = 6
+7: stimulus = 7
+8: stimulus = 8
+9: stimulus = 9
+10: stimulus = 10
+
+10: response = 1
+12: response = 2
+13: response = 3
+14: response = 4
+15: response = 5
+#fail-> too late
+17: response = 6
+18: response = 7
+19: response = 8
+20: response = 9
+21: response = 10

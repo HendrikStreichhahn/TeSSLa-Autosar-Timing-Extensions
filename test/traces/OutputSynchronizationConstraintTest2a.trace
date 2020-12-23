@@ -1,0 +1,9 @@
+# no fail
+1: stimulus = 1
+
+15: response1 = 1
+16: response1 = 1
+17: response1 = 1
+18: response1 = 1
+19: response1 = 1
+20: response2 = 1

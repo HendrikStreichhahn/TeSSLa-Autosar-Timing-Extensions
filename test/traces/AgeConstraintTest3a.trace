@@ -1,0 +1,28 @@
+#no fail
+10: stimulus = 1
+11: stimulus = 10
+12: stimulus = 12
+13: stimulus = 13
+14: stimulus = 14
+15: stimulus = 2
+16: stimulus = 3
+17: stimulus = 15
+18: stimulus = 16
+19: stimulus = 17
+20: stimulus = 4
+21: stimulus = 17
+22: stimulus = 18
+23: stimulus = 19
+24: stimulus = 20
+25: stimulus = 21
+26: stimulus = 22
+27: stimulus = 23
+28: stimulus = 24
+29: stimulus = 25
+
+
+30: response = 1
+35: response = 2
+36: response = 3
+40: response = 4
+45: stimulus = 25
