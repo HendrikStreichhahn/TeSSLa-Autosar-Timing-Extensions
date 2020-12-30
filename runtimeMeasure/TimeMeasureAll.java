@@ -236,33 +236,31 @@ public class TimeMeasureAll{
     
     private static void measureSynchronizationConstraint2(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/SynchronizationConstraintTimeMeasure2.tessla";
-        int numTraces = 72;
+        int numTraces = 116;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
         String[] params = new String[numTraces];
         int i = 0;
+        int clusterDistance = 200;
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
-            for (int tolerance = 1; tolerance <= 100; tolerance+=30){//4
-                int clusterDistance = 2*tolerance;
-                 for (int maxEventsPerCluster = 1; maxEventsPerCluster < tolerance;       //3
-                            maxEventsPerCluster+= 10){
-                        System.out.println("Synchronization2 Trace " + (i+1) + " of " + numTraces);
-                        params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
-                            " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
-                            + clusterDistance;
-                        System.out.println(params[i]);
-                        TimeMeasureSynchronizationConstraint constraint = 
-                            new TimeMeasureSynchronizationConstraint(tolerance, numStreams,
-                                maxEventsPerCluster, clusterDistance, clusterDistance);
-                        TraceSet trace = constraint.generateTrace(traceSize);
-                        //generate TesslaFile
-                        if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                            System.out.println(TESSLAFILEPATH + " could not be created!");
-                        //measure time per event
-                        results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA +
-                            " " + TESSLAFILEPATH);
-                        System.out.println(results[i]);
-                        i++;
-                }
+            for (int tolerance = 5; tolerance <= 145; tolerance+=5){//4
+                 int maxEventsPerCluster = tolerance/2;
+                System.out.println("Synchronization2 Trace " + (i+1) + " of " + numTraces);
+                params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
+                    " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
+                    + clusterDistance;
+                System.out.println(params[i]);
+                TimeMeasureSynchronizationConstraint constraint = 
+                    new TimeMeasureSynchronizationConstraint(tolerance, numStreams,
+                        maxEventsPerCluster, clusterDistance, clusterDistance);
+                TraceSet trace = constraint.generateTrace(traceSize);
+                //generate TesslaFile
+                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+                    System.out.println(TESSLAFILEPATH + " could not be created!");
+                //measure time per event
+                results[i] = constraint.measureConstraintSingle(trace, PATHTOTESSLA +
+                    " " + TESSLAFILEPATH);
+                System.out.println(results[i]);
+                i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
@@ -270,14 +268,13 @@ public class TimeMeasureAll{
     
     private static void measureStrongSynchronizationConstraint(String outputFileName, int traceSize){
         final String TESSLAFILEPATH = "tmp/StrongSynchronizationConstraintTimeMeasure.tessla";
-        int traceCount = 80;
+        int traceCount = 116;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
         int i = 0;
+        int clusterDistance = 200;
         for (int numStreams = 2; numStreams <= 5; numStreams++)//4
-            for (int tolerance = 1; tolerance <= 100; tolerance+=20)//6
-                for (int clusterDistance = 2; clusterDistance <= 246;       //5
-                        clusterDistance*=4){
+            for (int tolerance = 5; tolerance <= 145; tolerance+=5){//4
                     System.out.println("StrongSynchronizationConstraint Trace " + (i+1) + " of " + traceCount);
                     params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
                         " clusterDistance = " + clusterDistance;
