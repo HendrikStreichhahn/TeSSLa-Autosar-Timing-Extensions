@@ -1,5 +1,33 @@
 include "t2uHelpFunctions.tessla"
 
+
+## Checks the DelayConstraint defined in TADL2.
+## Each source event must be followed by at least one target event, which occurs within a time distance between lower and upper. Additional target events are allowed.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in source: Events[Unit]
+## in target: Events[Unit]
+## 
+## def lower = 15
+## def upper = 25
+## 
+## def constraint: Events[fourValuedBoolean] = delayConstraint(source, target, lower, upper)
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,90]
+## 10: source
+## 25: target
+## 50: source
+## 65: target
+## 75: target
+## 80: target
+## ~~~
 def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) : Events[fourValuedBoolean] :={
     # timestamps of source events, which did not have matching target event yet,
     # including the timestamps, which matches in this this timestamp
@@ -46,6 +74,31 @@ def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, uppe
                 {value= false, final= true})
 }
 
+## Checks the DelayConstraint defined in TADL2
+## Each source event must be followed by one target event, which occurs within a time distance between lower and upper. Additional target events are not allowed.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in source: Events[Unit]
+## in target: Events[Unit]
+## 
+## def lower = 15
+## def upper = 25
+## 
+## def constraint: Events[fourValuedBoolean] =  strongDelayConstraint(source, target, lower, upper)
+## out constraint
+## ~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,70]
+## 10: source
+## 25: target
+## 50: source
+## 65: target
+## ~~~
 def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
     #List with times of events on source without matching (until now) target event
     def unfinishedSourceTimes: Events[List[Int]] :=
@@ -87,6 +140,31 @@ def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int
                     {value= false, final= true})
 }
 
+## Checks the RepeatConstraint defined in TADL2.
+## The events are repeating with distances between lower and upper.
+## The parameter span defines overlaps of repetitions. (no overlaps: span=1, one overlap: span=2,...)
+##
+## **Usage Example**
+##
+## ~~~tessla
+##  in event: Events[Unit]
+##
+##  def constraint: Events[fourValuedBoolean] = repeatConstraint(event, 20, 20, 2)
+##  out constraint
+## 
+## ~~~
+##
+## **Trace Example**
+## ~~~trace
+## option timeDomain:[-1,50]
+## 5: event
+## 7: event
+## 25: event
+## 27: event
+## 45: event
+## 47: event
+## ~~~
+
 def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedBoolean] := {
 
     #stored state
@@ -124,7 +202,30 @@ def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events
                 {value= false, final= true})
     
 }
-        
+
+## Checks the RepetitionConstraint defined in TADL2.
+## The RepetitionConstraint is similar to the RepeatConstraint, but the parameter jitter allows to define further deviations from the repetitions.
+##
+## **Usage Example**
+##
+## ~~~tessla
+##  in event: Events[Unit]
+##
+##  def constraint: Events[fourValuedBoolean] = repetitionConstraint(event, 30, 30, 2, 2)
+##  out constraint
+## 
+##~~~
+##
+## **Trace Example**
+## ~~~trace
+## option timeDomain:[-1,80]
+## 5: event
+## 10: event
+## 35: event
+## 38: event
+## 67: event
+## 70: event
+## ~~~
 def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedBoolean] := {
     # lower bound for current x
     def lowerBoundXNow: Events[Int] =
@@ -171,6 +272,33 @@ def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jit
             {value= false, final= true})
 }
 
+## Checks the executionTimeConstraint defined in TADL2.
+## Checks, if the time between one start event and the next end event, minus the preemptions, is between lower and upper.
+## The source code is only tested for events in logical order.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in start: Events[Unit]
+## in end: Events[Unit]
+## in preempt: Events[Unit]
+## in resume: Events[Unit]
+##
+## def constraint: Events[fourValuedBoolean] = (start, end, preempt, resume, 10, 12)
+## out constraint
+## ~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,90]
+## 5: start
+## 10: preempt
+## 12: resume
+## 15: preempt
+## 17: resume
+## 20: end
+## ~~~
 def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
         lower: Int, upper: Int): Events[fourValuedBoolean] :={
     # timestamps, when the constraint is evaluated
@@ -199,6 +327,29 @@ def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preemp
             {value= false, final= true})
 }
 
+## Checks the OrderConstraint defined in TADL2.
+## The order Constraint that the ith target event must occur after the ith source event.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in source: Events[Unit]
+## in target: Events[Unit]
+##
+## def constraint: Event[fourValuedBoolean]= orderConstraint(source, target)
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,50]
+## 1: source
+## 2: target
+## 5: source
+## 6: source
+## 20: target
+## 40: target
+## ~~~
 def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedBoolean] :=
     stillFulfillabe(
         #number of events on both streams equal-> currently true
@@ -212,13 +363,60 @@ def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValu
                 # more target than source events-> false
                 {value= false, final= true})
 
+## Checks the SporadicConstraint defined in TADL2.
+## The SporadicConstraint describes sporadic event occurrences, constraint by the minimal distance between subsequent events (minimum), the distance between subsequent events (lower, upper) and a deviation from that pattern (jitter).
+## The SporadicConstraint is similar to the RepetitionConstraint, but additionally check the minimal distance of Events.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in event: Events[Unit]
+##
+## def constraint= sporadicConstraint(events, 10, 15, 0, 11)
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,50]
+## 5: event
+## 20: event
+## 31: event
+## 45: event
+## ~~~
 def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedBoolean]:=
     # application of repeat and repetititonConstraint
     slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1), fourValuedConjunction)
 
+## Checks the PeriodicConstraint defined in TADL2.
+## The events occur in a periodic pattern with an allowed deviation of upper and a minimal distance of minDist.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in event: Events[Unit]
+##
+## def constraint= periodic(events, 10, 2, 9)
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,70]
+## 5: event
+## 17: event
+## 26: event
+## 35: event
+## 47: event
+## 56: event
+## 65: event
+## ~~~
 def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int) :=
     sporadicConstraint(events, period, period, jitter, minDist)
 
+## nodoc
 def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[fourValuedBoolean] :=
     #recursive application of the repeatConstraint
     static if (List.size(minDist) > 1 && List.size(maxDist) > 1) then
@@ -228,14 +426,111 @@ def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[In
     else
         repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr)
 
+## Checks the ArbitraryConstraint defined in TADL2.
+## The ArbitraryConstraint describes the time distances between several subsequent events
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in event: Events[Unit]
+##
+## def minDist: List[Int] := List.append(List.append(List.empty[Int], 1), 5)
+## def maxDist: List[Int] := List.append(List.append(List.empty[Int], 5), 6)
+##
+## def constraint = arbitraryConstraint(event, minDist, maxDist)
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,90]
+## 1: x
+## 6: x
+## 7: x
+## 11: x
+## 12: x
+## 16: x
+## 17: x
+## 21: x
+## 22: x
+## 26: x
+## 27: x
+## 31: x
+## 32: x
+## 36: x
+## 37: x
+## 41: x
+## 42: x
+## 46: x
+## ~~~
 def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[fourValuedBoolean] :=
     arbitraryConstraintRec(e, minDist, maxDist, 1)
 
+## Checks the BurstConstraint defined in TADL2.
+## The BurstConstraints limits the number of events (maxOccurences) in a time interval of a specific length (length). Additionally, it is checked if subsequent events have a minimal distance (minDist).
+##
+## **Usage Example**
+##
+## ~~~tessla
+##
+## in event: Events[Unit]
+##
+## def constraint= burstConstraint(event, 5, 3, 1)
+## out constraint
+## 
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,25]
+## 1: event
+## 2: event
+## 3: event
+## 7: event
+## 8: event
+## 9: event
+## 20: event
+## 21: event
+## 22: event
+## ~~~
 def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[fourValuedBoolean] :=
     # application of repeatConstraint
     slift(repeatConstraint(e, length, infty, maxOccurences), repeatConstraint(e, minDist, infty, 1),
         fourValuedConjunction)
 
+## Checks the patternConstraint defined in TADL2.
+## The PatternConstraint decribes periodic patterns, in which the events must occur.
+## The events must occur in a pattern defined by the offset parameter, which is repeated after periodX timestamps.
+## A deviation from these offsets can be allowed by the jitter parameter, while the minimal distance between subsequent events can be defined using the  minDist parameter.
+## The offsets must be given in a map, which keys are subsequent indices, with the offsets as values.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in event: Events[Unit]
+##
+## def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 3), 2, 6)
+## def constraint:= patternConstraint(event, 20, offset, 1, 0)
+##
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,60]
+## 10: event
+## 13: event
+## 16: event
+## 31: event
+## 33: event
+## 36: event
+## 50: event
+## 53: event
+## 57: event
+## ~~~
 def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedBoolean] := {
     liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
         if b == 1 then 1 else a % b;
@@ -277,6 +572,35 @@ def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitt
         fourValuedConjunction)
 }
 
+## Checks the ReactionConstraint defined in TADL2.
+## For each stimulus event on stimulus, there must be an reponse event of the same color in response in the given time distance after the stimulus event.
+## The color attribute is represented as integer.
+## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+##
+## **Usage Example**
+##
+## ~~~tessla
+##
+## in stimulus: Events[Int]
+## in response: Events[Int]
+##
+## def constraint= reactionConstraint(stimulus, response, 5, 5)
+## out constraint
+##
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,25]
+## 1: stimulus = 1
+## 6: response = 1
+## 8: response = 4
+## 10: response = 2
+## 13: response = 3
+## 15: response = 2
+## 18: response = 3
+## ~~~
 def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedBoolean] := {
     # Map with unmatched stimulus events after stimulus
     def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
@@ -314,7 +638,35 @@ def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff
             {value= false, final= true})
 }
 
-
+## Checks the AgeConstraint defined in TADL2.
+## For each response event on stimulus, there must be an stimulus event of the same color in response in the given time distance before the stimulus event.
+## The color attribute is represented as integer.
+## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+##
+## **Usage Example**
+##
+## ~~~tessla
+##
+## in stimulus: Events[Int]
+## in response: Events[Int]
+##
+## def constraint= ageConstraint(stimulus, response, 5, 5)
+## out constraint
+##
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,25]
+## 1: stimulus = 1
+## 6: response = 1
+## 8: stimulus = 4
+## 10: response = 2
+## 13: response = 3
+## 15: response = 2
+## 18: response = 3
+## ~~~
 def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedBoolean] := {
     #removes colors, that were before timeBound, from the list
     def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
@@ -382,8 +734,37 @@ def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int
             {value= false, final= true})
 }
 
+## The function checkEventChain checks the correctness of event chains. Any stimulus event of a specific color must occur before the first response event with the same color.
+##
+## This function should only be used, when there is no other reasonable way to check the correctness of event chain, because it stores each color that occurs in the response stream.
+##
+## **Usage Example**
+##
+## ~~~tessla
+##
+## in stimulus: Events[Int]
+## in response: Events[Int]
+##
+## def constraint= checkEventChain(stimulus, response)
+## out constraint
+##
+## ~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,90]
+## 1: stimulus = 1
+## 2: stimulus = 2
+## 3: stimulus = 3
+## 4: stimulus = 4
+## 11: response = 1
+## 12: response = 2
+## 13: response = 3
+## 14: response = 4
+## ~~~
 def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedBoolean]:= {
-    # colors, that occured in response-> not allows in stimulus anymore
+    # colors that occured in response-> not allows in stimulus anymore
     def previousResponseColors: Events[Set[Int]]:=
         merge(Set.add(last(previousResponseColors, response), response), Set.empty[Int])
     stillFulfillabe(

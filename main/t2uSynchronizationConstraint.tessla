@@ -3,9 +3,42 @@ include "t2uHelpFunctions.tessla"
 # state information for each event:
 #   streamIndex: index of the stream, in which the event occurred
 #   eventTime: timestamp of the event
-#   fulfilled: found a synchronization cluster for this event?
+#   fulfilled: found a synchronization cluster for this event? 
+## nodoc
 type SynchronizationEventInfo = {streamIndex: Int, eventTime: Int, fulfilled: Bool}
 
+## Checks the SynchronizationConstraint defined in TADL2.
+## The SynchronizationConstraint describes groups of streams, which events occur in common clusters. Each of these streams must have at least one event in each of these intervals. Any events that lay outside of these intervals are prohibited. Overlaps of clusters are allowed.
+## The events of each input timestamp must be placed into an integer list, which contains the index (starting at 1) of all streams, which have an event in this timestamp. This list is then used as a parameter for the implementation. The creation of this list is already implemented for up to 10 streams. See synchronizationConstraint2, ... .
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in event1: Events[Unit]
+## in event2: Events[Unit]
+## in event3: Events[Unit]
+##
+## def constraint= synchronizationConstraint3(event1, event2, event3, 2)
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,50]
+## 5: event1
+## 5: event2
+## 5: event3
+## 15: event1
+## 15: event2
+## 15: event3
+## 24: event1
+## 25: event2
+## 26: event3
+## 36: event1
+## 34: event2
+## 35: event3
+## ~~~
 def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedBoolean]:= {
 
     def buildSynchronizationEventInfo(streamInd: Int, evtTime: Int, flflld: Bool) : SynchronizationEventInfo:=
@@ -140,6 +173,8 @@ def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int,
                 {value= false, final= true})
 }
 
+## checks the synchronizationConstraint for two streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
         Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(events1, events2))
@@ -159,6 +194,8 @@ def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tol
     synchronizationConstraint(eventList, 2, tolerance)
 }
 
+## checks the synchronizationConstraint for three streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
         Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
@@ -184,6 +221,8 @@ def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], 
     synchronizationConstraint(eventList, 3, tolerance)
 }
 
+## checks the synchronizationConstraint for four streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4))
@@ -215,6 +254,8 @@ def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B
     synchronizationConstraint(eventList, 4, tolerance)
 }
 
+## checks the synchronizationConstraint for five streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
@@ -253,6 +294,8 @@ def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Event
     synchronizationConstraint(eventList, 5, tolerance)
 }
 
+## checks the synchronizationConstraint for six streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
@@ -297,7 +340,8 @@ def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Ev
     synchronizationConstraint(eventList, 6, tolerance)
 }
 
-
+## checks the synchronizationConstraint for seven streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
@@ -348,6 +392,8 @@ def synchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2:
     synchronizationConstraint(eventList, 7, tolerance)
 }
 
+## checks the synchronizationConstraint for eight streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
@@ -404,6 +450,8 @@ def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], event
     synchronizationConstraint(eventList, 8, tolerance)
 }
 
+## checks the synchronizationConstraint for nine streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
@@ -466,6 +514,8 @@ def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], ev
     synchronizationConstraint(eventList, 9, tolerance)
 }
 
+## checks the synchronizationConstraint for ten streams.
+## See synchronizationConstraint for further information.
 def synchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
         events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[fourValuedBoolean]:={
     def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(

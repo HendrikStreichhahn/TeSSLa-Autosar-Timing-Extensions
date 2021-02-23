@@ -1,5 +1,37 @@
 include "t2uConstraints.tessla"
 
+## Checks the InputSynchronizationConstraint defined in TADL2.
+## In the InputSynchronizationConstraint, there must be one synchronization cluster of the length tolerance for each response event. Each stimulus stream must have at least one event of the same color as the response event in this cluster.
+## A stream of maps must be created, representing the events of each timestamp. The key of each entry is the index of the stream (0 for the response stream, 1, 2, ... for the stimulus streams), in which the event occurred and the value is the color of the event.
+## The creation of this map is already implemented for up to 10 response streams, see inputSynchronizationConstraint2, ... .
+## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+##
+## **Usage Example**
+##
+## ~~~tessla
+## in response: Events[Int]
+## in stimulus1: Events[Int]
+## in stimulus2: Events[Int]
+## in stimulus3: Events[Int]
+##
+## def constraint= inputSynchronizationConstraint3(stimulus1, stimulus2, stimulus3, response, 2)
+## out constraint
+##~~~
+##
+## **Trace Example**
+##
+## ~~~trace
+## option timeDomain:[-1,22]
+## 1: stimulus1 = 1
+## 5: stimulus1 = 1
+## 5: stimulus2 = 1
+## 5: stimulus3 = 1
+## 6: response = 1
+## 15: stimulus1 = 2
+## 16: stimulus2 = 2
+## 17: stimulus3 = 2
+## 20: response = 2
+## ~~~
 def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
         Events[fourValuedBoolean]:= {
     # Help functions
@@ -87,6 +119,8 @@ def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], st
 
 }
 
+## checks the InputSynchronizationConstraint for two streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[Int], response: Events[Int],
         tolerance: Int): Events[fourValuedBoolean] := {
     def timeNow = 
@@ -101,6 +135,8 @@ def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse2, 2, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for three streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         response: Events[Int], tolerance: Int): Events[fourValuedBoolean] := {
     def timeNow = 
@@ -117,6 +153,8 @@ def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse3, 3, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for four streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedBoolean] := {
     def timeNow = 
@@ -135,6 +173,8 @@ def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse4, 4, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for five streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], stimulus5: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedBoolean] := {
     def timeNow = 
@@ -155,6 +195,8 @@ def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse5, 5, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for six streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], response: Events[Int],
         tolerance: Int): Events[fourValuedBoolean] := {
@@ -178,6 +220,8 @@ def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse6, 6, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for seven streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
         response: Events[Int], tolerance: Int): Events[fourValuedBoolean] := {
@@ -203,6 +247,8 @@ def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse7, 7, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for eight streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
         stimulus8: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedBoolean] := {
@@ -230,6 +276,8 @@ def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse8, 8, tolerance)
 }
 
+## checks the InputSynchronizationConstraint for nine streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
         stimulus8: Events[Int], stimulus9: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedBoolean] := {
@@ -259,6 +307,9 @@ def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[In
     inputSynchronizationConstraint(eventResponse9, 9, tolerance)
 }
 
+
+## checks the InputSynchronizationConstraint for ten streams.
+## See InputSynchronizationConstraint for further information.
 def inputSynchronizationConstraint10(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
         stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
         stimulus8: Events[Int], stimulus9: Events[Int], stimulus10: Events[Int], response: Events[Int],
