@@ -1,4 +1,4 @@
-include "../main/t2uInputSynchronizationConstraint.tessla"
+include "../main/t2uConstraints.tessla"
 
 in response: Events[Int]
 in stimulus1: Events[Int]
@@ -9,4 +9,4 @@ in stimulus3: Events[Int]
 def stimulusStreamCount: Int = 3
 def tolerance: Int = 5
 
-out inputSynchronizationConstraint3(stimulus1, stimulus2, stimulus3, response, 5)
+out TADL2.inputSynchronizationConstraint3(stimulus1, stimulus2, stimulus3, response, 5)

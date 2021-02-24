@@ -3,4 +3,4 @@ include "../main/t2uConstraints.tessla"
 in stimulus: Events[Int]
 in response: Events[Int]
 
-out checkEventChain(stimulus, response)
+out TADL2.checkEventChain(stimulus, response)

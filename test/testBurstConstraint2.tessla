@@ -2,4 +2,4 @@ include "../main/t2uConstraints.tessla"
 
 in x: Events[Unit]
 
-out burstConstraint(x, 10, 4, 2)
+out TADL2.burstConstraint(x, 10, 4, 2)

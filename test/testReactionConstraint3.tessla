@@ -6,4 +6,4 @@ in response: Events[Int]
 def minTimeDiff : Int = 0
 def maxTimeDiff : Int = 10
 
-out reactionConstraint(stimulus, response, minTimeDiff, maxTimeDiff)
+out TADL2.reactionConstraint(stimulus, response, minTimeDiff, maxTimeDiff)

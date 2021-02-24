@@ -2,4 +2,4 @@ include "../main/t2uConstraints.tessla"
 
 in x: Events[Unit]
 
-out repeatConstraint(x, 5, 6, 1)
+out TADL2.repeatConstraint(x, 5, 6, 1)

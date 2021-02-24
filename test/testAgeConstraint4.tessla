@@ -7,4 +7,4 @@ def minTimeDiff : Int = 5
 def maxTimeDiff : Int = 50
 
 
-out ageConstraint(stimulus, response, minTimeDiff, maxTimeDiff)
+out TADL2.ageConstraint(stimulus, response, minTimeDiff, maxTimeDiff)

@@ -6,4 +6,4 @@ def lower = 5
 def upper = 6
 def span = 2
 
-out repeatConstraint(e, lower, upper, span)
+out TADL2.repeatConstraint(e, lower, upper, span)

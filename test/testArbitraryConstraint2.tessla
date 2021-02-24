@@ -5,4 +5,4 @@ in x: Events[Unit]
 def minDist: List[Int] := List.append(List.empty[Int], 1)
 def maxDist: List[Int] := List.append(List.empty[Int], 1)
 
-out arbitraryConstraint(x, minDist, maxDist)
+out TADL2.arbitraryConstraint(x, minDist, maxDist)

@@ -8,4 +8,4 @@ in target: Events[Unit]
 def lower = 5
 def upper = 5
 
-out strongDelayConstraint(source, target, lower, upper)
+out TADL2.strongDelayConstraint(source, target, lower, upper)

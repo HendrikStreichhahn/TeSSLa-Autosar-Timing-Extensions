@@ -1,4 +1,4 @@
-include "../main/t2uSynchronizationConstraint.tessla"
+include "../main/t2uConstraints.tessla"
 
 in events1: Events[Unit]
 in events2: Events[Unit]
@@ -9,4 +9,4 @@ in events5: Events[Unit]
 
 def tolerance = 0
 
-out synchronizationConstraint5(events1, events2, events3, events4, events5, tolerance)
+out TADL2.synchronizationConstraint5(events1, events2, events3, events4, events5, tolerance)

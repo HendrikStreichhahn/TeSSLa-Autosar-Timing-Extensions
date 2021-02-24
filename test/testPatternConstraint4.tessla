@@ -7,4 +7,4 @@ def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.add(Map.add(Map.empty[I
 def jitter: Int = 2
 def mini: Int = 2
 
-out patternConstraint(e, periodX, offset, jitter, mini)
+out TADL2.patternConstraint(e, periodX, offset, jitter, mini)

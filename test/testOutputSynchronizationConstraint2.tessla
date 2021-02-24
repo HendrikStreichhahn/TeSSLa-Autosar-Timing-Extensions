@@ -1,4 +1,4 @@
-include "../main/t2uOutputSynchronizationConstraint.tessla"
+include "../main/t2uConstraints.tessla"
 
 in stimulus: Events[Int]
 in response1: Events[Int]
@@ -6,6 +6,6 @@ in response2: Events[Int]
 
 def tolerance = 5
 
-def test = outputSynchronizationConstraint2(stimulus, response1, response2, tolerance) 
+def test = TADL2.outputSynchronizationConstraint2(stimulus, response1, response2, tolerance) 
 
 out test

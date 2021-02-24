@@ -6,4 +6,4 @@ def upper = 10
 def jitter = 1
 def minDist = 0
 
-out sporadicConstraint(x, lower, upper, jitter, minDist)
+out TADL2.sporadicConstraint(x, lower, upper, jitter, minDist)

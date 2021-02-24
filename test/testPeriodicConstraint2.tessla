@@ -6,4 +6,4 @@ def aPeriod = 10
 def jitter = 0
 def minDist = 0
 
-out periodicConstraint(events, aPeriod, jitter, minDist)
+out TADL2.periodicConstraint(events, aPeriod, jitter, minDist)
