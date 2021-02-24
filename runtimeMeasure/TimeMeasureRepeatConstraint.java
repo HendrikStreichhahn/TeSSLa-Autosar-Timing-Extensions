@@ -28,7 +28,7 @@ public class TimeMeasureRepeatConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := repeatConstraint(event, " + lower + ", " +
+            fileWriter.write("def constraint := TADL2.repeatConstraint(event, " + lower + ", " +
                 upper + ", " + span + ")\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();
@@ -44,7 +44,7 @@ public class TimeMeasureRepeatConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := repeatConstraint(event, " + lower + ", " +
+            fileWriter.write("def constraint := TADL2.repeatConstraint(event, " + lower + ", " +
                 upper + ", " + span + ")\n");
             fileWriter.write("out filter(constraint, !constraint)\n");
             fileWriter.close();

@@ -32,7 +32,7 @@ public class TimeMeasureStrongDelayConstraint extends TimeMeasureConstraint{
             fileWriter.write("in target: Events[Int]\n");
             fileWriter.write("def lower = " + lower + "\n");
             fileWriter.write("def upper = " + upper + "\n");
-            fileWriter.write("def constraint := strongDelayConstraint(source , target, " + lower + ", " +
+            fileWriter.write("def constraint := TADL2.strongDelayConstraint(source , target, " + lower + ", " +
                 upper + ")\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

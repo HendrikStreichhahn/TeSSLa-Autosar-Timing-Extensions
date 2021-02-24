@@ -28,7 +28,7 @@ public class TimeMeasureArbitraryConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := arbitraryConstraint(event, " +
+            fileWriter.write("def constraint := TADL2.arbitraryConstraint(event, " +
                 generateTesslaIntList(minimum) + ", " + generateTesslaIntList(maximum) +")\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

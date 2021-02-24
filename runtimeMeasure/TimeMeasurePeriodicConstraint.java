@@ -27,7 +27,7 @@ public class TimeMeasurePeriodicConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := periodicConstraint(event, " + period + ", "
+            fileWriter.write("def constraint := TADL2.periodicConstraint(event, " + period + ", "
                 + jitter + ", 1)\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

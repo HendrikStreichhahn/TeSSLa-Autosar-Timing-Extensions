@@ -34,7 +34,7 @@ public class TimeMeasurePatternConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := patternConstraint(event, " + period + ", " + offsetString
+            fileWriter.write("def constraint := TADL2.patternConstraint(event, " + period + ", " + offsetString
                 + ", "+ jitter + ", 1)\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

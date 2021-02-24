@@ -27,7 +27,7 @@ public class TimeMeasureBurstConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := burstConstraint(event, " + length + ", "
+            fileWriter.write("def constraint := TADL2.burstConstraint(event, " + length + ", "
                 + maxOccurrences + ", 1)\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();
@@ -43,7 +43,7 @@ public class TimeMeasureBurstConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := burstConstraint(event, " + length + ", "
+            fileWriter.write("def constraint := TADL2.burstConstraint(event, " + length + ", "
                 + maxOccurrences + ", 1)\n");
             fileWriter.write("out filter(constraint, !constraint)\n");
             fileWriter.close();

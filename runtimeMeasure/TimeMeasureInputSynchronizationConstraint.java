@@ -26,7 +26,7 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
     
     private String writeInput(){
         String result = "";
-        result+= "include \"" + PATHTOINPUTSYNCH + "\"\n";
+        result+= "include \"" + PATHTOMAIN + "\"\n";
         result+= "in response: Events[Int]\n";
         result+= "in endOfStreams: Events[Int]\n";
         for (int i = 1; i <= streamCount; i++)
@@ -43,13 +43,13 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
     
     private String writeEventsNow(int i){
         if (i == 0)
-            return "def eventResponse:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]";
+            return "def eventResponse:= if (TADL2.defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]";
         if (i == 1)
             return writeEventsNow(i-1)+ "\n" +
-                "def eventStimulus1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventResponse, 1, default(stimulus1, -1)) else eventResponse";
+                "def eventStimulus1:= if (TADL2.defaultTime(stimulus1)  >= timeNow) then Map.add(eventResponse, 1, default(stimulus1, -1)) else eventResponse";
         else
             return writeEventsNow(i-1) + "\n" +
-                "def eventStimulus"+i+":= if (defaultTime(stimulus"+i+")  >= timeNow) then Map.add(eventStimulus"+(i-1)+", "+i+", default(stimulus"+i+", -1)) else eventStimulus"+(i-1);
+                "def eventStimulus"+i+":= if (TADL2.defaultTime(stimulus"+i+")  >= timeNow) then Map.add(eventStimulus"+(i-1)+", "+i+", default(stimulus"+i+", -1)) else eventStimulus"+(i-1);
     }
     
     private String writeEventsNow(){
@@ -64,7 +64,7 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
             fileWriter.write(writeEventsNow()+ "\n");
 
             //output
-            fileWriter.write("def constraint :=  inputSynchronizationConstraint(eventsNow, " + streamCount +" ," + tolerance + ")\n");    
+            fileWriter.write("def constraint :=  TADL2.inputSynchronizationConstraint(eventsNow, " + streamCount +" ," + tolerance + ")\n");    
             fileWriter.write("out constraint");
             fileWriter.close();
         } catch (IOException e) {

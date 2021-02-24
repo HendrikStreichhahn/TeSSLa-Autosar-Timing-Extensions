@@ -28,7 +28,7 @@ public class TimeMeasureSporadicConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := sporadicConstraint(event, " + lower + ", " +
+            fileWriter.write("def constraint := TADL2.sporadicConstraint(event, " + lower + ", " +
                 upper + ", " + jitter + ", 1)\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

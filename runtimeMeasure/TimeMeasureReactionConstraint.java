@@ -30,7 +30,7 @@ public class TimeMeasureReactionConstraint extends TimeMeasureConstraint{
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in stimulus: Events[Int]\n");
             fileWriter.write("in response: Events[Int]\n");
-            fileWriter.write("def constraint := reactionConstraint(stimulus, response, " + minimum + ", "
+            fileWriter.write("def constraint := TADL2.reactionConstraint(stimulus, response, " + minimum + ", "
                 + maximum + ")\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

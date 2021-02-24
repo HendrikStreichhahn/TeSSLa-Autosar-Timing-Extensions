@@ -14,7 +14,7 @@ public class TimeMeasureCheckEventChain extends TimeMeasureReactionConstraint{
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in stimulus: Events[Int]\n");
             fileWriter.write("in response: Events[Int]\n");
-            fileWriter.write("def constraint := checkEventChain(stimulus, response)\n");
+            fileWriter.write("def constraint := TADL2.checkEventChain(stimulus, response)\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();
         } catch (IOException e) {

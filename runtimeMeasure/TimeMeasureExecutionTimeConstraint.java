@@ -37,7 +37,7 @@ public class TimeMeasureExecutionTimeConstraint extends TimeMeasureConstraint{
             fileWriter.write("in preempt: Events[Int]\n");
             fileWriter.write("in resume: Events[Int]\n");
             fileWriter.write("in stop: Events[Int]\n");
-            fileWriter.write("def constraint := executionTimeConstraint(start, stop, preempt, resume, " +
+            fileWriter.write("def constraint := TADL2.executionTimeConstraint(start, stop, preempt, resume, " +
                 lower + ", " + upper + ")\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();

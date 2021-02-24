@@ -42,10 +42,10 @@ public class TimeMeasureStrongSynchronizationConstraint extends TimeMeasureConst
     
     private String writeEventsNow(int i){
         if (i == 0)
-            return "def eventList"+i+":= if (defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",List.empty[Int]) else List.empty[Int]";
+            return "def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",List.empty[Int]) else List.empty[Int]";
         else
             return writeEventsNow(i-1) + "\n" +
-                "def eventList"+i+":= if (defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",eventList"+(i-1)+") else eventList"+(i-1);
+                "def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",eventList"+(i-1)+") else eventList"+(i-1);
     }
     
     private String writeEventsNow(){
@@ -56,7 +56,7 @@ public class TimeMeasureStrongSynchronizationConstraint extends TimeMeasureConst
     public boolean generateTeSSLaFile(String fileName){
         try {
             FileWriter fileWriter = new FileWriter(fileName);
-            fileWriter.write("include \"" + PATHTOSTRONGSYNCHRONIZATIONCONSTRAINT + "\"\n");
+            fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             
             for (int i = 0; i < streamCount; i++)
                 fileWriter.write("in event" + i + ": Events[Int]\n");
@@ -66,7 +66,7 @@ public class TimeMeasureStrongSynchronizationConstraint extends TimeMeasureConst
             fileWriter.write(writeEventsNow(streamCount-1)+"\n");
             fileWriter.write("def eventsNow:=eventList"+(streamCount-1)+"\n");
             
-            fileWriter.write("def constraint := StrongSynchronizationConstraint(eventsNow, "+streamCount+","+tolerance +")\n");
+            fileWriter.write("def constraint := TADL2.StrongSynchronizationConstraint(eventsNow, "+streamCount+","+tolerance +")\n");
 
             fileWriter.write("out constraint\n");
             fileWriter.close();

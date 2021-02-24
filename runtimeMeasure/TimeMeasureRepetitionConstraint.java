@@ -29,7 +29,7 @@ public class TimeMeasureRepetitionConstraint extends TimeMeasureConstraint{
             FileWriter fileWriter = new FileWriter(fileName);
             fileWriter.write("include \"" + PATHTOMAIN + "\"\n");
             fileWriter.write("in event: Events[Int]\n");
-            fileWriter.write("def constraint := repetitionConstraint(event, " + lower + ", " +
+            fileWriter.write("def constraint := TADL2.repetitionConstraint(event, " + lower + ", " +
                 upper + ", " + span + ", "+ jitter + ")\n");
             fileWriter.write("out constraint\n");
             fileWriter.close();
