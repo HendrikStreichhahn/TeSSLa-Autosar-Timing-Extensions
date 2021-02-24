@@ -1,780 +1,2754 @@
-include "t2uHelpFunctions.tessla"
+module TADL2{
+    ## ~~~nodoc
+    def infty : Int := 9223372036854775807
 
+    ## four valued logic value
+    ##  fourValuedLogicValue.value: current logical value
+    ##  fourValuedLogicValue.final: is the current value final? -> will not change in future
+    type fourValuedLogicValue = {value: Bool, final: Bool}
 
-## Checks the DelayConstraint defined in TADL2.
-## Each source event must be followed by at least one target event, which occurs within a time distance between lower and upper. Additional target events are allowed.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in source: Events[Unit]
-## in target: Events[Unit]
-## 
-## def lower = 15
-## def upper = 25
-## 
-## def constraint: Events[fourValuedBoolean] = delayConstraint(source, target, lower, upper)
-## out constraint
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,90]
-## 10: source
-## 25: target
-## 50: source
-## 65: target
-## 75: target
-## 80: target
-## ~~~
-def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) : Events[fourValuedBoolean] :={
-    # timestamps of source events, which did not have matching target event yet,
-    # including the timestamps, which matches in this this timestamp
-    def unfinishedSourceTimesNewSource: Events[List[Int]] := 
-        # 'now' has source event
-        if (defaultTime(source) >= defaultTime(target)) then
-            merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                  List.empty[Int])
+    ## conjunction operator on four valued logic values
+    liftable def fourValuedConjunction(a: fourValuedLogicValue, b: fourValuedLogicValue):=
+        if ((!a.value && a.final) || (!b.value && b.final)) then
+            {value= false, final= true}
         else
-            merge(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
-    # timestamps of source events, which did not have matching target event yet
-    def unfinishedSourceTimes: Events[List[Int]]:=
-        # 'now' has target event
-        if (defaultTime(source) <= defaultTime(target) &&
-                # List has source event without matching target
-                List.size(unfinishedSourceTimesNewSource) > 0 &&
-                # target event now matches with oldest source event
-                List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
-            #remove matched target events
-            merge(slift(unfinishedSourceTimesNewSource, defaultTime(target) - lower + 1, 
-					removeItemsSmallerThanAFromListFront),
-				List.empty[Int])
-        else
-            merge(unfinishedSourceTimesNewSource, List.empty[Int])
-    # timestamps, in which the evaluation occurs
-	def evaluateTimes = mergeUnit(mergeUnit(source, target),
-        safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
-				infty
-			else
-				List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
-			mergeUnit(source, target)))
-            
-    stillFulfillabe(
-        # no unfinished source events -> current true
-        if (List.size(unfinishedSourceTimes) == 0) then
-            {value= true, final= false}
-        else
-            # oldest source event can still be finished-> current false
-            if (time(evaluateTimes) <= List.head(unfinishedSourceTimes) + upper) then
+            if ((!a.value && !a.final) || (!b.value && !b.final)) then
                 {value= false, final= false}
-            # oldest source event is too old -> final false
             else
-                {value= false, final= true})
-}
+                if ((a.value && !a.final) || (b.value && !b.final)) then
+                    {value= true, final= false}
+                else
+                    {value= true, final= true}
 
-## Checks the DelayConstraint defined in TADL2
-## Each source event must be followed by one target event, which occurs within a time distance between lower and upper. Additional target events are not allowed.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in source: Events[Unit]
-## in target: Events[Unit]
-## 
-## def lower = 15
-## def upper = 25
-## 
-## def constraint: Events[fourValuedBoolean] =  strongDelayConstraint(source, target, lower, upper)
-## out constraint
-## ~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,70]
-## 10: source
-## 25: target
-## 50: source
-## 65: target
-## ~~~
-def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
-    #List with times of events on source without matching (until now) target event
-    def unfinishedSourceTimes: Events[List[Int]] :=
-        #event now is source event
-        if (defaultTime(source) > defaultTime(target)) then
-            merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                  List.empty[Int])
-        else if (defaultTime(source) < defaultTime(target)) then
-            merge(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), List.empty[Int])
-        else # defaultTime(source) == defaultTime(target)
-            merge(List.append(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
-                  List.empty[Int])
-    # timestamps, in which the evaluation occurs
-    def evaluateTimes = mergeUnit(mergeUnit(source, target),
-        safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
-				infty
-			else
-				List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
-			mergeUnit(source, target)))
-	# output
-    stillFulfillabe(
-        # no unmatched source event-> current true
-        if (List.size(last(unfinishedSourceTimes, evaluateTimes)) == 0) then
-            {value= true, final= false}
+
+    # time of the event, or 0, if there wasn't an event before
+    ## ~~~nodoc
+    def defaultTime[T](stream: Events[T]): Events[Int]:=
+        default(time(stream), 0)
+        
+    # searchest for the smallest value in a [Int, Int]-map
+    ## ~~~nodoc
+    def mapMinimumValueRec(aMap: Map[Int, Int], keys: List[Int]) : Int :=
+        if (List.size(keys) == 0) then
+            infty
         else
-            # now just source events
-            if (defaultTime(source) > defaultTime(target)) then
-                # oldest stored event not too old
-                if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper) then
+            min(Map.get(aMap, List.head(keys)),
+                mapMinimumValueRec(aMap, List.tail(keys)))
+
+    # smallest value in map
+    ## ~~~nodoc
+    def mapMinimumValue(aMap: Map[Int, Int]) : Int :=
+        mapMinimumValueRec(aMap, Map.keys(aMap))
+        
+    # checks, if all values in Int->Bool map are true
+    ## ~~~nodoc
+    def mapAllTrue(aMap: Map[Int, Bool]): Bool :=
+        mapAllTrueRec(aMap, Map.keys(aMap))
+
+    # checks, if all values in int->bool map within the key list are true
+    ## ~~~nodoc
+    def mapAllTrueRec(aMap: Map[Int, Bool], keys: List[Int]): Bool :=
+        if (Map.size(aMap) == 0 || List.size(keys) == 0) then
+            true
+        else
+            Map.get(aMap, List.head(keys)) && mapAllTrueRec(aMap, List.tail(keys))
+
+
+    # remove all elementsm that equal val, from the list
+    ## ~~~nodoc
+    def List_remove(aList: List[Int], val: Int): List[Int] :=
+        if (List.size(aList) == 0) then
+            aList
+        else
+            if (List.head(aList) == val) then
+                List_remove(List.tail(aList), val)
+            else
+                List.prepend(List.head(aList), List_remove(List.tail(aList), val))
+            
+
+    # FREMDQUELLTEXT => abgewandelte Form von resetCount
+    ## ~~~nodoc
+    def resetSum[A](events: Events[Int], reset: Events[A]): Events[Int] = sum where {
+      def sum: Events[Int] = default(
+        # `reset` contains the latest event
+        if default(time(reset) > time(events), false) then
+            0
+        # `reset` and `events` latest event happen simultaneously
+        else 
+            if default(time(reset) == time(events), false) then
+                events
+            # `events` contains the latest event > increment counter
+            else
+                last(sum, events) + events,
+        0)
+    }
+
+    ## ensures that a four valued logic value, which is {value= false, final= true}, stays {value= false, final= true}.
+    def stillFulfillabe(events: Events[fourValuedLogicValue]): Events[fourValuedLogicValue] :={
+        def storage: Events[Bool] := merge(
+            last(storage, events) && events != {value= false, final= true},
+            true)
+
+        if storage then
+            events
+        else
+            {value= false, final= true}
+    }
+
+    # builds a map with [1, init], [2, init], ..., [size, init]
+    ## ~~~nodoc
+    def buildMap[A](size: Int, init: A): Map[Int, A] :=
+        if (size <= 0) then
+            Map.empty[Int, A]
+        else
+            Map.add(buildMap(size-1, init), size, init)
+
+    # delay, but delay is infty, if delay value is negative
+    ## ~~~nodoc
+    def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
+        delay(if(delays > 0) then delays else infty, resets)
+        
+    #removes all list elements, that are smaller than A from the list
+    # list must be in ascending order
+    ## ~~~nodoc
+    def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
+        if (List.size(list) == 0) then
+            list
+        else
+            if List.head(list) < A then
+                removeItemsSmallerThanAFromListFront(List.tail(list), A)
+            else
+                list
+
+    ## Checks the DelayConstraint defined in TADL2.
+    ## Each source event must be followed by at least one target event, which occurs within a time distance between lower and upper. Additional target events are allowed.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in source: Events[Unit]
+    ## in target: Events[Unit]
+    ## 
+    ## def lower = 15
+    ## def upper = 25
+    ## 
+    ## def constraint= delayConstraint(source, target, lower, upper)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,90]
+    ## 10: source
+    ## 25: target
+    ## 50: source
+    ## 65: target
+    ## 75: target
+    ## 80: target
+    ## ~~~
+    def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) : Events[fourValuedLogicValue] :={
+        # timestamps of source events, which did not have matching target event yet,
+        # including the timestamps, which matches in this this timestamp
+        def unfinishedSourceTimesNewSource: Events[List[Int]] := 
+            # 'now' has source event
+            if (defaultTime(source) >= defaultTime(target)) then
+                merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
+                      List.empty[Int])
+            else
+                merge(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+        # timestamps of source events, which did not have matching target event yet
+        def unfinishedSourceTimes: Events[List[Int]]:=
+            # 'now' has target event
+            if (defaultTime(source) <= defaultTime(target) &&
+                    # List has source event without matching target
+                    List.size(unfinishedSourceTimesNewSource) > 0 &&
+                    # target event now matches with oldest source event
+                    List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                    List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                #remove matched target events
+                merge(slift(unfinishedSourceTimesNewSource, defaultTime(target) - lower + 1, 
+                        removeItemsSmallerThanAFromListFront),
+                    List.empty[Int])
+            else
+                merge(unfinishedSourceTimesNewSource, List.empty[Int])
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes = mergeUnit(mergeUnit(source, target),
+            safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
+                    infty
+                else
+                    List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
+                mergeUnit(source, target)))
+                
+        stillFulfillabe(
+            # no unfinished source events -> current true
+            if (List.size(unfinishedSourceTimes) == 0) then
+                {value= true, final= false}
+            else
+                # oldest source event can still be finished-> current false
+                if (time(evaluateTimes) <= List.head(unfinishedSourceTimes) + upper) then
                     {value= false, final= false}
+                # oldest source event is too old -> final false
+                else
+                    {value= false, final= true})
+    }
+
+    ## Checks the DelayConstraint defined in TADL2
+    ## Each source event must be followed by one target event, which occurs within a time distance between lower and upper. Additional target events are not allowed.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in source: Events[Unit]
+    ## in target: Events[Unit]
+    ## 
+    ## def lower = 15
+    ## def upper = 25
+    ## 
+    ## def constraint: Events[fourValuedLogicValue] =  strongDelayConstraint(source, target, lower, upper)
+    ## out constraint
+    ## ~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,70]
+    ## 10: source
+    ## 25: target
+    ## 50: source
+    ## 65: target
+    ## ~~~
+    def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
+        #List with times of events on source without matching (until now) target event
+        def unfinishedSourceTimes: Events[List[Int]] :=
+            #event now is source event
+            if (defaultTime(source) > defaultTime(target)) then
+                merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
+                      List.empty[Int])
+            else if (defaultTime(source) < defaultTime(target)) then
+                merge(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), List.empty[Int])
+            else # defaultTime(source) == defaultTime(target)
+                merge(List.append(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
+                      List.empty[Int])
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes = mergeUnit(mergeUnit(source, target),
+            safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
+                    infty
+                else
+                    List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
+                mergeUnit(source, target)))
+        # output
+        stillFulfillabe(
+            # no unmatched source event-> current true
+            if (List.size(last(unfinishedSourceTimes, evaluateTimes)) == 0) then
+                {value= true, final= false}
+            else
+                # now just source events
+                if (defaultTime(source) > defaultTime(target)) then
+                    # oldest stored event not too old
+                    if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper) then
+                        {value= false, final= false}
+                    else
+                        {value= false, final= true}
+                else
+                    # oldest stored event in right distance
+                    if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper &&
+                            defaultTime(target) >= List.head(last(unfinishedSourceTimes, evaluateTimes)) + lower ) then
+                        {value= false, final= false}
+                    else
+                        {value= false, final= true})
+    }
+
+    ## Checks the RepeatConstraint defined in TADL2.
+    ## The events are repeating with distances between lower and upper.
+    ## The parameter span defines overlaps of repetitions. (no overlaps: span=1, one overlap: span=2,...)
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##  in event: Events[Unit]
+    ##
+    ##  def constraint: Events[fourValuedLogicValue] = repeatConstraint(event, 20, 20, 2)
+    ##  out constraint
+    ## 
+    ## ~~~
+    ##
+    ## **Trace Example**
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 5: event
+    ## 7: event
+    ## 25: event
+    ## 27: event
+    ## 45: event
+    ## 47: event
+    ## ~~~
+
+    def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := {
+
+        #stored state
+        def latestSpanEventTimes: Events[List[Int]]:=
+            merge(List.append(
+                if (List.size(last(latestSpanEventTimes, e)) > span) then
+                    List.tail(last(latestSpanEventTimes, defaultTime(e)))
+                else
+                    last(latestSpanEventTimes, e), defaultTime(e)),
+                List.empty[Int])
+        
+        # timestamps, in which the evaluation occurs
+        def delayPeriod :=
+            if (defaultTime(e) == defaultTime(firstEvent(e))) then
+                List.head(latestSpanEventTimes) + upper - time(e) + 1
+            else
+                List.head(List.tail(latestSpanEventTimes)) + upper - time(e) + 1
+        
+        def evaluateTimes := 
+            mergeUnit(e, safeDelay(delayPeriod, e))
+        
+        stillFulfillabe(
+            # more than span events occured-> distance to span-1^th event is relevant
+            if (List.size(latestSpanEventTimes) > span) then
+                if List.head(latestSpanEventTimes) + lower <= time(evaluateTimes) &&
+                        List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
+                    {value= true, final= false}
                 else
                     {value= false, final= true}
             else
-                # oldest stored event in right distance
-                if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper &&
-                        defaultTime(target) >= List.head(last(unfinishedSourceTimes, evaluateTimes)) + lower ) then
+                # less than span events occurred-> first event must be younger than upper
+                if List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
+                    {value= true, final= false}
+                else
+                    {value= false, final= true})
+        
+    }
+
+    ## Checks the RepetitionConstraint defined in TADL2.
+    ## The RepetitionConstraint is similar to the RepeatConstraint, but the parameter jitter allows to define further deviations from the repetitions.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##  in event: Events[Unit]
+    ##
+    ##  def constraint: Events[fourValuedLogicValue] = repetitionConstraint(event, 30, 30, 2, 2)
+    ##  out constraint
+    ## 
+    ##~~~
+    ##
+    ## **Trace Example**
+    ## ~~~trace
+    ## option timeDomain:[-1,80]
+    ## 5: event
+    ## 10: event
+    ## 35: event
+    ## 38: event
+    ## 67: event
+    ## 70: event
+    ## ~~~
+    def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedLogicValue] := {
+        # lower bound for current x
+        def lowerBoundXNow: Events[Int] =
+            if (List.size(last(LowerBoundX, e)) < span) then
+                time(e)-jitter
+            else
+                max(List.head(last(LowerBoundX, e)), time(e)-jitter)
+        # upper bound for current x
+        def upperBoundXNow: Events[Int] =
+            if (List.size(last(UpperBoundX, e)) < span) then
+                time(e)
+            else
+                min(List.head(last(UpperBoundX, e)), time(e))
+
+        # lower bound for span next x
+        def LowerBoundX: Events[List[Int]]:= merge(
+            if (List.size(last(LowerBoundX, e)) < span) then
+               List.append(last(LowerBoundX, e), lowerBoundXNow + lower)
+            else
+                List.append(last(List.tail(LowerBoundX), e), lowerBoundXNow + lower),
+            List.empty[Int]
+        )
+            
+         # upper bound for span next x
+        def UpperBoundX: Events[List[Int]]:= merge(
+            if (List.size(last(UpperBoundX, e)) < span) then
+                List.append(last(UpperBoundX, e), upperBoundXNow+upper)
+            else
+                List.append(last(List.tail(UpperBoundX), e), upperBoundXNow + upper),
+            List.empty[Int]
+        )
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes = mergeUnit(e,
+            safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
+                    jitter - time(e)+1, e))
+        # Evaluation        
+        stillFulfillabe(
+            #first event or correct distance to X
+            if (List.size(LowerBoundX) == 0 && List.size(UpperBoundX) == 0) ||
+                    lowerBoundXNow <= time(evaluateTimes) &&
+                    upperBoundXNow + jitter >= time(evaluateTimes) then
+                {value= true, final= false}
+            else
+                {value= false, final= true})
+    }
+
+    ## Checks the executionTimeConstraint defined in TADL2.
+    ## Checks, if the time between one start event and the next end event, minus the preemptions, is between lower and upper.
+    ## The source code is only tested for events in logical order.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in start: Events[Unit]
+    ## in end: Events[Unit]
+    ## in preempt: Events[Unit]
+    ## in resume: Events[Unit]
+    ##
+    ## def constraint: Events[fourValuedLogicValue] = (start, end, preempt, resume, 10, 12)
+    ## out constraint
+    ## ~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,90]
+    ## 5: start
+    ## 10: preempt
+    ## 12: resume
+    ## 15: preempt
+    ## 17: resume
+    ## 20: end
+    ## ~~~
+    def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
+            lower: Int, upper: Int): Events[fourValuedLogicValue] :={
+        # timestamps, when the constraint is evaluated
+        def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes: Events[Unit] := 
+            mergeUnit(inputTimes, safeDelay(if (time(inputTimes) != defaultTime(end) &&
+                                                    time(inputTimes) != defaultTime(preempt)) then
+                                                upper - execTime + 1
+                                            else
+                                                infty, inputTimes))
+
+        # evaluation
+        def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
+        # 'now' is end event
+            
+        stillFulfillabe(
+            #first event or correct distance to X
+            if (if (time(evaluateTimes) == defaultTime(end)) then
+                    lower <= execTime && execTime <= upper
+                else
+                    #ignore lower
+                    execTime <= upper) then
+                {value= true, final= false}
+            else
+                {value= false, final= true})
+    }
+
+    ## Checks the OrderConstraint defined in TADL2.
+    ## The order Constraint that the ith target event must occur after the ith source event.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in source: Events[Unit]
+    ## in target: Events[Unit]
+    ##
+    ## def constraint: Event[fourValuedLogicValue]= orderConstraint(source, target)
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 1: source
+    ## 2: target
+    ## 5: source
+    ## 6: source
+    ## 20: target
+    ## 40: target
+    ## ~~~
+    def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedLogicValue] :=
+        stillFulfillabe(
+            #number of events on both streams equal-> currently true
+            if count(source) == count(target) then
+                {value= true, final= false}
+            else
+                # more source than target events-> currently false
+                if (count(source) >= count(target)) then
+                    {value= false, final= false}
+                else
+                    # more target than source events-> false
+                    {value= false, final= true})
+
+    ## Checks the SporadicConstraint defined in TADL2.
+    ## The SporadicConstraint describes sporadic event occurrences, constraint by the minimal distance between subsequent events (minimum), the distance between subsequent events (lower, upper) and a deviation from that pattern (jitter).
+    ## The SporadicConstraint is similar to the RepetitionConstraint, but additionally check the minimal distance of Events.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def constraint= sporadicConstraint(events, 10, 15, 0, 11)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 5: event
+    ## 20: event
+    ## 31: event
+    ## 45: event
+    ## ~~~
+    def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedLogicValue]:=
+        # application of repeat and repetititonConstraint
+        slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1), fourValuedConjunction)
+
+    ## Checks the PeriodicConstraint defined in TADL2.
+    ## The events occur in a periodic pattern with an allowed deviation of upper and a minimal distance of minDist.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def constraint= periodic(events, 10, 2, 9)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,70]
+    ## 5: event
+    ## 17: event
+    ## 26: event
+    ## 35: event
+    ## 47: event
+    ## 56: event
+    ## 65: event
+    ## ~~~
+    def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int) :=
+        sporadicConstraint(events, period, period, jitter, minDist)
+
+    ## nodoc
+    def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[fourValuedLogicValue] :=
+        #recursive application of the repeatConstraint
+        static if (List.size(minDist) > 1 && List.size(maxDist) > 1) then
+            slift(arbitraryConstraintRec(e, List.tail(minDist), List.tail(maxDist), ctr+1),
+                repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr),
+                fourValuedConjunction)
+        else
+            repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr)
+
+    ## Checks the ArbitraryConstraint defined in TADL2.
+    ## The ArbitraryConstraint describes the time distances between several subsequent events
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def minDist: List[Int] := List.append(List.append(List.empty[Int], 1), 5)
+    ## def maxDist: List[Int] := List.append(List.append(List.empty[Int], 5), 6)
+    ##
+    ## def constraint = arbitraryConstraint(event, minDist, maxDist)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,90]
+    ## 1: x
+    ## 6: x
+    ## 7: x
+    ## 11: x
+    ## 12: x
+    ## 16: x
+    ## 17: x
+    ## 21: x
+    ## 22: x
+    ## 26: x
+    ## 27: x
+    ## 31: x
+    ## 32: x
+    ## 36: x
+    ## 37: x
+    ## 41: x
+    ## 42: x
+    ## 46: x
+    ## ~~~
+    def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[fourValuedLogicValue] :=
+        arbitraryConstraintRec(e, minDist, maxDist, 1)
+
+    ## Checks the BurstConstraint defined in TADL2.
+    ## The BurstConstraints limits the number of events (maxOccurences) in a time interval of a specific length (length). Additionally, it is checked if subsequent events have a minimal distance (minDist).
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##
+    ## in event: Events[Unit]
+    ##
+    ## def constraint= burstConstraint(event, 5, 3, 1)
+    ## out constraint
+    ## 
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,25]
+    ## 1: event
+    ## 2: event
+    ## 3: event
+    ## 7: event
+    ## 8: event
+    ## 9: event
+    ## 20: event
+    ## 21: event
+    ## 22: event
+    ## ~~~
+    def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[fourValuedLogicValue] :=
+        # application of repeatConstraint
+        slift(repeatConstraint(e, length, infty, maxOccurences), repeatConstraint(e, minDist, infty, 1),
+            fourValuedConjunction)
+
+    ## Checks the patternConstraint defined in TADL2.
+    ## The PatternConstraint decribes periodic patterns, in which the events must occur.
+    ## The events must occur in a pattern defined by the offset parameter, which is repeated after periodX timestamps.
+    ## A deviation from these offsets can be allowed by the jitter parameter, while the minimal distance between subsequent events can be defined using the  minDist parameter.
+    ## The offsets must be given in a map, which keys are subsequent indices, with the offsets as values.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 3), 2, 6)
+    ## def constraint:= patternConstraint(event, 20, offset, 1, 0)
+    ##
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,60]
+    ## 10: event
+    ## 13: event
+    ## 16: event
+    ## 31: event
+    ## 33: event
+    ## 36: event
+    ## 50: event
+    ## 53: event
+    ## 57: event
+    ## ~~~
+    def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedLogicValue] := {
+        liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
+            if b == 1 then 1 else a % b;
+        # lower bound for latest x
+        def lowerBoundX: Events[Int] :=  merge (
+            # increase by period and adjust by offset and jitter
+            if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e)) then
+                max(last(lowerBoundX, e) + periodX,
+                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter) 
+            #adjust by offset and jitter
+            else
+                max(last(lowerBoundX, e),
+                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter),
+            time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)) - jitter)
+        # lower bound for latest x
+        def upperBoundX: Events[Int] :=  merge (
+            # increase by period and adjust by offset and jitter
+            if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e))  then
+                min(last(upperBoundX, e) + periodX,
+                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))) 
+            else
+            # adjust by offset and jitter
+                min(last(upperBoundX, e),
+                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))),
+            time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)))
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes= mergeUnit(e, safeDelay(upperBoundX + (if count(e) % Map.size(offset) == 0 then periodX else 0) +
+            Map.get(offset, count(e) % Map.size(offset)) + jitter - time(e) + 1, e))
+        #evaluation
+        slift(
+            # distance to x is correct-> current true, false otherwise
+            if (lowerBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) <= time(evaluateTimes) &&
+                    time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) + jitter) then
+                {value= true, final= false}
+            else
+                {value= false, final= true},
+            # application of the repeatConstraint
+            repeatConstraint(e, minDist, infty, 1),
+            fourValuedConjunction)
+    }
+
+    ## Checks the ReactionConstraint defined in TADL2.
+    ## For each stimulus event on stimulus, there must be an reponse event of the same color in response in the given time distance after the stimulus event.
+    ## The color attribute is represented as integer.
+    ## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##
+    ## in stimulus: Events[Int]
+    ## in response: Events[Int]
+    ##
+    ## def constraint= reactionConstraint(stimulus, response, 5, 5)
+    ## out constraint
+    ##
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,25]
+    ## 1: stimulus = 1
+    ## 6: response = 1
+    ## 8: response = 4
+    ## 10: response = 2
+    ## 13: response = 3
+    ## 15: response = 2
+    ## 18: response = 3
+    ## ~~~
+    def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] := {
+        # Map with unmatched stimulus events after stimulus
+        def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
+            if defaultTime(stimulus) >= defaultTime(response) &&
+                    !Map.contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
+                Map.add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, defaultTime(stimulus))
+            else
+                last(unmatchedStimulusEvents, merge(stimulus, response)),
+            Map.empty[Int, Int])
+        # Map with unmatched stimulus events after response
+        def unmatchedStimulusEvents := merge (
+            if (defaultTime(stimulus) <= defaultTime(response) &&
+                    Map.contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
+                    Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+                    Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+                Map.remove(unmatchedStimulusEventsNewStimulus, response)
+            else
+                unmatchedStimulusEventsNewStimulus,
+            unmatchedStimulusEventsNewStimulus)
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes = mergeUnit(mergeUnit(stimulus, response),
+                safeDelay(slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff -
+                    time(mergeUnit(stimulus, response)) + 1,
+                    mergeUnit(stimulus, response)))
+                    
+        #evaluation
+        # no unmatched stimulus events-> currently true
+        stillFulfillabe(if (Map.size(unmatchedStimulusEvents) == 0) then
+            {value= true, final= false}
+        else
+            # all unmatched stimulus events can still be matched-> currently false
+            if (slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes)) then
+                {value= false, final= false}
+            else
+                {value= false, final= true})
+    }
+
+    ## Checks the AgeConstraint defined in TADL2.
+    ## For each response event on stimulus, there must be an stimulus event of the same color in response in the given time distance before the stimulus event.
+    ## The color attribute is represented as integer.
+    ## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##
+    ## in stimulus: Events[Int]
+    ## in response: Events[Int]
+    ##
+    ## def constraint= ageConstraint(stimulus, response, 5, 5)
+    ## out constraint
+    ##
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,25]
+    ## 1: stimulus = 1
+    ## 6: response = 1
+    ## 8: stimulus = 4
+    ## 10: response = 2
+    ## 13: response = 3
+    ## 15: response = 2
+    ## 18: response = 3
+    ## ~~~
+    def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] := {
+        #removes colors, that were before timeBound, from the list
+        def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
+                colorTimeStamps: Map[Int, Int], timeBound: Int): List[Int] :=
+            # list empty
+            if (List.size(latestStimulusColors) == 0) then
+                latestStimulusColors
+            else
+                # oldest event not too old-> return current list
+                if (Map.contains(colorTimeStamps, List.head(latestStimulusColors)) &&
+                        Map.get(colorTimeStamps, List.head(latestStimulusColors)) >= timeBound) then
+                    latestStimulusColors
+                else
+                    # recursive call without oldest color
+                    removeOldStimulusColorsFromList(List.tail(latestStimulusColors), colorTimeStamps, timeBound)
+        
+        #removes colors, that were before timeBound, from the map
+        def removeOldStimulusColorsFromSet(latestStimulusColors: List[Int],
+                colorTimeStamps: Map[Int, Int], timeBound: Int): Map[Int, Int] :=
+            if (List.size(latestStimulusColors) == 0) then
+                colorTimeStamps
+            else
+                 # oldest event not too old-> return current map
+                if (Map.contains(colorTimeStamps, List.head(latestStimulusColors)) &&
+                        Map.get(colorTimeStamps, List.head(latestStimulusColors)) >= timeBound)  then
+                    colorTimeStamps
+                else
+                    # recursive call without oldest color
+                    removeOldStimulusColorsFromSet(List.tail(latestStimulusColors),
+                        Map.remove(colorTimeStamps, List.head(latestStimulusColors)), timeBound)
+
+
+        # map with unmatched stimulus events after stimulus
+        def stimulusEventsNewStimulus : Events[Map[Int, Int]] := 
+                if (defaultTime(stimulus) >= defaultTime(response)) then
+                    Map.add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
+                else
+                    last(stimulusEvents, merge(stimulus, response))
+        #unmatched stimulus events, remove events that are too old
+        def stimulusEvents:=
+            merge(
+                slift3(last(stimulusColorsYoungerThanMax, stimulus),
+                    stimulusEventsNewStimulus,
+                    time(merge(stimulus, response)) - maxTimeDiff,
+                    removeOldStimulusColorsFromSet),
+            Map.empty[Int, Int])
+        
+        #unmatched stimulus events, that are younger than maximum
+        def stimulusColorsYoungerThanMax: Events[List[Int]]:= merge(
+            slift3(List.append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
+                stimulusEvents, 
+                time(merge(stimulus, response)) - maxTimeDiff,
+                removeOldStimulusColorsFromList),
+            List.empty[Int])
+            
+        #evaluation
+        # 'now' has response event => time matches to unmatched stimulus event
+        stillFulfillabe(
+            if ((!(defaultTime(stimulus) <= defaultTime(response))) || 
+                Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
+                Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+                Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+            {value= true, final= false}
+            else
+                {value= false, final= true})
+    }
+
+    ## The function checkEventChain checks the correctness of event chains. Any stimulus event of a specific color must occur before the first response event with the same color.
+    ##
+    ## This function should only be used, when there is no other reasonable way to check the correctness of event chain, because it stores each color that occurs in the response stream.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##
+    ## in stimulus: Events[Int]
+    ## in response: Events[Int]
+    ##
+    ## def constraint= checkEventChain(stimulus, response)
+    ## out constraint
+    ##
+    ## ~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,90]
+    ## 1: stimulus = 1
+    ## 2: stimulus = 2
+    ## 3: stimulus = 3
+    ## 4: stimulus = 4
+    ## 11: response = 1
+    ## 12: response = 2
+    ## 13: response = 3
+    ## 14: response = 4
+    ## ~~~
+    def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedLogicValue]:= {
+        # colors that occured in response-> not allows in stimulus anymore
+        def previousResponseColors: Events[Set[Int]]:=
+            merge(Set.add(last(previousResponseColors, response), response), Set.empty[Int])
+        stillFulfillabe(
+            if on(merge(stimulus, response),
+                # stimulus event-> color didn't occur in response earlier
+                    if (defaultTime(stimulus) >= defaultTime(response)) then 
+                        !Set.contains(previousResponseColors, stimulus)
+                    else
+                        true) then
+                {value= true, final= false}
+            else
+                {value= false, final= true})
+    }
+    
+    # state information of synchronization constraint for each event:
+    #   streamIndex: index of the stream, in which the event occurred
+    #   eventTime: timestamp of the event
+    #   fulfilled: found a synchronization cluster for this event? 
+    ## nodoc
+    type SynchronizationEventInfo = {streamIndex: Int, eventTime: Int, fulfilled: Bool}
+
+    ## Checks the SynchronizationConstraint defined in TADL2.
+    ## The SynchronizationConstraint describes groups of streams, which events occur in common clusters. Each of these streams must have at least one event in each of these intervals. Any events that lay outside of these intervals are prohibited. Overlaps of clusters are allowed.
+    ## The events of each input timestamp must be placed into an integer list, which contains the index (starting at 1) of all streams, which have an event in this timestamp. This list is then used as a parameter for the implementation. The creation of this list is already implemented for up to 10 streams. See synchronizationConstraint2, ... .
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event1: Events[Unit]
+    ## in event2: Events[Unit]
+    ## in event3: Events[Unit]
+    ##
+    ## def constraint= synchronizationConstraint3(event1, event2, event3, 2)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 5: event1
+    ## 5: event2
+    ## 5: event3
+    ## 15: event1
+    ## 15: event2
+    ## 15: event3
+    ## 24: event1
+    ## 25: event2
+    ## 26: event3
+    ## 36: event1
+    ## 34: event2
+    ## 35: event3
+    ## ~~~
+    def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
+
+        def buildSynchronizationEventInfo(streamInd: Int, evtTime: Int, flflld: Bool) : SynchronizationEventInfo:=
+            {streamIndex= streamInd, eventTime= evtTime, fulfilled= flflld}
+
+        # add events from one timestamp to the state
+        # O(|events|)
+        def addEvents(existingEvents: List[SynchronizationEventInfo], newEventStreamIndices: List[Int], timeNow: Int) :
+                List[SynchronizationEventInfo]:=
+            if (List.size(newEventStreamIndices) == 0) then
+                existingEvents
+            else
+                addEvents(List.append(existingEvents,
+                        buildSynchronizationEventInfo(List.head(newEventStreamIndices), timeNow, false)),
+                    List.tail(newEventStreamIndices), timeNow)
+            
+        # checks, if the events between timeNow and (timeNow-tolerance) fulfills the cluster
+        # O(List_length)= O(tolerance*|events|)
+        def clusterFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): Bool := {
+            # creates a set with [1, 2, ..., size]
+            def fillSet(count: Int): Set[Int]:=
+                if count == 0 then
+                    Set.empty[Int]
+                else
+                    Set.add(fillSet(count-1), count)
+            
+            def checkCluster(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, reaminingIndices: Set[Int]):Bool:=
+                if Set.size(reaminingIndices) == 0 then
+                    true
+                else
+                    if (List.size(events) == 0) then
+                        false
+                    else
+                        if (List.head(events).eventTime + tolerance >= timeNow) && (Set.contains(reaminingIndices, List.head(events).streamIndex)) then
+                            checkCluster(List.tail(events), timeNow, tolerance, Set.remove(reaminingIndices, List.head(events).streamIndex))
+                        else
+                            checkCluster(List.tail(events), timeNow, tolerance, reaminingIndices)
+
+            checkCluster(events, timeNow, tolerance, fillSet(streamCount))
+        }
+
+
+        # sets all Events in list to fulfilled, if not too old
+        def setEventsToFulfilled(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int): 
+                List[SynchronizationEventInfo] :=
+            if (List.size(events) == 0) then
+                events
+            else
+                # set List.head to fulfilled, if not too old
+                List.prepend(
+                    if (List.head(events).eventTime + tolerance >= timeNow) then
+                        buildSynchronizationEventInfo(List.head(events).streamIndex, List.head(events).eventTime, true)
+                    else
+                        List.head(events),
+                    setEventsToFulfilled(List.tail(events), timeNow, tolerance, streamCount))
+
+        #set fulfilled state of events to true, if fulfilled
+        def updateFullfilledEvents(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int, streamCount: Int):
+                List[SynchronizationEventInfo]:=
+            if (clusterFulfilled(events, timeNow, tolerance, streamCount)) then
+                setEventsToFulfilled(events, timeNow, tolerance, streamCount)
+            else
+                events
+
+        # creates a List with all events, that are older than tolerance
+        def eventsToRemove(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int):
+                List[SynchronizationEventInfo] :=
+            if (List.size(events) == 0) then
+                events
+            else
+                # head of List too old
+                if(timeNow - List.head(events).eventTime > tolerance) then
+                    # add head of list to return list
+                    #List.prepend(List.head(events), eventsToRemove(List.tail(events), timeNow, tolerance))
+                    List.append(eventsToRemove(List.tail(events), timeNow, tolerance), List.head(events))
+                else
+                    # rest of list can't be older-> return empty
+                    List.empty[SynchronizationEventInfo]
+
+        # removes all events, that are older than tolerance
+        def removeEvents(events: List[SynchronizationEventInfo], timeNow: Int, tolerance: Int):
+                List[SynchronizationEventInfo] :=
+            if (List.size(events) == 0) then
+                events
+            else
+                # head of List too old
+                if(timeNow - List.head(events).eventTime > tolerance) then
+                    removeEvents(List.tail(events), timeNow, tolerance)
+                else
+                    # rest of list can't be older-> return unchanged
+                    events
+
+        def noUnfulfilledRemoved(removedEvents: List[SynchronizationEventInfo]) : Bool :=
+            if (List.size(removedEvents) == 0) then
+                true
+            else
+                List.head(removedEvents).fulfilled &&
+                noUnfulfilledRemoved(List.tail(removedEvents))
+        # insert new events and set cluster to fulfilled, if possible
+       def storedEventsBeforeRemove: Events[List[SynchronizationEventInfo]] :=
+            slift4(slift3(last(storedEvents, eventIndices), eventIndices, time(eventIndices), addEvents),
+                    time(eventIndices), tolerance, streamCount, updateFullfilledEvents)
+        # remove old events from list
+        def storedEvents: Events[List[SynchronizationEventInfo]] := merge(
+            slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents),
+            List.empty[SynchronizationEventInfo])
+            
+        def timeOldestUnfulfilledEvent(storedEvents: List[SynchronizationEventInfo]): Int :=
+            if (List.size(storedEvents) == 0) then
+                infty
+            else
+                if !List.head(storedEvents).fulfilled then
+                    List.head(storedEvents).eventTime
+                else
+                    timeOldestUnfulfilledEvent(List.tail(storedEvents))
+        
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes = mergeUnit(eventIndices,
+            safeDelay(slift1(storedEvents, timeOldestUnfulfilledEvent) + tolerance - time(eventIndices)+1, eventIndices))
+            
+        #Evaluation
+        #no unfullfilled event-> current true
+        stillFulfillabe(
+            if (slift1(storedEvents, timeOldestUnfulfilledEvent) == infty) then
+                {value= true, final= false}
+            else
+                #check, if all removed events are fulfilled(had a cluster)-> current false, but not final
+                #if (slift1(slift3(storedEventsBeforeRemove, time(evaluateTimes), tolerance, eventsToRemove), noUnfulfilledRemoved)) then
+                if (slift1(storedEventsBeforeRemove, timeOldestUnfulfilledEvent) >= time(evaluateTimes) - tolerance) then
                     {value= false, final= false}
                 else
                     {value= false, final= true})
-}
+    }
 
-## Checks the RepeatConstraint defined in TADL2.
-## The events are repeating with distances between lower and upper.
-## The parameter span defines overlaps of repetitions. (no overlaps: span=1, one overlap: span=2,...)
-##
-## **Usage Example**
-##
-## ~~~tessla
-##  in event: Events[Unit]
-##
-##  def constraint: Events[fourValuedBoolean] = repeatConstraint(event, 20, 20, 2)
-##  out constraint
-## 
-## ~~~
-##
-## **Trace Example**
-## ~~~trace
-## option timeDomain:[-1,50]
-## 5: event
-## 7: event
-## 25: event
-## 27: event
-## 45: event
-## 47: event
-## ~~~
-
-def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedBoolean] := {
-
-    #stored state
-    def latestSpanEventTimes: Events[List[Int]]:=
-        merge(List.append(
-            if (List.size(last(latestSpanEventTimes, e)) > span) then
-                List.tail(last(latestSpanEventTimes, defaultTime(e)))
-            else
-                last(latestSpanEventTimes, e), defaultTime(e)),
-            List.empty[Int])
-    
-    # timestamps, in which the evaluation occurs
-    def delayPeriod :=
-        if (defaultTime(e) == defaultTime(firstEvent(e))) then
-            List.head(latestSpanEventTimes) + upper - time(e) + 1
-        else
-            List.head(List.tail(latestSpanEventTimes)) + upper - time(e) + 1
-    
-    def evaluateTimes := 
-        mergeUnit(e, safeDelay(delayPeriod, e))
-    
-    stillFulfillabe(
-        # more than span events occured-> distance to span-1^th event is relevant
-        if (List.size(latestSpanEventTimes) > span) then
-            if List.head(latestSpanEventTimes) + lower <= time(evaluateTimes) &&
-                    List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
-                {value= true, final= false}
-            else
-                {value= false, final= true}
-        else
-            # less than span events occurred-> first event must be younger than upper
-            if List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
-                {value= true, final= false}
-            else
-                {value= false, final= true})
-    
-}
-
-## Checks the RepetitionConstraint defined in TADL2.
-## The RepetitionConstraint is similar to the RepeatConstraint, but the parameter jitter allows to define further deviations from the repetitions.
-##
-## **Usage Example**
-##
-## ~~~tessla
-##  in event: Events[Unit]
-##
-##  def constraint: Events[fourValuedBoolean] = repetitionConstraint(event, 30, 30, 2, 2)
-##  out constraint
-## 
-##~~~
-##
-## **Trace Example**
-## ~~~trace
-## option timeDomain:[-1,80]
-## 5: event
-## 10: event
-## 35: event
-## 38: event
-## 67: event
-## 70: event
-## ~~~
-def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedBoolean] := {
-    # lower bound for current x
-    def lowerBoundXNow: Events[Int] =
-        if (List.size(last(LowerBoundX, e)) < span) then
-            time(e)-jitter
-        else
-            max(List.head(last(LowerBoundX, e)), time(e)-jitter)
-    # upper bound for current x
-    def upperBoundXNow: Events[Int] =
-        if (List.size(last(UpperBoundX, e)) < span) then
-            time(e)
-        else
-            min(List.head(last(UpperBoundX, e)), time(e))
-
-    # lower bound for span next x
-    def LowerBoundX: Events[List[Int]]:= merge(
-        if (List.size(last(LowerBoundX, e)) < span) then
-           List.append(last(LowerBoundX, e), lowerBoundXNow + lower)
-        else
-            List.append(last(List.tail(LowerBoundX), e), lowerBoundXNow + lower),
-        List.empty[Int]
-    )
+    ## checks the synchronizationConstraint for two streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
+            Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(events1, events2))
         
-     # upper bound for span next x
-    def UpperBoundX: Events[List[Int]]:= merge(
-        if (List.size(last(UpperBoundX, e)) < span) then
-            List.append(last(UpperBoundX, e), upperBoundXNow+upper)
-        else
-            List.append(last(List.tail(UpperBoundX), e), upperBoundXNow + upper),
-        List.empty[Int]
-    )
-    # timestamps, in which the evaluation occurs
-    def evaluateTimes = mergeUnit(e,
-        safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
-                jitter - time(e)+1, e))
-    # Evaluation        
-    stillFulfillabe(
-        #first event or correct distance to X
-        if (List.size(LowerBoundX) == 0 && List.size(UpperBoundX) == 0) ||
-                lowerBoundXNow <= time(evaluateTimes) &&
-                upperBoundXNow + jitter >= time(evaluateTimes) then
-            {value= true, final= false}
-        else
-            {value= false, final= true})
-}
-
-## Checks the executionTimeConstraint defined in TADL2.
-## Checks, if the time between one start event and the next end event, minus the preemptions, is between lower and upper.
-## The source code is only tested for events in logical order.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in start: Events[Unit]
-## in end: Events[Unit]
-## in preempt: Events[Unit]
-## in resume: Events[Unit]
-##
-## def constraint: Events[fourValuedBoolean] = (start, end, preempt, resume, 10, 12)
-## out constraint
-## ~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,90]
-## 5: start
-## 10: preempt
-## 12: resume
-## 15: preempt
-## 17: resume
-## 20: end
-## ~~~
-def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
-        lower: Int, upper: Int): Events[fourValuedBoolean] :={
-    # timestamps, when the constraint is evaluated
-    def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
-    # timestamps, in which the evaluation occurs
-    def evaluateTimes: Events[Unit] := 
-        mergeUnit(inputTimes, safeDelay(if (time(inputTimes) != defaultTime(end) &&
-                                                time(inputTimes) != defaultTime(preempt)) then
-                                            upper - execTime + 1
-                                        else
-                                            infty, inputTimes))
-
-    # evaluation
-    def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
-    # 'now' is end event
-        
-    stillFulfillabe(
-        #first event or correct distance to X
-        if (if (time(evaluateTimes) == defaultTime(end)) then
-                lower <= execTime && execTime <= upper
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, List.empty[Int])
             else
-                #ignore lower
-                execTime <= upper) then
-            {value= true, final= false}
-        else
-            {value= false, final= true})
-}
+                List.empty[Int]
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
 
-## Checks the OrderConstraint defined in TADL2.
-## The order Constraint that the ith target event must occur after the ith source event.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in source: Events[Unit]
-## in target: Events[Unit]
-##
-## def constraint: Event[fourValuedBoolean]= orderConstraint(source, target)
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,50]
-## 1: source
-## 2: target
-## 5: source
-## 6: source
-## 20: target
-## 40: target
-## ~~~
-def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedBoolean] :=
-    stillFulfillabe(
-        #number of events on both streams equal-> currently true
-        if count(source) == count(target) then
+        synchronizationConstraint(eventList, 2, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for three streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
+            Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, List.empty[Int])
+            else
+                List.empty[Int]
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 3, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for four streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4))
+        
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, List.empty[Int])
+            else
+                List.empty[Int]
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 4, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for five streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5))
+         
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, List.empty[Int])
+            else
+                List.empty[Int]
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 5, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for six streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6))
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, List.empty[Int])
+            else
+                List.empty[Int]
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 6, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for seven streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7))
+
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, List.empty[Int])
+            else
+                List.empty[Int]
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 7, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for eight streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7), events8))
+         
+        def eventList8:= 
+            if (defaultTime(events8) >= timeNow) then
+                List.prepend(8, List.empty[Int])
+            else
+                List.empty[Int]
+         
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, eventList8)
+            else
+                eventList8
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 8, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for nine streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7), events8), events9))
+            
+        def eventList9:= 
+            if (defaultTime(events9) >= timeNow) then
+                List.prepend(9, List.empty[Int])
+            else
+                List.empty[Int]
+        
+        def eventList8:= 
+            if (defaultTime(events8) >= timeNow) then
+                List.prepend(8, eventList9)
+            else
+                eventList9
+         
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, eventList8)
+            else
+                eventList8
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 9, tolerance)
+    }
+
+    ## checks the synchronizationConstraint for ten streams.
+    ## See synchronizationConstraint for further information.
+    def synchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7), events8), events9), events10))
+        
+        def eventList10:= 
+            if (defaultTime(events10) >= timeNow) then
+                List.prepend(10, List.empty[Int])
+            else
+                List.empty[Int]    
+        
+        def eventList9:= 
+            if (defaultTime(events9) >= timeNow) then
+                List.prepend(9, eventList10)
+            else
+                eventList10
+        
+        def eventList8:= 
+            if (defaultTime(events8) >= timeNow) then
+                List.prepend(8, eventList9)
+            else
+                eventList9
+         
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, eventList8)
+            else
+                eventList8
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        synchronizationConstraint(eventList, 10, tolerance)
+    }
+    
+    # State information of strongSynchronizationConstraints for currently active snchronization clusters
+    #   startTime: startTime of the cluster (timestamp of first event in this cluster)
+    #   fulfilledStreams.key:   Indices of all streams
+    #   fulfilledStreams.value: event in this stream for this cluster?
+    ## nodoc
+    type synchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, Bool]}
+
+    ## Checks the StrongSynchronizationConstraint defined in TADL2.
+    ## The StrongSynchronizationConstraint describes groups of streams, which events occur in common clusters. Each of these streams must have exactly one event in each of these intervals. Any events that lay outside of these intervals are prohibited. Overlaps of clusters are allowed.
+    ## The events of each input timestamp must be placed into an integer list, which contains the index (starting at 1) of all streams, which have an event in this timestamp. This list is then used as a parameter for the implementation. The creation of this list is already implemented for up to 10 streams. See synchronizationConstraint2, ... .
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event1: Events[Unit]
+    ## in event2: Events[Unit]
+    ## in event3: Events[Unit]
+    ##
+    ## def constraint= StrongSynchronizationConstraint3(event1, event2, event3, 2)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 5: event1
+    ## 5: event2
+    ## 5: event3
+    ## 15: event1
+    ## 15: event2
+    ## 15: event3
+    ## 24: event1
+    ## 25: event2
+    ## 26: event3
+    ## 36: event1
+    ## 34: event2
+    ## 35: event3
+    ## ~~~
+    def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
+
+        # inserts one events to the active clusters. Creates new cluster, if needed.
+        # insertes only, if cluster not too old
+        # runtime: list.length(activeClusters)
+        liftable def insertEvent(activeClusters: List[synchronizationCluster], eventIndex: Int, timeNow: Int): List[synchronizationCluster] :=
+            # no more clusters to check -> create new cluster
+            if (List.size(activeClusters) == 0) then
+                List.append(activeClusters, {startTime= timeNow, 
+                    fulfilledStreams= Map.add(buildMap(streamCount, false), eventIndex, true)})
+            else
+                # stream index already was in head cluster or too old-> check next one
+                if (Map.get(List.head(activeClusters).fulfilledStreams, eventIndex) ||
+                        List.head(activeClusters).startTime + tolerance < timeNow) then
+                    List.prepend(List.head(activeClusters), insertEvent(List.tail(activeClusters), eventIndex, timeNow))
+                #found matching cluster-> set stream in this cluster to true
+                else
+                    List.prepend({startTime= List.head(activeClusters).startTime, 
+                                fulfilledStreams= Map.add(List.head(activeClusters).fulfilledStreams, eventIndex, true)},
+                        List.tail(activeClusters))
+        
+        # inserts all events from eventIndices to the active clusters.
+        # runtime: List.length(eventIndices) * list.length(activeClusters)
+        liftable def insertEventsList(activeClusters: List[synchronizationCluster], eventIndices: List[Int], timeNow: Int): List[synchronizationCluster] :=
+            if (List.size(eventIndices) == 0) then
+                activeClusters
+            else
+                insertEventsList(insertEvent(activeClusters, List.head(eventIndices), timeNow), 
+                    List.tail(eventIndices), timeNow)
+        
+        # runtime: min(tolerance, List.length(eventIndices) * list.length(activeClusters))
+        liftable def removeFulfilledClusters(activeClusters: List[synchronizationCluster]): List[synchronizationCluster]:=
+            #head of list is fulfilled-> remove and check next list entry
+            if (List.size(activeClusters) != 0 && mapAllTrue(List.head(activeClusters).fulfilledStreams)) then
+                removeFulfilledClusters(List.tail(activeClusters))
+            # head of list is unfulfilled-> don't remove, rest can't be fulfilled either
+            else
+                activeClusters
+                
+        #state
+        # list of active clusters
+        def activeClusters: Events[List[synchronizationCluster]]:=
+            merge(removeFulfilledClusters(insertEventsList(last(activeClusters, eventIndices),
+                    eventIndices, time(eventIndices))),
+                List.empty[synchronizationCluster])
+        #delay
+        def evalTimes:= 
+            time(mergeUnit(eventIndices,
+                safeDelay(if (List.size(activeClusters) != 0) then
+                         List.head(activeClusters).startTime+ tolerance - time(eventIndices)+1
+                     else
+                        infty, eventIndices)))
+        
+        #no unfulfilled clusters-> current true
+        stillFulfillabe(if List.size(activeClusters) == 0 then
             {value= true, final= false}
         else
-            # more source than target events-> currently false
-            if (count(source) >= count(target)) then
+            # unfulfilled clusters exists, but not too old-> current false
+            if (List.head(activeClusters).startTime + tolerance > evalTimes) then
                 {value= false, final= false}
             else
-                # more target than source events-> false
+                # unfulfilled clusters are too old-> def. false
+                {value= false, final= true})
+    }
+
+    ## checks the StrongSynchronizationConstraint for two streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
+            Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(events1, events2))
+        
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, List.empty[Int])
+            else
+                List.empty[Int]
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList2, 2, tolerance)
+    }
+
+    ## checks the StrongSynchronizationConstraint for three streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
+            Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, List.empty[Int])
+            else
+                List.empty[Int]
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 3, tolerance)
+    }
+
+    ## checks the StrongSynchronizationConstraint for four streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4))
+        
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, List.empty[Int])
+            else
+                List.empty[Int]
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 4, tolerance)
+    }
+
+    ## checks the StrongSynchronizationConstraint for five streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5))
+         
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, List.empty[Int])
+            else
+                List.empty[Int]
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 5, tolerance)
+    }
+
+    ## checks the StrongSynchronizationConstraint for six streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6))
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, List.empty[Int])
+            else
+                List.empty[Int]
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 6, tolerance)
+    }
+
+
+    ## checks the StrongSynchronizationConstraint for seven streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7))
+
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, List.empty[Int])
+            else
+                List.empty[Int]
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 7, tolerance)
+    }
+
+
+    ## checks the StrongSynchronizationConstraint for eight streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7), events8))
+         
+        def eventList8:= 
+            if (defaultTime(events8) >= timeNow) then
+                List.prepend(8, List.empty[Int])
+            else
+                List.empty[Int]
+         
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, eventList8)
+            else
+                eventList8
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 8, tolerance)
+    }
+
+
+    ## checks the StrongSynchronizationConstraint for nine streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7), events8), events9))
+            
+        def eventList9:= 
+            if (defaultTime(events9) >= timeNow) then
+                List.prepend(9, List.empty[Int])
+            else
+                List.empty[Int]
+        
+        def eventList8:= 
+            if (defaultTime(events8) >= timeNow) then
+                List.prepend(8, eventList9)
+            else
+                eventList9
+         
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, eventList8)
+            else
+                eventList8
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 9, tolerance)
+    }
+
+    ## checks the StrongSynchronizationConstraint for ten streams.
+    ## See StrongSynchronizationConstraint for further information.
+    def StrongSynchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
+            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
+            events1, events2), events3), events4), events5), events6), events7), events8), events9), events10))
+        
+        def eventList10:= 
+            if (defaultTime(events10) >= timeNow) then
+                List.prepend(10, List.empty[Int])
+            else
+                List.empty[Int]    
+        
+        def eventList9:= 
+            if (defaultTime(events9) >= timeNow) then
+                List.prepend(9, eventList10)
+            else
+                eventList10
+        
+        def eventList8:= 
+            if (defaultTime(events8) >= timeNow) then
+                List.prepend(8, eventList9)
+            else
+                eventList9
+         
+        def eventList7:= 
+            if (defaultTime(events7) >= timeNow) then
+                List.prepend(7, eventList8)
+            else
+                eventList8
+            
+        def eventList6:= 
+            if (defaultTime(events6) >= timeNow) then
+                List.prepend(6, eventList7)
+            else
+                eventList7
+        
+        def eventList5:= 
+            if (defaultTime(events5) >= timeNow) then
+                List.prepend(5, eventList6)
+            else
+                eventList6
+         
+        def eventList4:= 
+            if (defaultTime(events4) >= timeNow) then
+                List.prepend(4, eventList5)
+            else
+                eventList5
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, eventList4)
+            else
+                eventList4
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraint(eventList, 10, tolerance)
+    }
+    
+    ## nodoc
+    def buildOutputSynchronizationCluster(time: Int, streamCount: Int) : outputSynchronizationCluster =
+        {startTime = time, fulfilledStreams = buildMap(streamCount, false)}
+    # State information for currently active snchronization clusters
+    #   startTime: startTime of the cluster (timestamp of first event in this cluster)
+    #   fulfilledStreams.key:   Indices of all streams
+    #   fulfilledStreams.value: event in this stream for this cluster?
+    ## nodoc
+    type outputSynchronizationCluster = {startTime: Int, fulfilledStreams: Map[Int, Bool]}
+
+    ## Checks the OutputSynchronizationConstraint defined in TADL2.
+    ## In the OutputSynchronizationConstraint, there must be one synchronization cluster of the length tolerance for each stimulus event. Each response stream must have at least one event of the same color as the stimulus event in this cluster.
+    ## A stream of maps must be created, representing the events of each timestamp. The key of each entry is the index of the stream (0 for the stimulus stream, 1, 2, ... for the response streams), in which the event occurred and the value is the color of the event.
+    ## The creation of this map is already implemented for up to 10 response streams, see outputSynchronizationConstraint2, ... .
+    ## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in stimulus: Events[Int]
+    ## in response1: Events[Int]
+    ## in response2: Events[Int]
+    ## in response3: Events[Int]
+    ##
+    ## def constraint= outputSynchronizationConstraint3(stimulus, response1, response2, response3, 2)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,20]
+    ## 1: stimulus = 1
+    ## 5: response1 = 1
+    ## 5: response2 = 1
+    ## 6: response3 = 1
+    ## 11: stimulus = 2
+    ## 12: stimulus = 3
+    ## 15: response1= 2
+    ## 15: response2= 3
+    ## 15: response3= 2
+    ## 16: response1= 3
+    ## 16: response2= 2
+    ## 16: response3= 3
+    ## ~~~
+    def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
+        ##### Help funtions #####
+        # add an empty cluster to storedClusters
+        def addNewCluster(storedClusters: Map[Int, outputSynchronizationCluster], newColor: Int, time: Int, responseStreamCount: Int): 
+                Map[Int, outputSynchronizationCluster] :=
+            Map.add(storedClusters, newColor, buildOutputSynchronizationCluster(time, responseStreamCount))
+        
+        #removes every entry of listToRemove from the given set
+        liftable def removeListFromSet[A](aSet: Set[A], listToRemove: List[A]): Set[A]:=
+            if (List.size(listToRemove) == 0) then
+                aSet
+            else
+                removeListFromSet(
+                    if (Set.contains(aSet, List.head(listToRemove))) then 
+                        Set.remove(aSet, List.head(listToRemove))
+                    else
+                        aSet,
+                    List.tail(listToRemove))
+        
+        # build list from aMap with all keys given in remainingKeys
+        liftable def mapValuesToList[A, B](aMap: Map[A, B], remainingKeys: List[A]): List[B]:=
+            if List.size(remainingKeys) == 0 then
+                List.empty[B]
+            else
+                List.append(mapValuesToList(aMap, List.tail(remainingKeys)),
+                    Map.get(aMap, List.head(remainingKeys)))
+        
+        # removes map entries with key = 0
+        liftable def removeStimulusEvents(events: Map[Int, Int]): Map[Int, Int] :=
+            if (Map.contains(events, 0)) then
+                Map.remove(events, 0)
+            else
+                events
+        #updates the stored synchronization clusters by all events in this timestamp (update or creation of new cluster)
+        def updateSynchronizationClusters(storedClusters: Map[Int, outputSynchronizationCluster], events: Map[Int, Int], eventKeys: List[Int],
+                unmatchedStimulusColors: Set[Int], timeNow: Int): Map[Int, outputSynchronizationCluster] := {
+            # set the given stream in cluster to true
+            def setStreamInSynchronizationCluster(cluster: outputSynchronizationCluster, stream: Int): outputSynchronizationCluster = {
+                    startTime = cluster.startTime,
+                    fulfilledStreams = Map.add(cluster.fulfilledStreams, stream, true)
+                }
+            
+            if List.size(eventKeys) == 0 then
+                storedClusters
+            else
+                updateSynchronizationClusters(
+                    # set stream to fulfilled in Cluster
+                    if (Map.contains(storedClusters, Map.get(events, List.head(eventKeys))) || Set.contains(unmatchedStimulusColors, Map.get(events, List.head(eventKeys)))) then
+                        Map.add(storedClusters, Map.get(events, List.head(eventKeys)),
+                            setStreamInSynchronizationCluster(
+                                Map.get(
+                                    # add new cluster, if needed
+                                    if ((!Map.contains(storedClusters, Map.get(events, List.head(eventKeys)))) && Set.contains(unmatchedStimulusColors, Map.get(events, List.head(eventKeys)))) then
+                                        addNewCluster(storedClusters, Map.get(events, List.head(eventKeys)), timeNow, responseStreamCount)
+                                    else
+                                        storedClusters,
+                                    Map.get(events, List.head(eventKeys))),
+                                List.head(eventKeys)))
+                        else
+                            storedClusters,
+                    events, List.tail(eventKeys), unmatchedStimulusColors, timeNow)
+            }
+        
+        # check, if all streams are fulfilled in this cluster. Ignores timing
+        def clusterFulfilled(fulfilledStreams: Map[Int, Bool], keys: List[Int]): Bool :=
+            if (List.size(keys) == 0) then
+                true
+            else
+                if (Map.get(fulfilledStreams,  List.head(keys))) then
+                    clusterFulfilled(fulfilledStreams, List.tail(keys))
+                else
+                    false
+
+        # searches for all fulfilled clusters in Map and returns their colors in a list
+        #   storedClusters: Map with stored clusters (color -> cluster)
+        liftable def fulfilledClustersInMapRec(storedClusters: Map[Int, outputSynchronizationCluster], aList: List[Int], keys: List[Int]): List[Int] :=
+            if (List.size(keys) == 0) then
+                aList
+            else
+                fulfilledClustersInMapRec(storedClusters, 
+                    if (clusterFulfilled(Map.get(storedClusters, List.head(keys)).fulfilledStreams, Map.keys(Map.get(storedClusters, List.head(keys)).fulfilledStreams))) then
+                        List.append(aList, List.head(keys))
+                    else
+                        aList, List.tail(keys))
+
+        # searches for all fulfilled clusters in Map and returns their colors in a list
+        #   storedClusters: Map with stored clusters (color -> cluster)
+        liftable def fulfilledClustersInMap(storedClusters: Map[Int, outputSynchronizationCluster]): List[Int] :=
+            fulfilledClustersInMapRec(storedClusters, List.empty[Int], Map.keys(storedClusters))
+        
+        #removes clusters from Map
+        def removeClusters(storedClusters: Map[Int, outputSynchronizationCluster], colorsToRemove: List[Int]): 
+                Map[Int, outputSynchronizationCluster] :=
+            if (List.size(colorsToRemove) == 0) then
+                storedClusters
+            else
+                removeClusters(Map.remove(storedClusters, List.head(colorsToRemove)), List.tail(colorsToRemove))
+                    
+        liftable def startTimeOldestCluster(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster],
+                keys: List[Int]): Int :=
+            if (List.size(keys) == 0) then
+                infty
+            else
+                min(Map.get(storedClustersBeforeRemove, List.head(keys)).startTime,
+                    startTimeOldestCluster(storedClustersBeforeRemove, List.tail(keys)))
+
+        # Stored Information #
+        
+        #stimulus colors without matching target event
+        def unmatchedStimulusColors: Events[Set[Int]] := merge(
+                removeListFromSet(
+                    if (Map.contains(eventStreamIndices, 0)) then
+                        Set.add(last(unmatchedStimulusColors, eventStreamIndices), Map.get(eventStreamIndices, 0))
+                    else
+                        last(unmatchedStimulusColors, eventStreamIndices),
+                    mapValuesToList(removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)))),
+            Set.empty[Int])
+
+        # synchronization clusters with new stimulus events
+        def storedClustersBeforeRemove : Events[Map[Int, outputSynchronizationCluster]] := 
+            merge(slift5(last(storedClusters, time(eventStreamIndices)), removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)), prev(unmatchedStimulusColors),
+            time(eventStreamIndices), updateSynchronizationClusters),
+            Map.empty[Int, outputSynchronizationCluster])
+        
+        # stored clusters after removing the clusters, which were fulfilled in this timestamp
+        def storedClusters: Events[Map[Int, outputSynchronizationCluster]] := merge(
+            slift(storedClustersBeforeRemove, slift1(storedClustersBeforeRemove, fulfilledClustersInMap), removeClusters),
+            Map.empty[Int, outputSynchronizationCluster])
+        
+        # timestamps, in which the evaluation occurs
+        def evalTimes = time(mergeUnit(eventStreamIndices,
+            safeDelay(slift(storedClusters, Map.keys(storedClusters), startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
+        
+        #no unfinished synchronization clusters and no unmatched Stimulus colors
+        stillFulfillabe(if (Set.size(unmatchedStimulusColors) == 0 && Map.size(storedClusters) == 0) then
+            {value= true, final= false}
+        else
+            # unfulfilled stimulus colors exist, all clusters are still fulfillable-> current false
+            if startTimeOldestCluster(storedClusters, Map.keys(storedClusters)) + tolerance > evalTimes then
+                {value= false, final= false}
+            else
                 {value= false, final= true})
 
-## Checks the SporadicConstraint defined in TADL2.
-## The SporadicConstraint describes sporadic event occurrences, constraint by the minimal distance between subsequent events (minimum), the distance between subsequent events (lower, upper) and a deviation from that pattern (jitter).
-## The SporadicConstraint is similar to the RepetitionConstraint, but additionally check the minimal distance of Events.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in event: Events[Unit]
-##
-## def constraint= sporadicConstraint(events, 10, 15, 0, 11)
-## out constraint
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,50]
-## 5: event
-## 20: event
-## 31: event
-## 45: event
-## ~~~
-def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedBoolean]:=
-    # application of repeat and repetititonConstraint
-    slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1), fourValuedConjunction)
+    }
 
-## Checks the PeriodicConstraint defined in TADL2.
-## The events occur in a periodic pattern with an allowed deviation of upper and a minimal distance of minDist.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in event: Events[Unit]
-##
-## def constraint= periodic(events, 10, 2, 9)
-## out constraint
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,70]
-## 5: event
-## 17: event
-## 26: event
-## 35: event
-## 47: event
-## 56: event
-## 65: event
-## ~~~
-def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int) :=
-    sporadicConstraint(events, period, period, jitter, minDist)
+    ## checks the OutputSynchronizationConstraint for two streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint2(stimulus: Events[Int], response1: Events[Int], response2: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            (time(response2))))
 
-## nodoc
-def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[fourValuedBoolean] :=
-    #recursive application of the repeatConstraint
-    static if (List.size(minDist) > 1 && List.size(maxDist) > 1) then
-        slift(arbitraryConstraintRec(e, List.tail(minDist), List.tail(maxDist), ctr+1),
-            repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr),
-            fourValuedConjunction)
-    else
-        repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr)
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        outputSynchronizationConstraint(eventResponse2, 2, tolerance)
+    }
 
-## Checks the ArbitraryConstraint defined in TADL2.
-## The ArbitraryConstraint describes the time distances between several subsequent events
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in event: Events[Unit]
-##
-## def minDist: List[Int] := List.append(List.append(List.empty[Int], 1), 5)
-## def maxDist: List[Int] := List.append(List.append(List.empty[Int], 5), 6)
-##
-## def constraint = arbitraryConstraint(event, minDist, maxDist)
-## out constraint
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,90]
-## 1: x
-## 6: x
-## 7: x
-## 11: x
-## 12: x
-## 16: x
-## 17: x
-## 21: x
-## 22: x
-## 26: x
-## 27: x
-## 31: x
-## 32: x
-## 36: x
-## 37: x
-## 41: x
-## 42: x
-## 46: x
-## ~~~
-def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[fourValuedBoolean] :=
-    arbitraryConstraintRec(e, minDist, maxDist, 1)
+    ## checks the OutputSynchronizationConstraint for three streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint3(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+                time(response3))))
 
-## Checks the BurstConstraint defined in TADL2.
-## The BurstConstraints limits the number of events (maxOccurences) in a time interval of a specific length (length). Additionally, it is checked if subsequent events have a minimal distance (minDist).
-##
-## **Usage Example**
-##
-## ~~~tessla
-##
-## in event: Events[Unit]
-##
-## def constraint= burstConstraint(event, 5, 3, 1)
-## out constraint
-## 
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,25]
-## 1: event
-## 2: event
-## 3: event
-## 7: event
-## 8: event
-## 9: event
-## 20: event
-## 21: event
-## 22: event
-## ~~~
-def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[fourValuedBoolean] :=
-    # application of repeatConstraint
-    slift(repeatConstraint(e, length, infty, maxOccurences), repeatConstraint(e, minDist, infty, 1),
-        fourValuedConjunction)
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        outputSynchronizationConstraint(eventResponse3, 3, tolerance)
+    }
 
-## Checks the patternConstraint defined in TADL2.
-## The PatternConstraint decribes periodic patterns, in which the events must occur.
-## The events must occur in a pattern defined by the offset parameter, which is repeated after periodX timestamps.
-## A deviation from these offsets can be allowed by the jitter parameter, while the minimal distance between subsequent events can be defined using the  minDist parameter.
-## The offsets must be given in a map, which keys are subsequent indices, with the offsets as values.
-##
-## **Usage Example**
-##
-## ~~~tessla
-## in event: Events[Unit]
-##
-## def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 3), 2, 6)
-## def constraint:= patternConstraint(event, 20, offset, 1, 0)
-##
-## out constraint
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,60]
-## 10: event
-## 13: event
-## 16: event
-## 31: event
-## 33: event
-## 36: event
-## 50: event
-## 53: event
-## 57: event
-## ~~~
-def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedBoolean] := {
-    liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
-        if b == 1 then 1 else a % b;
-    # lower bound for latest x
-    def lowerBoundX: Events[Int] :=  merge (
-        # increase by period and adjust by offset and jitter
-        if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e)) then
-            max(last(lowerBoundX, e) + periodX,
-                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter) 
-        #adjust by offset and jitter
-        else
-            max(last(lowerBoundX, e),
-                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter),
-        time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)) - jitter)
-    # lower bound for latest x
-    def upperBoundX: Events[Int] :=  merge (
-        # increase by period and adjust by offset and jitter
-        if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e))  then
-            min(last(upperBoundX, e) + periodX,
-                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))) 
-        else
-        # adjust by offset and jitter
-            min(last(upperBoundX, e),
-                time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))),
-        time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)))
-    # timestamps, in which the evaluation occurs
-    def evaluateTimes= mergeUnit(e, safeDelay(upperBoundX + (if count(e) % Map.size(offset) == 0 then periodX else 0) +
-        Map.get(offset, count(e) % Map.size(offset)) + jitter - time(e) + 1, e))
-    #evaluation
-    slift(
-        # distance to x is correct-> current true, false otherwise
-        if (lowerBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) <= time(evaluateTimes) &&
-                time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) + jitter) then
-            {value= true, final= false}
-        else
-            {value= false, final= true},
-        # application of the repeatConstraint
-        repeatConstraint(e, minDist, infty, 1),
-        fourValuedConjunction)
-}
-
-## Checks the ReactionConstraint defined in TADL2.
-## For each stimulus event on stimulus, there must be an reponse event of the same color in response in the given time distance after the stimulus event.
-## The color attribute is represented as integer.
-## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
-##
-## **Usage Example**
-##
-## ~~~tessla
-##
-## in stimulus: Events[Int]
-## in response: Events[Int]
-##
-## def constraint= reactionConstraint(stimulus, response, 5, 5)
-## out constraint
-##
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,25]
-## 1: stimulus = 1
-## 6: response = 1
-## 8: response = 4
-## 10: response = 2
-## 13: response = 3
-## 15: response = 2
-## 18: response = 3
-## ~~~
-def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedBoolean] := {
-    # Map with unmatched stimulus events after stimulus
-    def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
-        if defaultTime(stimulus) >= defaultTime(response) &&
-                !Map.contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
-            Map.add(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus, defaultTime(stimulus))
-        else
-            last(unmatchedStimulusEvents, merge(stimulus, response)),
-        Map.empty[Int, Int])
-    # Map with unmatched stimulus events after response
-    def unmatchedStimulusEvents := merge (
-        if (defaultTime(stimulus) <= defaultTime(response) &&
-                Map.contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
-                Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-            Map.remove(unmatchedStimulusEventsNewStimulus, response)
-        else
-            unmatchedStimulusEventsNewStimulus,
-        unmatchedStimulusEventsNewStimulus)
-    # timestamps, in which the evaluation occurs
-    def evaluateTimes = mergeUnit(mergeUnit(stimulus, response),
-            safeDelay(slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff -
-                time(mergeUnit(stimulus, response)) + 1,
-                mergeUnit(stimulus, response)))
+    ## checks the OutputSynchronizationConstraint for four streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint4(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+                time(response4)))))
                 
-    #evaluation
-    # no unmatched stimulus events-> currently true
-    stillFulfillabe(if (Map.size(unmatchedStimulusEvents) == 0) then
-        {value= true, final= false}
-    else
-        # all unmatched stimulus events can still be matched-> currently false
-        if (slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes)) then
-            {value= false, final= false}
-        else
-            {value= false, final= true})
-}
-
-## Checks the AgeConstraint defined in TADL2.
-## For each response event on stimulus, there must be an stimulus event of the same color in response in the given time distance before the stimulus event.
-## The color attribute is represented as integer.
-## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
-##
-## **Usage Example**
-##
-## ~~~tessla
-##
-## in stimulus: Events[Int]
-## in response: Events[Int]
-##
-## def constraint= ageConstraint(stimulus, response, 5, 5)
-## out constraint
-##
-##~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,25]
-## 1: stimulus = 1
-## 6: response = 1
-## 8: stimulus = 4
-## 10: response = 2
-## 13: response = 3
-## 15: response = 2
-## 18: response = 3
-## ~~~
-def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedBoolean] := {
-    #removes colors, that were before timeBound, from the list
-    def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
-            colorTimeStamps: Map[Int, Int], timeBound: Int): List[Int] :=
-        # list empty
-        if (List.size(latestStimulusColors) == 0) then
-            latestStimulusColors
-        else
-            # oldest event not too old-> return current list
-            if (Map.contains(colorTimeStamps, List.head(latestStimulusColors)) &&
-                    Map.get(colorTimeStamps, List.head(latestStimulusColors)) >= timeBound) then
-                latestStimulusColors
-            else
-                # recursive call without oldest color
-                removeOldStimulusColorsFromList(List.tail(latestStimulusColors), colorTimeStamps, timeBound)
-    
-    #removes colors, that were before timeBound, from the map
-    def removeOldStimulusColorsFromSet(latestStimulusColors: List[Int],
-            colorTimeStamps: Map[Int, Int], timeBound: Int): Map[Int, Int] :=
-        if (List.size(latestStimulusColors) == 0) then
-            colorTimeStamps
-        else
-             # oldest event not too old-> return current map
-            if (Map.contains(colorTimeStamps, List.head(latestStimulusColors)) &&
-                    Map.get(colorTimeStamps, List.head(latestStimulusColors)) >= timeBound)  then
-                colorTimeStamps
-            else
-                # recursive call without oldest color
-                removeOldStimulusColorsFromSet(List.tail(latestStimulusColors),
-                    Map.remove(colorTimeStamps, List.head(latestStimulusColors)), timeBound)
-
-
-    # map with unmatched stimulus events after stimulus
-    def stimulusEventsNewStimulus : Events[Map[Int, Int]] := 
-            if (defaultTime(stimulus) >= defaultTime(response)) then
-                Map.add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
-            else
-                last(stimulusEvents, merge(stimulus, response))
-    #unmatched stimulus events, remove events that are too old
-    def stimulusEvents:=
-        merge(
-            slift3(last(stimulusColorsYoungerThanMax, stimulus),
-                stimulusEventsNewStimulus,
-                time(merge(stimulus, response)) - maxTimeDiff,
-                removeOldStimulusColorsFromSet),
-        Map.empty[Int, Int])
-    
-    #unmatched stimulus events, that are younger than maximum
-    def stimulusColorsYoungerThanMax: Events[List[Int]]:= merge(
-        slift3(List.append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
-            stimulusEvents, 
-            time(merge(stimulus, response)) - maxTimeDiff,
-            removeOldStimulusColorsFromList),
-        List.empty[Int])
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
         
-    #evaluation
-    # 'now' has response event => time matches to unmatched stimulus event
-    stillFulfillabe(
-        if ((!(defaultTime(stimulus) <= defaultTime(response))) || 
-            Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
-            Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-            Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-        {value= true, final= false}
-        else
-            {value= false, final= true})
-}
+        outputSynchronizationConstraint(eventResponse4, 4, tolerance)
+    }
 
-## The function checkEventChain checks the correctness of event chains. Any stimulus event of a specific color must occur before the first response event with the same color.
-##
-## This function should only be used, when there is no other reasonable way to check the correctness of event chain, because it stores each color that occurs in the response stream.
-##
-## **Usage Example**
-##
-## ~~~tessla
-##
-## in stimulus: Events[Int]
-## in response: Events[Int]
-##
-## def constraint= checkEventChain(stimulus, response)
-## out constraint
-##
-## ~~~
-##
-## **Trace Example**
-##
-## ~~~trace
-## option timeDomain:[-1,90]
-## 1: stimulus = 1
-## 2: stimulus = 2
-## 3: stimulus = 3
-## 4: stimulus = 4
-## 11: response = 1
-## 12: response = 2
-## 13: response = 3
-## 14: response = 4
-## ~~~
-def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedBoolean]:= {
-    # colors that occured in response-> not allows in stimulus anymore
-    def previousResponseColors: Events[Set[Int]]:=
-        merge(Set.add(last(previousResponseColors, response), response), Set.empty[Int])
-    stillFulfillabe(
-        if on(merge(stimulus, response),
-            # stimulus event-> color didn't occur in response earlier
-                if (defaultTime(stimulus) >= defaultTime(response)) then 
-                    !Set.contains(previousResponseColors, stimulus)
+    ## checks the OutputSynchronizationConstraint for five streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint5(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], response5: Events[Int], tolerance: Int):
+            Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+            merge(time(response4),
+                time(response5))))))
+
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(response5)  >= timeNow) then Map.add(eventResponse4, 5, default(response5, -1)) else eventResponse4
+        
+        outputSynchronizationConstraint(eventResponse5, 5, tolerance)
+    }
+
+    ## checks the OutputSynchronizationConstraint for six streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint6(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+            tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+            merge(time(response4),
+            merge(time(response5),
+                time(response6)))))))
+
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(response5)  >= timeNow) then Map.add(eventResponse4, 5, default(response5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(response6)  >= timeNow) then Map.add(eventResponse5, 6, default(response6, -1)) else eventResponse5
+        
+        outputSynchronizationConstraint(eventResponse6, 6, tolerance)
+    }
+
+    ## checks the OutputSynchronizationConstraint for seven streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint7(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+            response7: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+            merge(time(response4),
+            merge(time(response5),
+            merge(time(response6),
+                time(response7))))))))
+
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(response5)  >= timeNow) then Map.add(eventResponse4, 5, default(response5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(response6)  >= timeNow) then Map.add(eventResponse5, 6, default(response6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(response7)  >= timeNow) then Map.add(eventResponse6, 7, default(response7, -1)) else eventResponse6
+        
+        outputSynchronizationConstraint(eventResponse7, 7, tolerance)
+    }
+
+    ## checks the OutputSynchronizationConstraint for eight streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint8(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+            response7: Events[Int], response8: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+            merge(time(response4),
+            merge(time(response5),
+            merge(time(response6),
+            merge(time(response7),
+                time(response8)))))))))
+
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(response5)  >= timeNow) then Map.add(eventResponse4, 5, default(response5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(response6)  >= timeNow) then Map.add(eventResponse5, 6, default(response6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(response7)  >= timeNow) then Map.add(eventResponse6, 7, default(response7, -1)) else eventResponse6
+        def eventResponse8:= if (defaultTime(response8)  >= timeNow) then Map.add(eventResponse7, 8, default(response8, -1)) else eventResponse7
+        
+        outputSynchronizationConstraint(eventResponse8, 8, tolerance)
+    }
+
+    ## checks the OutputSynchronizationConstraint for nine streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint9(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+            response7: Events[Int], response8: Events[Int], response9: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+            merge(time(response4),
+            merge(time(response5),
+            merge(time(response6),
+            merge(time(response7),
+            merge(time(response8),
+                time(response9))))))))))
+
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(response5)  >= timeNow) then Map.add(eventResponse4, 5, default(response5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(response6)  >= timeNow) then Map.add(eventResponse5, 6, default(response6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(response7)  >= timeNow) then Map.add(eventResponse6, 7, default(response7, -1)) else eventResponse6
+        def eventResponse8:= if (defaultTime(response8)  >= timeNow) then Map.add(eventResponse7, 8, default(response8, -1)) else eventResponse7
+        def eventResponse9:= if (defaultTime(response9)  >= timeNow) then Map.add(eventResponse8, 9, default(response9, -1)) else eventResponse8
+        
+        outputSynchronizationConstraint(eventResponse9, 9, tolerance)
+    }
+
+    ## checks the OutputSynchronizationConstraint for ten streams.
+    ## See OutputSynchronizationConstraint for further information.
+    def outputSynchronizationConstraint10(stimulus: Events[Int], response1: Events[Int], response2: Events[Int],
+            response3: Events[Int], response4: Events[Int], response5: Events[Int], response6: Events[Int],
+            response7: Events[Int], response8: Events[Int], response9: Events[Int], response10: Events[Int],
+            tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus),
+            merge(time(response1),
+            merge(time(response2),
+            merge(time(response3),
+            merge(time(response4),
+            merge(time(response5),
+            merge(time(response6),
+            merge(time(response7),
+            merge(time(response8),
+            merge(time(response9),
+                time(response10)))))))))))
+
+        def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(response4)  >= timeNow) then Map.add(eventResponse3, 4, default(response4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(response5)  >= timeNow) then Map.add(eventResponse4, 5, default(response5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(response6)  >= timeNow) then Map.add(eventResponse5, 6, default(response6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(response7)  >= timeNow) then Map.add(eventResponse6, 7, default(response7, -1)) else eventResponse6
+        def eventResponse8:= if (defaultTime(response8)  >= timeNow) then Map.add(eventResponse7, 8, default(response8, -1)) else eventResponse7
+        def eventResponse9:= if (defaultTime(response9)  >= timeNow) then Map.add(eventResponse8, 9, default(response9, -1)) else eventResponse8
+        def eventResponse10:= if (defaultTime(response10)  >= timeNow) then Map.add(eventResponse9, 10, default(response10, -1)) else eventResponse9
+        
+        outputSynchronizationConstraint(eventResponse10, 10, tolerance)
+    }
+            
+    
+    ## Checks the InputSynchronizationConstraint defined in TADL2.
+    ## In the InputSynchronizationConstraint, there must be one synchronization cluster of the length tolerance for each response event. Each stimulus stream must have at least one event of the same color as the response event in this cluster.
+    ## A stream of maps must be created, representing the events of each timestamp. The key of each entry is the index of the stream (0 for the response stream, 1, 2, ... for the stimulus streams), in which the event occurred and the value is the color of the event.
+    ## The creation of this map is already implemented for up to 10 response streams, see inputSynchronizationConstraint2, ... .
+    ## The source code expects the colors of the streams to fulfill the correctness of event chain. See checkEventChain to check this.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in response: Events[Int]
+    ## in stimulus1: Events[Int]
+    ## in stimulus2: Events[Int]
+    ## in stimulus3: Events[Int]
+    ##
+    ## def constraint= inputSynchronizationConstraint3(stimulus1, stimulus2, stimulus3, response, 2)
+    ## out constraint
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,22]
+    ## 1: stimulus1 = 1
+    ## 5: stimulus1 = 1
+    ## 5: stimulus2 = 1
+    ## 5: stimulus3 = 1
+    ## 6: response = 1
+    ## 15: stimulus1 = 2
+    ## 16: stimulus2 = 2
+    ## 17: stimulus3 = 2
+    ## 20: response = 2
+    ## ~~~
+    def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
+            Events[fourValuedLogicValue]:= {
+        # Help functions
+        
+        #builds the starting point for the state Map
+        def buildEmptylatestEventTimes(stimulusStreamCount: Int): Map[Int, Map[Int, Int]] :=
+            if (stimulusStreamCount == 0) then
+                Map.empty[Int, Map[Int, Int]]
+            else
+                Map.add(buildEmptylatestEventTimes(stimulusStreamCount-1), stimulusStreamCount, Map.empty[Int, Int]);
+
+        # adds stimulus events to stored events    
+        def addEventsToEmptylatestEventTimes(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
+                eventStreamIndices: Map[Int, Int]): Map[Int, Map[Int, Int]] :=
+            addEventsToEmptylatestEventTimesRec(latestEventTimes, timeNow, eventStreamIndices, Map.keys(eventStreamIndices));
+                        
+        def addEventsToEmptylatestEventTimesRec(latestEventTimes: Map[Int, Map[Int, Int]], timeNow: Int,
+                eventStreamIndices: Map[Int, Int], remainingKeys: List[Int]): Map[Int, Map[Int, Int]] :=
+            if (List.size(remainingKeys) == 0) then
+                latestEventTimes
+            else
+                # if resoponse stream -> don't insert
+                if (List.head(remainingKeys) == 0) then
+                    addEventsToEmptylatestEventTimesRec(latestEventTimes, timeNow, eventStreamIndices, List.tail(remainingKeys))
                 else
-                    true) then
-            {value= true, final= false}
-        else
-            {value= false, final= true})
+                    # insert head of map and recursive call
+                    addEventsToEmptylatestEventTimesRec(
+                        Map.add(latestEventTimes, List.head(remainingKeys),
+                            Map.add(Map.get(latestEventTimes, List.head(remainingKeys)), Map.get(eventStreamIndices, List.head(remainingKeys)), timeNow)), 
+                        timeNow, eventStreamIndices, List.tail(remainingKeys))
+        # time of the oldest event of the given color
+        def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
+            #static if (Map.size(latestEvents) == 0 || List.size(remainingKeys) == 0) then
+            if (List.size(remainingKeys) == 0) then
+                infty
+            else
+                if (Map.contains(Map.get(latestEvents, List.head(remainingKeys)), color)) then
+                    min(Map.get(Map.get(latestEvents, List.head(remainingKeys)), color),
+                        timeOldestEvent(latestEvents, color, List.tail(remainingKeys)))
+                else
+                    -infty
+
+        # time of the youngest event of the given color
+        def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
+            #static if (Map.size(latestEvents) == 0 || List.size(remainingKeys) == 0) then
+            if (List.size(remainingKeys) == 0) then
+                -infty
+            else
+                if (Map.contains(Map.get(latestEvents, List.head(remainingKeys)), color)) then
+                    max(Map.get(Map.get(latestEvents, List.head(remainingKeys)), color),
+                        timeYoungestEvent(latestEvents, color, List.tail(remainingKeys)))
+                else
+                    infty
+
+        # checks, if the synchronization cluster for the given color is fulfilled
+        def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =
+            clusterFulfilledRec(latestEventTimes, Map.keys(latestEventTimes), color, tolerance)
+                
+        def clusterFulfilledRec(latestEventTimes: Map[Int, Map[Int, Int]], remainingKeys: List[Int], color: Int, tolerance: Int) : Bool =
+            if (List.size(remainingKeys) == 0) then
+                true
+            else
+                timeOldestEvent(latestEventTimes, color, remainingKeys) + tolerance >= timeYoungestEvent(latestEventTimes, color, remainingKeys) &&
+                clusterFulfilledRec(latestEventTimes, List.tail(remainingKeys), color, tolerance)
+            
+        #stored information
+        
+        # time of last stimulus events with given color
+        #   streamIndex -> (color -> time)
+        def latestEventTimes: Events[Map[Int, Map[Int, Int]]] := 
+            merge(slift3(last(latestEventTimes, time(eventStreamIndices)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes),
+                buildEmptylatestEventTimes(stimulusStreamCount))
+        
+        #evaluation
+        stillFulfillabe(
+            # response event-> valid cluster of the same color must exists
+            if (Map.contains(eventStreamIndices, 0)) then
+                if slift3(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, clusterFulfilled) then
+                    {value= true, final= false}
+                else
+                    {value= false, final= true}
+            else
+                # no response event-> invalid trace
+                {value= true, final= false})
+
+    }
+
+    ## checks the InputSynchronizationConstraint for two streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[Int], response: Events[Int],
+            tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+                time(response)))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        
+        inputSynchronizationConstraint(eventResponse2, 2, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for three streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+                time(response))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        
+        inputSynchronizationConstraint(eventResponse3, 3, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for four streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+                time(response)))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        
+        inputSynchronizationConstraint(eventResponse4, 4, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for five streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+            merge(time(stimulus5),
+                time(response))))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+        
+        inputSynchronizationConstraint(eventResponse5, 5, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for six streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], response: Events[Int],
+            tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+            merge(time(stimulus5),
+            merge(time(stimulus6),
+                time(response)))))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+        
+        inputSynchronizationConstraint(eventResponse6, 6, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for seven streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+            merge(time(stimulus5),
+            merge(time(stimulus6),
+            merge(time(stimulus7),
+                time(response))))))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+        
+        inputSynchronizationConstraint(eventResponse7, 7, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for eight streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            stimulus8: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+            merge(time(stimulus5),
+            merge(time(stimulus6),
+            merge(time(stimulus7),
+            merge(time(stimulus8),
+                time(response)))))))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+        def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
+        
+        inputSynchronizationConstraint(eventResponse8, 8, tolerance)
+    }
+
+    ## checks the InputSynchronizationConstraint for nine streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            stimulus8: Events[Int], stimulus9: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+            merge(time(stimulus5),
+            merge(time(stimulus6),
+            merge(time(stimulus7),
+            merge(time(stimulus8),
+            merge(time(stimulus9),
+                time(response))))))))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+        def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
+        def eventResponse9:= if (defaultTime(stimulus9)  >= timeNow) then Map.add(eventResponse8, 9, default(stimulus9, -1)) else eventResponse8
+        
+        inputSynchronizationConstraint(eventResponse9, 9, tolerance)
+    }
+
+
+    ## checks the InputSynchronizationConstraint for ten streams.
+    ## See InputSynchronizationConstraint for further information.
+    def inputSynchronizationConstraint10(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            stimulus8: Events[Int], stimulus9: Events[Int], stimulus10: Events[Int], response: Events[Int],
+            tolerance: Int): Events[fourValuedLogicValue] := {
+        def timeNow = 
+            merge(time(stimulus1),
+            merge(time(stimulus2),
+            merge(time(stimulus3),
+            merge(time(stimulus4),
+            merge(time(stimulus5),
+            merge(time(stimulus6),
+            merge(time(stimulus7),
+            merge(time(stimulus8),
+            merge(time(stimulus9),
+            merge(time(stimulus10),
+                time(response)))))))))))
+
+        def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+        def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+        def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+        def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+        def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
+        def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
+        def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
+        def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
+        def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
+        def eventResponse9:= if (defaultTime(stimulus9)  >= timeNow) then Map.add(eventResponse8, 9, default(stimulus9, -1)) else eventResponse8
+        def eventResponse10:= if (defaultTime(stimulus10)  >= timeNow) then Map.add(eventResponse9, 10, default(stimulus10, -1)) else eventResponse9
+        inputSynchronizationConstraint(eventResponse10, 10, tolerance)
+    }
 }
