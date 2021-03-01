@@ -1,4 +1,3 @@
-tessla.sh
-tessla-assembly-1.0.10.jar
 .gitignore
-./tracegenerator/tmp/*
+*.class
+runtimeMeasure/tmp/*
