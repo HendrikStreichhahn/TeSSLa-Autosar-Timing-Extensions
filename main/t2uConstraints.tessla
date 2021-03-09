@@ -24,7 +24,7 @@ module TADL2{
     # time of the event, or 0, if there wasn't an event before
     ## nodoc
     def defaultTime[T](stream: Events[T]): Events[Int]:=
-        default(time(stream), 0)
+        default(time(stream), -infty)
         
     # searchest for the smallest value in a [Int, Int]-map
     ## nodoc
@@ -291,12 +291,17 @@ module TADL2{
 
         #stored state
         def latestSpanEventTimes: Events[List[Int]]:=
-            merge(List.append(
-                if (List.size(last(latestSpanEventTimes, e)) > span) then
-                    List.tail(last(latestSpanEventTimes, defaultTime(e)))
-                else
-                    last(latestSpanEventTimes, e), defaultTime(e)),
-                List.empty[Int])
+            if TADL2.defaultTime(e) == 0 then
+                List.append(List.empty[Int], TADL2.defaultTime(e))
+            else
+                default(
+                    List.append(
+                        if (List.size(last(latestSpanEventTimes, e)) > span) then
+                            List.tail(last(latestSpanEventTimes, TADL2.defaultTime(e)))
+                        else
+                            last(latestSpanEventTimes, e),
+                        TADL2.defaultTime(e)),
+                    List.empty[Int])
         
         # timestamps, in which the evaluation occurs
         def delayPeriod :=
