@@ -24,7 +24,7 @@ module TADL2{
     # time of the event, or 0, if there wasn't an event before
     ## nodoc
     def defaultTime[T](stream: Events[T]): Events[Int]:=
-        default(time(stream), 0)
+        default(time(stream), -infty)
         
     # searchest for the smallest value in a [Int, Int]-map
     ## nodoc
@@ -221,17 +221,35 @@ module TADL2{
     ## 65: target
     ## ~~~
     def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
-        #List with times of events on source without matching (until now) target event
-        def unfinishedSourceTimes: Events[List[Int]] :=
-            #event now is source event
-            if (defaultTime(source) > defaultTime(target)) then
-                merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                      List.empty[Int])
-            else if (defaultTime(source) < defaultTime(target)) then
-                merge(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), List.empty[Int])
-            else # defaultTime(source) == defaultTime(target)
-                merge(List.append(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
-                      List.empty[Int])
+        # timestamps of source events, which did not have matching target event yet,
+        # including the timestamps, which matches in this this timestamp
+        def unfinishedSourceTimesNewSource:=
+            #current timeStamp has source event
+            if (defaultTime(source) >= defaultTime(target)) then
+                # append timestamp to list
+                List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
+            else
+                default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+        # timestamps of source events, which did not have matching target event yet
+        def unfinishedSourceTimes: Events[List[Int]]:=
+            #current timeStamp has target event
+            if (defaultTime(source) <= defaultTime(target)) then
+                # removing possible-> remove
+                if List.size(unfinishedSourceTimesNewSource) != 0 then
+                    # if matching time distance to oldest stored event
+                    if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                            List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                        # just keep tail
+                        List.tail(unfinishedSourceTimesNewSource)
+                    else
+                        # return unchanged
+                        unfinishedSourceTimesNewSource
+                else
+                    # removing not possible-> insert event, that triggers {value= false, final= true}
+                    List.append(List.empty[Int], -infty)
+            else
+                unfinishedSourceTimesNewSource
+
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
             safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
@@ -242,23 +260,28 @@ module TADL2{
         # output
         stillFulfillabe(
             # no unmatched source event-> current true
-            if (List.size(last(unfinishedSourceTimes, evaluateTimes)) == 0) then
+            if (List.size(unfinishedSourceTimes) == 0) then
                 {value= true, final= false}
             else
-                # now just source events
-                if (defaultTime(source) > defaultTime(target)) then
-                    # oldest stored event not too old
-                    if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper) then
-                        {value= false, final= false}
-                    else
-                        {value= false, final= true}
+                # target event, but no stored source event-> false
+                if (List.size(unfinishedSourceTimesNewSource) == 0) then
+                    {value= false, final= true}
                 else
-                    # oldest stored event in right distance
-                    if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper &&
-                            defaultTime(target) >= List.head(last(unfinishedSourceTimes, evaluateTimes)) + lower ) then
-                        {value= false, final= false}
+                    # current timestamp has target event
+                    if (defaultTime(target) >= time(evaluateTimes)) then
+                        # correct distance-> current false
+                        if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                                List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                            {value= false, final= false}
+                        else
+                            {value= false, final= true}
                     else
-                        {value= false, final= true})
+                        # distance must only be smaller than upper
+                        if List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(evaluateTimes) then
+                            {value= false, final= false}
+                        else
+                            {value= false, final= true})
+
     }
 
     ## Checks the RepeatConstraint defined in TADL2.
