@@ -485,7 +485,10 @@ module TADL2{
         stillFulfillabe(
             #number of events on both streams equal-> currently true
             if count(source) == count(target) then
-                {value= true, final= false}
+                if (defaultTime(source) == defaultTime(target) && defaultTime(source) != -infty) then
+                    {value= false, final= true}
+                else
+                    {value= true, final= false}
             else
                 # more source than target events-> currently false
                 if (count(source) >= count(target)) then
