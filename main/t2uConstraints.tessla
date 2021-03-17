@@ -861,38 +861,38 @@ module TADL2{
                     removeOldStimulusColorsFromSet(List.tail(latestStimulusColors),
                         Map.remove(colorTimeStamps, List.head(latestStimulusColors)), timeBound)
 
-
         # map with unmatched stimulus events after stimulus
-        def stimulusEventsNewStimulus : Events[Map[Int, Int]] := 
-                if (defaultTime(stimulus) >= defaultTime(response)) then
-                    Map.add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
-                else
-                    last(stimulusEvents, merge(stimulus, response))
+        def stimulusEventsNewStimulus : Events[Map[Int, Int]] :=
+            # stimulus events in this timestamp-> insert event in Map, else keep previous map
+            if (defaultTime(stimulus) >= defaultTime(response)) then
+                Map.add(default(last(stimulusEvents, merge(stimulus, response)), Map.empty[Int, Int]),
+                    stimulus, defaultTime(stimulus))
+            else
+                default(last(stimulusEvents, merge(stimulus, response)), Map.empty[Int, Int])
         #unmatched stimulus events, remove events that are too old
         def stimulusEvents:=
-            merge(
-                slift3(last(stimulusColorsYoungerThanMax, stimulus),
+                slift3(default(last(stimulusColorsYoungerThanMax, stimulus), List.empty[Int]),
                     stimulusEventsNewStimulus,
-                    time(merge(stimulus, response)) - maxTimeDiff,
-                    removeOldStimulusColorsFromSet),
-            Map.empty[Int, Int])
+                    defaultTime(merge(stimulus, response)) - maxTimeDiff,
+                    removeOldStimulusColorsFromSet)
         
         #unmatched stimulus events, that are younger than maximum
-        def stimulusColorsYoungerThanMax: Events[List[Int]]:= merge(
-            slift3(List.append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
-                stimulusEvents, 
-                time(merge(stimulus, response)) - maxTimeDiff,
-                removeOldStimulusColorsFromList),
-            List.empty[Int])
+        def stimulusColorsYoungerThanMax: Events[List[Int]]:= 
+            slift3(
+                List.append(slift(default(last(stimulusColorsYoungerThanMax, stimulus), List.empty[Int]),
+                        stimulus, List_remove), stimulus), 
+                stimulusEventsNewStimulus, 
+                defaultTime(merge(stimulus, response)) - maxTimeDiff,
+                removeOldStimulusColorsFromList)
             
         #evaluation
         # 'now' has response event => time matches to unmatched stimulus event
         stillFulfillabe(
             if ((!(defaultTime(stimulus) <= defaultTime(response))) || 
-                Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
-                Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-            {value= true, final= false}
+                    Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
+                    Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+                    Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+                {value= true, final= false}
             else
                 {value= false, final= true})
     }
