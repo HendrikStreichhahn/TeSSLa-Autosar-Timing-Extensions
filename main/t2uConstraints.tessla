@@ -85,9 +85,8 @@ module TADL2{
 
     ## ensures that a four valued logic value, which is {value= false, final= true}, stays {value= false, final= true}.
     def stillFulfillabe(events: Events[fourValuedLogicValue]): Events[fourValuedLogicValue] :={
-        def storage: Events[Bool] := merge(
-            last(storage, events) && events != {value= false, final= true},
-            true)
+        def storage: Events[Bool] := 
+            default(last(storage, events), true) && events != {value= false, final= true}
 
         if storage then
             events
