@@ -1,0 +1,7 @@
+# no fail
+0: start
+1: preempt
+2: resume
+4: preempt
+5: resume
+6: end
