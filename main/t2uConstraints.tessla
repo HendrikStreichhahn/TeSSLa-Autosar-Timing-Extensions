@@ -153,10 +153,9 @@ module TADL2{
         def unfinishedSourceTimesNewSource: Events[List[Int]] := 
             # 'now' has source event
             if (defaultTime(source) >= defaultTime(target)) then
-                merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                      List.empty[Int])
+                List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
             else
-                merge(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+                default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
             # 'now' has target event
@@ -193,7 +192,7 @@ module TADL2{
                     {value= false, final= true})
     }
 
-    ## Checks the DelayConstraint defined in TADL2
+    ## Checks the StrongDelayConstraint defined in TADL2
     ## Each source event must be followed by one target event, which occurs within a time distance between lower and upper. Additional target events are not allowed.
     ##
     ## **Usage Example**
