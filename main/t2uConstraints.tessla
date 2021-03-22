@@ -1608,9 +1608,8 @@ module TADL2{
         #state
         # list of active clusters
         def activeClusters: Events[List[synchronizationCluster]]:=
-            merge(removeFulfilledClusters(insertEventsList(last(activeClusters, eventIndices),
-                    eventIndices, time(eventIndices))),
-                List.empty[synchronizationCluster])
+            removeFulfilledClusters(insertEventsList(default(last(activeClusters, eventIndices), List.empty[synchronizationCluster]),
+                    eventIndices, time(eventIndices)))
         #delay
         def evalTimes:= 
             time(mergeUnit(eventIndices,
@@ -1649,7 +1648,7 @@ module TADL2{
             else
                 eventList2
 
-        StrongSynchronizationConstraint(eventList2, 2, tolerance)
+        StrongSynchronizationConstraint(eventList, 2, tolerance)
     }
 
     ## checks the StrongSynchronizationConstraint for three streams.
