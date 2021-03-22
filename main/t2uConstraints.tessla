@@ -1082,12 +1082,11 @@ module TADL2{
                 noUnfulfilledRemoved(List.tail(removedEvents))
         # insert new events and set cluster to fulfilled, if possible
        def storedEventsBeforeRemove: Events[List[SynchronizationEventInfo]] :=
-            slift4(slift3(last(storedEvents, eventIndices), eventIndices, time(eventIndices), addEvents),
+            slift4(slift3(default(last(storedEvents, eventIndices), List.empty[SynchronizationEventInfo]), eventIndices, time(eventIndices), addEvents),
                     time(eventIndices), tolerance, streamCount, updateFullfilledEvents)
         # remove old events from list
-        def storedEvents: Events[List[SynchronizationEventInfo]] := merge(
-            slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents),
-            List.empty[SynchronizationEventInfo])
+        def storedEvents: Events[List[SynchronizationEventInfo]] :=
+            slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents)
             
         def timeOldestUnfulfilledEvent(storedEvents: List[SynchronizationEventInfo]): Int :=
             if (List.size(storedEvents) == 0) then
