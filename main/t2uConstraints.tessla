@@ -2199,15 +2199,14 @@ module TADL2{
         # Stored Information #
         
         #stimulus colors without matching target event
-        def unmatchedStimulusColors: Events[Set[Int]] := merge(
+        def unmatchedStimulusColors: Events[Set[Int]] :=
                 removeListFromSet(
                     if (Map.contains(eventStreamIndices, 0)) then
-                        Set.add(last(unmatchedStimulusColors, eventStreamIndices), Map.get(eventStreamIndices, 0))
+                        Set.add(default(last(unmatchedStimulusColors, eventStreamIndices), Set.empty[Int]), Map.get(eventStreamIndices, 0))
                     else
-                        last(unmatchedStimulusColors, eventStreamIndices),
-                    mapValuesToList(removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)))),
-            Set.empty[Int])
-
+                        default(last(unmatchedStimulusColors, eventStreamIndices), Set.empty[Int]),
+                    mapValuesToList(removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices))))
+    
         # synchronization clusters with new stimulus events
         def storedClustersBeforeRemove : Events[Map[Int, outputSynchronizationCluster]] := 
             merge(slift5(last(storedClusters, time(eventStreamIndices)), removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)), prev(unmatchedStimulusColors),
