@@ -2558,8 +2558,8 @@ module TADL2{
         # time of last stimulus events with given color
         #   streamIndex -> (color -> time)
         def latestEventTimes: Events[Map[Int, Map[Int, Int]]] := 
-            merge(slift3(last(latestEventTimes, time(eventStreamIndices)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes),
-                buildEmptylatestEventTimes(stimulusStreamCount))
+            slift3(default(last(latestEventTimes, time(eventStreamIndices)), buildEmptylatestEventTimes(stimulusStreamCount)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes)
+
         
         #evaluation
         stillFulfillabe(

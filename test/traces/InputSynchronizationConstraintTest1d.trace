@@ -1,0 +1,22 @@
+# no fail
+0: stimulus1 = 4
+0: stimulus2 = 4
+0: stimulus3 = 4
+
+5: stimulus1 = 1
+6: stimulus2 = 1
+7: stimulus3 = 1
+
+11: stimulus1 = 2
+12: stimulus2 = 2
+13: stimulus3 = 2
+
+20: stimulus1 = 3
+20: stimulus2 = 3
+20: stimulus3 = 3
+
+50: response = 1
+51: response = 2
+52: response = 3
+
+60: response = 4
