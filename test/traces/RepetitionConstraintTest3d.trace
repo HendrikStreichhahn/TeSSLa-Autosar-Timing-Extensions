@@ -1,0 +1,15 @@
+# distance = lower
+0: x
+10: x
+20: x
+30: x
+
+# distance = upper
+45: x
+60: x
+75: x
+
+# distance = upper + jitter
+91: x
+# fail-> too early
+99: x

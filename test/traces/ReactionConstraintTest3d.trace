@@ -1,0 +1,23 @@
+0: stimulus = 1
+0: response = 10
+1: stimulus = 2
+1: response = 9
+2: stimulus = 3
+2: response = 8
+3: stimulus = 4
+3: response = 7
+4: stimulus = 5
+4: response = 6
+5: stimulus = 6
+5: response = 5
+6: stimulus = 7
+6: response = 4
+7: stimulus = 8
+7: response = 3
+8: stimulus = 9
+8: response = 2
+9: stimulus = 10
+9: response = 1
+#fail at 11
+
+100: end

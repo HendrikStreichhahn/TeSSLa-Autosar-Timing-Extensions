@@ -1,0 +1,24 @@
+# Parameters : 
+# length: 6
+# maxOccurences: 3
+# minimum: 1
+0:x 
+1:x
+2:x
+8:x 
+9:x
+10:x 
+16: x
+17: x
+18: x
+23: x
+24: x
+25: x
+47: x
+48: x
+50: x
+# new burst -> no fail here
+53: x
+54: x
+#fail, because of distance to 50
+55: x

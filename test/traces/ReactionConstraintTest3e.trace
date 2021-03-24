@@ -1,0 +1,22 @@
+#no fail
+0: stimulus = 1
+1: stimulus = 2
+2: stimulus = 3
+3: stimulus = 4
+4: stimulus = 5
+5: stimulus = 6
+6: stimulus = 7
+7: stimulus = 8
+8: stimulus = 9
+9: stimulus = 10
+
+10: response = 1
+11: response = 2
+12: response = 3
+13: response = 4
+14: response = 5
+15: response = 6
+16: response = 7
+17: response = 8
+18: response = 9
+19: response = 10

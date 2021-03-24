@@ -25,7 +25,7 @@ module TADL2{
     # time of the event, or 0, if there wasn't an event before
     ## nodoc
     def defaultTime[T](stream: Events[T]): Events[Int]:=
-        default(time(stream), 0)
+        default(time(stream), -infty)
         
     # searchest for the smallest value in a [Int, Int]-map
     ## nodoc
@@ -86,9 +86,8 @@ module TADL2{
 
     ## Ensures that a four valued logic value, which is {value= false, final= true}, stays {value= false, final= true}.
     def stillFulfillabe(events: Events[fourValuedLogicValue]): Events[fourValuedLogicValue] :={
-        def storage: Events[Bool] := merge(
-            last(storage, events) && events != {value= false, final= true},
-            true)
+        def storage: Events[Bool] := 
+            default(last(storage, events), true) && events != {value= false, final= true}
 
         if storage then
             events
@@ -155,10 +154,9 @@ module TADL2{
         def unfinishedSourceTimesNewSource: Events[List[Int]] := 
             # 'now' has source event
             if (defaultTime(source) >= defaultTime(target)) then
-                merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                      List.empty[Int])
+                List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
             else
-                merge(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+                default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
             # 'now' has target event
@@ -195,8 +193,7 @@ module TADL2{
                     {value= false, final= true})
     }
 
-    ## Checks the DelayConstraint defined in TADL2
-    ##
+    ## Checks the StrongDelayConstraint defined in TADL2
     ## Each source event must be followed by one target event, which occurs within a time distance between lower and upper. Additional target events are not allowed.
     ##
     ## **Usage Example**
@@ -222,17 +219,35 @@ module TADL2{
     ## 65: target = ()
     ## ~~~
     def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
-        #List with times of events on source without matching (until now) target event
-        def unfinishedSourceTimes: Events[List[Int]] :=
-            #event now is source event
-            if (defaultTime(source) > defaultTime(target)) then
-                merge(List.append(last(unfinishedSourceTimes, mergeUnit(source, target)), time(source)),
-                      List.empty[Int])
-            else if (defaultTime(source) < defaultTime(target)) then
-                merge(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), List.empty[Int])
-            else # defaultTime(source) == defaultTime(target)
-                merge(List.append(List.tail(last(unfinishedSourceTimes, mergeUnit(source, target))), time(source)),
-                      List.empty[Int])
+        # timestamps of source events, which did not have matching target event yet,
+        # including the timestamps, which matches in this this timestamp
+        def unfinishedSourceTimesNewSource:=
+            #current timeStamp has source event
+            if (defaultTime(source) >= defaultTime(target)) then
+                # append timestamp to list
+                List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
+            else
+                default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+        # timestamps of source events, which did not have matching target event yet
+        def unfinishedSourceTimes: Events[List[Int]]:=
+            #current timeStamp has target event
+            if (defaultTime(source) <= defaultTime(target)) then
+                # removing possible-> remove
+                if List.size(unfinishedSourceTimesNewSource) != 0 then
+                    # if matching time distance to oldest stored event
+                    if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                            List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                        # just keep tail
+                        List.tail(unfinishedSourceTimesNewSource)
+                    else
+                        # return unchanged
+                        unfinishedSourceTimesNewSource
+                else
+                    # removing not possible-> insert event, that triggers {value= false, final= true}
+                    List.append(List.empty[Int], -infty)
+            else
+                unfinishedSourceTimesNewSource
+
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
             safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
@@ -243,23 +258,28 @@ module TADL2{
         # output
         stillFulfillabe(
             # no unmatched source event-> current true
-            if (List.size(last(unfinishedSourceTimes, evaluateTimes)) == 0) then
+            if (List.size(unfinishedSourceTimes) == 0) then
                 {value= true, final= false}
             else
-                # now just source events
-                if (defaultTime(source) > defaultTime(target)) then
-                    # oldest stored event not too old
-                    if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper) then
-                        {value= false, final= false}
-                    else
-                        {value= false, final= true}
+                # target event, but no stored source event-> false
+                if (List.size(unfinishedSourceTimesNewSource) == 0) then
+                    {value= false, final= true}
                 else
-                    # oldest stored event in right distance
-                    if (time(evaluateTimes) <= List.head(last(unfinishedSourceTimes, evaluateTimes)) + upper &&
-                            defaultTime(target) >= List.head(last(unfinishedSourceTimes, evaluateTimes)) + lower ) then
-                        {value= false, final= false}
+                    # current timestamp has target event
+                    if (defaultTime(target) >= time(evaluateTimes)) then
+                        # correct distance-> current false
+                        if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
+                                List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                            {value= false, final= false}
+                        else
+                            {value= false, final= true}
                     else
-                        {value= false, final= true})
+                        # distance must only be smaller than upper
+                        if List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(evaluateTimes) then
+                            {value= false, final= false}
+                        else
+                            {value= false, final= true})
+
     }
 
     ## Checks the RepeatConstraint defined in TADL2.
@@ -293,12 +313,17 @@ module TADL2{
 
         #stored state
         def latestSpanEventTimes: Events[List[Int]]:=
-            merge(List.append(
-                if (List.size(last(latestSpanEventTimes, e)) > span) then
-                    List.tail(last(latestSpanEventTimes, defaultTime(e)))
-                else
-                    last(latestSpanEventTimes, e), defaultTime(e)),
-                List.empty[Int])
+            if TADL2.defaultTime(e) == 0 then
+                List.append(List.empty[Int], TADL2.defaultTime(e))
+            else
+                default(
+                    List.append(
+                        if (List.size(last(latestSpanEventTimes, e)) > span) then
+                            List.tail(last(latestSpanEventTimes, TADL2.defaultTime(e)))
+                        else
+                            last(latestSpanEventTimes, e),
+                        TADL2.defaultTime(e)),
+                    List.empty[Int])
         
         # timestamps, in which the evaluation occurs
         def delayPeriod :=
@@ -484,7 +509,10 @@ module TADL2{
         stillFulfillabe(
             #number of events on both streams equal-> currently true
             if count(source) == count(target) then
-                {value= true, final= false}
+                if (defaultTime(source) == defaultTime(target) && defaultTime(source) != -infty) then
+                    {value= false, final= true}
+                else
+                    {value= true, final= false}
             else
                 # more source than target events-> currently false
                 if (count(source) >= count(target)) then
@@ -838,38 +866,38 @@ module TADL2{
                     removeOldStimulusColorsFromSet(List.tail(latestStimulusColors),
                         Map.remove(colorTimeStamps, List.head(latestStimulusColors)), timeBound)
 
-
         # map with unmatched stimulus events after stimulus
-        def stimulusEventsNewStimulus : Events[Map[Int, Int]] := 
-                if (defaultTime(stimulus) >= defaultTime(response)) then
-                    Map.add(last(stimulusEvents, merge(stimulus, response)), stimulus, time(stimulus))
-                else
-                    last(stimulusEvents, merge(stimulus, response))
+        def stimulusEventsNewStimulus : Events[Map[Int, Int]] :=
+            # stimulus events in this timestamp-> insert event in Map, else keep previous map
+            if (defaultTime(stimulus) >= defaultTime(response)) then
+                Map.add(default(last(stimulusEvents, merge(stimulus, response)), Map.empty[Int, Int]),
+                    stimulus, defaultTime(stimulus))
+            else
+                default(last(stimulusEvents, merge(stimulus, response)), Map.empty[Int, Int])
         #unmatched stimulus events, remove events that are too old
         def stimulusEvents:=
-            merge(
-                slift3(last(stimulusColorsYoungerThanMax, stimulus),
+                slift3(default(last(stimulusColorsYoungerThanMax, stimulus), List.empty[Int]),
                     stimulusEventsNewStimulus,
-                    time(merge(stimulus, response)) - maxTimeDiff,
-                    removeOldStimulusColorsFromSet),
-            Map.empty[Int, Int])
+                    defaultTime(merge(stimulus, response)) - maxTimeDiff,
+                    removeOldStimulusColorsFromSet)
         
         #unmatched stimulus events, that are younger than maximum
-        def stimulusColorsYoungerThanMax: Events[List[Int]]:= merge(
-            slift3(List.append(slift(last(stimulusColorsYoungerThanMax, stimulus), stimulus, List_remove), stimulus), 
-                stimulusEvents, 
-                time(merge(stimulus, response)) - maxTimeDiff,
-                removeOldStimulusColorsFromList),
-            List.empty[Int])
+        def stimulusColorsYoungerThanMax: Events[List[Int]]:= 
+            slift3(
+                List.append(slift(default(last(stimulusColorsYoungerThanMax, stimulus), List.empty[Int]),
+                        stimulus, List_remove), stimulus), 
+                stimulusEventsNewStimulus, 
+                defaultTime(merge(stimulus, response)) - maxTimeDiff,
+                removeOldStimulusColorsFromList)
             
         #evaluation
         # 'now' has response event => time matches to unmatched stimulus event
         stillFulfillabe(
             if ((!(defaultTime(stimulus) <= defaultTime(response))) || 
-                Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
-                Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-            {value= true, final= false}
+                    Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
+                    Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+                    Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+                {value= true, final= false}
             else
                 {value= false, final= true})
     }
@@ -1061,12 +1089,11 @@ module TADL2{
                 noUnfulfilledRemoved(List.tail(removedEvents))
         # insert new events and set cluster to fulfilled, if possible
        def storedEventsBeforeRemove: Events[List[SynchronizationEventInfo]] :=
-            slift4(slift3(last(storedEvents, eventIndices), eventIndices, time(eventIndices), addEvents),
+            slift4(slift3(default(last(storedEvents, eventIndices), List.empty[SynchronizationEventInfo]), eventIndices, time(eventIndices), addEvents),
                     time(eventIndices), tolerance, streamCount, updateFullfilledEvents)
         # remove old events from list
-        def storedEvents: Events[List[SynchronizationEventInfo]] := merge(
-            slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents),
-            List.empty[SynchronizationEventInfo])
+        def storedEvents: Events[List[SynchronizationEventInfo]] :=
+            slift3(storedEventsBeforeRemove, time(eventIndices), tolerance, removeEvents)
             
         def timeOldestUnfulfilledEvent(storedEvents: List[SynchronizationEventInfo]): Int :=
             if (List.size(storedEvents) == 0) then
@@ -1597,9 +1624,8 @@ module TADL2{
         #state
         # list of active clusters
         def activeClusters: Events[List[synchronizationCluster]]:=
-            merge(removeFulfilledClusters(insertEventsList(last(activeClusters, eventIndices),
-                    eventIndices, time(eventIndices))),
-                List.empty[synchronizationCluster])
+            removeFulfilledClusters(insertEventsList(default(last(activeClusters, eventIndices), List.empty[synchronizationCluster]),
+                    eventIndices, time(eventIndices)))
         #delay
         def evalTimes:= 
             time(mergeUnit(eventIndices,
@@ -1639,7 +1665,7 @@ module TADL2{
             else
                 eventList2
 
-        StrongSynchronizationConstraint(eventList2, 2, tolerance)
+        StrongSynchronizationConstraint(eventList, 2, tolerance)
     }
 
     ## Checks the StrongSynchronizationConstraint for three streams.
@@ -2199,15 +2225,14 @@ module TADL2{
         # Stored Information #
         
         #stimulus colors without matching target event
-        def unmatchedStimulusColors: Events[Set[Int]] := merge(
+        def unmatchedStimulusColors: Events[Set[Int]] :=
                 removeListFromSet(
                     if (Map.contains(eventStreamIndices, 0)) then
-                        Set.add(last(unmatchedStimulusColors, eventStreamIndices), Map.get(eventStreamIndices, 0))
+                        Set.add(default(last(unmatchedStimulusColors, eventStreamIndices), Set.empty[Int]), Map.get(eventStreamIndices, 0))
                     else
-                        last(unmatchedStimulusColors, eventStreamIndices),
-                    mapValuesToList(removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)))),
-            Set.empty[Int])
-
+                        default(last(unmatchedStimulusColors, eventStreamIndices), Set.empty[Int]),
+                    mapValuesToList(removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices))))
+    
         # synchronization clusters with new stimulus events
         def storedClustersBeforeRemove : Events[Map[Int, outputSynchronizationCluster]] := 
             merge(slift5(last(storedClusters, time(eventStreamIndices)), removeStimulusEvents(eventStreamIndices), Map.keys(removeStimulusEvents(eventStreamIndices)), prev(unmatchedStimulusColors),
@@ -2569,8 +2594,8 @@ module TADL2{
         # time of last stimulus events with given color
         #   streamIndex -> (color -> time)
         def latestEventTimes: Events[Map[Int, Map[Int, Int]]] := 
-            merge(slift3(last(latestEventTimes, time(eventStreamIndices)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes),
-                buildEmptylatestEventTimes(stimulusStreamCount))
+            slift3(default(last(latestEventTimes, time(eventStreamIndices)), buildEmptylatestEventTimes(stimulusStreamCount)), time(eventStreamIndices), eventStreamIndices, addEventsToEmptylatestEventTimes)
+
         
         #evaluation
         stillFulfillabe(
