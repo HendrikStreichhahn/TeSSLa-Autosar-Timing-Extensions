@@ -142,11 +142,23 @@ module TADL2{
     ##
     ## ~~~trace
     ## 10: source = ()
+    ## 10: constraint.value = false
+    ## 10: constraint.final = false
     ## 25: target = ()
+    ## 25: constraint.value = true
+    ## 25: constraint.final = false
     ## 50: source = ()
+    ## 50: constraint.value = false
+    ## 50: constraint.final = false
     ## 65: target = ()
+    ## 65: constraint.value = true
+    ## 65: constraint.final = false
     ## 75: target = ()
+    ## 75: constraint.value = true
+    ## 75: constraint.final = false
     ## 80: target = ()
+    ## 80: constraint.value = true
+    ## 80: constraint.final = false
     ## ~~~
     def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) : Events[fourValuedLogicValue] :={
         # timestamps of source events, which did not have matching target event yet,
@@ -214,9 +226,20 @@ module TADL2{
     ##
     ## ~~~trace
     ## 10: source = ()
+    ## 10: constraint.value = false
+    ## 10: constraint.final = false
     ## 25: target = ()
+    ## 25: constraint.value = true
+    ## 25: constraint.final = false
     ## 50: source = ()
+    ## 50: constraint.value = false
+    ## 50: constraint.final = false
     ## 65: target = ()
+    ## 65: constraint.value = true
+    ## 65: constraint.final = false
+    ## 75: target = ()
+    ## 75: constraint.value = false
+    ## 75: constraint.final = true
     ## ~~~
     def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
         # timestamps of source events, which did not have matching target event yet,
@@ -292,7 +315,11 @@ module TADL2{
     ## ~~~tessla
     ##  in event: Events[Unit]
     ##
-    ##  def constraint:= TADL2.repeatConstraint(event, 20, 20, 2)
+    ##  def lower = 20
+    ##  def upper = 20
+    ##  def span = 2
+    ##
+    ##  def constraint:= TADL2.repeatConstraint(event, lower, upper, span)
     ##  out constraint.value
     ##  out constraint.final
     ## 
@@ -302,11 +329,23 @@ module TADL2{
     ##
     ## ~~~trace
     ## 5: event = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 7: event = ()
+    ## 7: constraint.value = true
+    ## 7: constraint.final = false
     ## 25: event = ()
+    ## 25: constraint.value = true
+    ## 25: constraint.final = false
     ## 27: event = ()
+    ## 27: constraint.value = true
+    ## 27: constraint.final = false
     ## 45: event = ()
+    ## 45: constraint.value = true
+    ## 45: constraint.final = false
     ## 47: event = ()
+    ## 47: constraint.value = true
+    ## 47: constraint.final = false
     ## ~~~
 
     def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := {
@@ -361,21 +400,37 @@ module TADL2{
     ## ~~~tessla
     ##  in event: Events[Unit]
     ##
-    ##  def constraint= TADL2.repetitionConstraint(event, 30, 30, 2, 2)
+    ##  def lower = 30
+    ##  def upper = 30
+    ##  def span = 2
+    ##  def jitter = 2
+    ##
+    ##  def constraint= TADL2.repetitionConstraint(event, lower, upper, span, jitter)
     ##  out constraint.value
     ##  out constraint.final
-    ## 
     ##~~~
     ##
     ## **Trace Example**
     ##
     ## ~~~trace
     ## 5: event = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 10: event = ()
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
     ## 35: event = ()
+    ## 35: constraint.value = true
+    ## 35: constraint.final = false
     ## 38: event = ()
+    ## 38: constraint.value = true
+    ## 38: constraint.final = false
     ## 67: event = ()
+    ## 67: constraint.value = true
+    ## 67: constraint.final = false
     ## 70: event = ()
+    ## 70: constraint.value = true
+    ## 70: constraint.final = false
     ## ~~~
     def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedLogicValue] := {
         # lower bound for current x
@@ -431,25 +486,40 @@ module TADL2{
     ## **Usage Example**
     ##
     ## ~~~tessla
-    ## in start: Events[Unit]
-    ## in end: Events[Unit]
-    ## in preempt: Events[Unit]
-    ## in resume: Events[Unit]
+    ##  in start: Events[Unit]
+    ##  in end: Events[Unit]
+    ##  in preempt: Events[Unit]
+    ##  in resume: Events[Unit]
     ##
-    ## def constraint= TADL2.executionTimeConstraint(start, end, preempt, resume, 10, 12)
-    ## out constraint.value
-    ## out constraint.final
+    ##  def lower = 10
+    ##  def upper = 12
+    ##
+    ##  def constraint= TADL2.executionTimeConstraint(start, end, preempt, resume, 10, 12)
+    ##  out constraint.value
+    ##  out constraint.final
     ## ~~~
     ##
     ## **Trace Example**
     ##
     ## ~~~trace
     ## 5: start = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 10: preempt = ()
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
     ## 12: resume = ()
+    ## 12: constraint.value = true
+    ## 12: constraint.final = false
     ## 15: preempt = ()
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
     ## 17: resume = ()
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
     ## 20: end = ()
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
     ## ~~~
     def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
             lower: Int, upper: Int): Events[fourValuedLogicValue] :={
@@ -499,11 +569,23 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,50]
     ## 1: source
+    ## 1: constraint.value = false
+    ## 1: constraint.final = false
     ## 2: target
+    ## 2: constraint.value = true
+    ## 2: constraint.final = false
     ## 5: source
+    ## 5: constraint.value = false
+    ## 5: constraint.final = false
     ## 6: source
+    ## 6: constraint.value = false
+    ## 6: constraint.final = false
     ## 20: target
+    ## 20: constraint.value = false
+    ## 20: constraint.final = false
     ## 40: target
+    ## 40: constraint.value = true
+    ## 40: constraint.final = false
     ## ~~~
     def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedLogicValue] :=
         stillFulfillabe(
@@ -531,7 +613,12 @@ module TADL2{
     ## ~~~tessla
     ## in event: Events[Unit]
     ##
-    ## def constraint= TADL2.sporadicConstraint(event, 10, 15, 0, 11)
+    ## def lower = 10
+    ## def upper = 15
+    ## def jitter = 0
+    ## def minDist = 11
+    ##
+    ## def constraint= TADL2.sporadicConstraint(event, lower, upper, jitter, minDist)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -541,9 +628,17 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,50]
     ## 5: event = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 20: event = ()
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
     ## 31: event = ()
+    ## 31: constraint.value = true
+    ## 31: constraint.final = false
     ## 45: event = ()
+    ## 45: constraint.value = true
+    ## 45: constraint.final = false
     ## ~~~
     def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedLogicValue]:=
         # application of repeat and repetititonConstraint
@@ -558,7 +653,11 @@ module TADL2{
     ## ~~~tessla
     ## in event: Events[Unit]
     ##
-    ## def constraint= TADL2.periodicConstraint(event, 10, 2, 9)
+    ## def period = 10
+    ## def jitter = 2
+    ## def minDist = 9
+    ##
+    ## def constraint= TADL2.periodicConstraint(event, period, jitter, minDist)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -567,12 +666,26 @@ module TADL2{
     ##
     ## ~~~trace
     ## 5: event = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 17: event = ()
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
     ## 26: event = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
     ## 35: event = ()
+    ## 35: constraint.value = true
+    ## 35: constraint.final = false
     ## 47: event = ()
+    ## 47: constraint.value = true
+    ## 47: constraint.final = false
     ## 56: event = ()
+    ## 56: constraint.value = true
+    ## 56: constraint.final = false
     ## 65: event = ()
+    ## 65: constraint.value = true
+    ## 65: constraint.final = false
     ## ~~~
     def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int) :=
         sporadicConstraint(events, period, period, jitter, minDist)
@@ -608,23 +721,59 @@ module TADL2{
     ##
     ## ~~~trace
     ## 1: x = ()
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
     ## 6: x = ()
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
     ## 7: x = ()
+    ## 7: constraint.value = true
+    ## 7: constraint.final = false
     ## 11: x = ()
+    ## 11: constraint.value = true
+    ## 11: constraint.final = false
     ## 12: x = ()
+    ## 12: constraint.value = true
+    ## 12: constraint.final = false
     ## 16: x = ()
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
     ## 17: x = ()
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
     ## 21: x = ()
+    ## 21: constraint.value = true
+    ## 21: constraint.final = false
     ## 22: x = ()
+    ## 22: constraint.value = true
+    ## 22: constraint.final = false
     ## 26: x = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
     ## 27: x = ()
+    ## 27: constraint.value = true
+    ## 27: constraint.final = false
     ## 31: x = ()
+    ## 31: constraint.value = true
+    ## 31: constraint.final = false
     ## 32: x = ()
+    ## 32: constraint.value = true
+    ## 32: constraint.final = false
     ## 36: x = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
     ## 37: x = ()
+    ## 37: constraint.value = true
+    ## 37: constraint.final = false
     ## 41: x = ()
+    ## 41: constraint.value = true
+    ## 41: constraint.final = false
     ## 42: x = ()
+    ## 42: constraint.value = true
+    ## 42: constraint.final = false
     ## 46: x = ()
+    ## 46: constraint.value = true
+    ## 46: constraint.final = false
     ## ~~~
     def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[fourValuedLogicValue] :=
         arbitraryConstraintRec(e, minDist, maxDist, 1)
@@ -639,24 +788,46 @@ module TADL2{
     ##
     ## in event: Events[Unit]
     ##
-    ## def constraint= TADL2.burstConstraint(event, 5, 3, 1)
+    ## def length = 5
+    ## def maxOccurences = 3
+    ## def minDist = 1
+    ##
+    ##
+    ## def constraint= TADL2.burstConstraint(event, length, macOccurences, minDist)
     ## out constraint.value
     ## out constraint.final
-    ## 
     ##~~~
     ##
     ## **Trace Example**
     ##
     ## ~~~trace
     ## 1: event = ()
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
     ## 2: event = ()
+    ## 2: constraint.value = true
+    ## 2: constraint.final = false
     ## 3: event = ()
+    ## 3: constraint.value = true
+    ## 3: constraint.final = false
     ## 7: event = ()
+    ## 7: constraint.value = true
+    ## 7: constraint.final = false
     ## 8: event = ()
+    ## 8: constraint.value = true
+    ## 8: constraint.final = false
     ## 9: event = ()
+    ## 9: constraint.value = true
+    ## 9: constraint.final = false
     ## 20: event = ()
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
     ## 21: event = ()
+    ## 21: constraint.value = true
+    ## 21: constraint.final = false
     ## 22: event = ()
+    ## 22: constraint.value = true
+    ## 22: constraint.final = false
     ## ~~~
     def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[fourValuedLogicValue] :=
         # application of repeatConstraint
@@ -675,8 +846,12 @@ module TADL2{
     ## ~~~tessla
     ## in event: Events[Unit]
     ##
+    ## def periodX = 20
     ## def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 3), 2, 6)
-    ## def constraint:= TADL2.patternConstraint(event, 20, offset, 1, 0)
+    ## def jitter = 1
+    ## def minDist = 0
+    ##
+    ## def constraint:= TADL2.patternConstraint(event, periodX, offset, jitter, minDist)
     ##
     ## out constraint.value
     ## out constraint.final
@@ -686,14 +861,32 @@ module TADL2{
     ##
     ## ~~~trace
     ## 10: event = ()
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
     ## 13: event = ()
+    ## 13: constraint.value = true
+    ## 13: constraint.final = false
     ## 16: event = ()
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
     ## 31: event = ()
+    ## 31: constraint.value = true
+    ## 31: constraint.final = false
     ## 33: event = ()
+    ## 33: constraint.value = true
+    ## 33: constraint.final = false
     ## 36: event = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
     ## 50: event = ()
+    ## 50: constraint.value = true
+    ## 50: constraint.final = false
     ## 53: event = ()
+    ## 53: constraint.value = true
+    ## 53: constraint.final = false
     ## 57: event = ()
+    ## 57: constraint.value = true
+    ## 57: constraint.final = false
     ## ~~~
     def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedLogicValue] := {
         liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
@@ -749,10 +942,12 @@ module TADL2{
     ## in stimulus: Events[Int]
     ## in response: Events[Int]
     ##
-    ## def constraint= TADL2.reactionConstraint(stimulus, response, 5, 5)
+    ## def minTimeDiff = 5
+    ## def maxTimeDiff = 5
+    ##
+    ## def constraint= TADL2.reactionConstraint(stimulus, response, minTimeDiff, maxTimeDiff)
     ## out constraint.value
     ## out constraint.final
-    ##
     ##~~~
     ##
     ## **Trace Example**
@@ -760,12 +955,26 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,25]
     ## 1: stimulus = 1
+    ## 1: constraint.value = false
+    ## 1: constraint.final = false
     ## 6: response = 1
+    ## 6: constraint.value =  true
+    ## 6: constraint.final = false
     ## 8: response = 4
+    ## 8: constraint.value = true
+    ## 8: constraint.final = false
     ## 10: stimulus = 2
+    ## 10: constraint.value = false
+    ## 10: constraint.final = false
     ## 13: stimulus = 3
+    ## 13: constraint.value = false
+    ## 13: constraint.final = false
     ## 15: response = 2
+    ## 15: constraint.value = false
+    ## 15: constraint.final = false
     ## 18: response = 3
+    ## 18: constraint.value = true
+    ## 18: constraint.final = false
     ## ~~~
     def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] := {
         # Map with unmatched stimulus events after stimulus
@@ -817,10 +1026,12 @@ module TADL2{
     ## in stimulus: Events[Int]
     ## in response: Events[Int]
     ##
-    ## def constraint= TADL2.ageConstraint(stimulus, response, 5, 5)
+    ## def minTimeDiff = 5
+    ## def maxTimeDiff = 5
+    ##
+    ## def constraint= TADL2.ageConstraint(stimulus, response, minTimeDiff, maxTimeDiff)
     ## out constraint.value
     ## out constraint.final
-    ##
     ##~~~
     ##
     ## **Trace Example**
@@ -828,12 +1039,26 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,25]
     ## 1: stimulus = 1
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
     ## 6: response = 1
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
     ## 8: stimulus = 4
-    ## 10: response = 2
-    ## 13: response = 3
+    ## 8: constraint.value = true
+    ## 8: constraint.final = false
+    ## 10: stimulus = 2
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
+    ## 13: stimulus = 3
+    ## 13: constraint.value = true
+    ## 13: constraint.final = false
     ## 15: response = 2
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
     ## 18: response = 3
+    ## 18: constraint.value = true
+    ## 18: constraint.final = false
     ## ~~~
     def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] := {
         #removes colors, that were before timeBound, from the list
@@ -916,7 +1141,6 @@ module TADL2{
     ## def constraint= TADL2.checkEventChain(stimulus, response)
     ## out constraint.value
     ## out constraint.final
-    ##
     ## ~~~
     ##
     ## **Trace Example**
@@ -924,13 +1148,29 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,90]
     ## 1: stimulus = 1
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
     ## 2: stimulus = 2
+    ## 2: constraint.value = true
+    ## 2: constraint.final = false
     ## 3: stimulus = 3
+    ## 3: constraint.value = true
+    ## 3: constraint.final = false
     ## 4: stimulus = 4
+    ## 4: constraint.value = true
+    ## 4: constraint.final = false
     ## 11: response = 1
+    ## 11: constraint.value = true
+    ## 11: constraint.final = false
     ## 12: response = 2
+    ## 12: constraint.value = true
+    ## 12: constraint.final = false
     ## 13: response = 3
+    ## 13: constraint.value = true
+    ## 13: constraint.final = false
     ## 14: response = 4
+    ## 14: constraint.value = true
+    ## 14: constraint.final = false
     ## ~~~
     def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedLogicValue]:= {
         # colors that occured in response-> not allows in stimulus anymore
@@ -967,7 +1207,9 @@ module TADL2{
     ## in event2: Events[Unit]
     ## in event3: Events[Unit]
     ##
-    ## def constraint= TADL2.synchronizationConstraint3(event1, event2, event3, 2)
+    ## def tolerance = 2
+    ##
+    ## def constraint= TADL2.synchronizationConstraint3(event1, event2, event3, tolerance)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -979,15 +1221,31 @@ module TADL2{
     ## 5: event1 = ()
     ## 5: event2 = ()
     ## 5: event3 = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 15: event1 = ()
     ## 15: event2 = ()
     ## 15: event3 = ()
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
     ## 24: event1 = ()
+    ## 24: constraint.value = false
+    ## 24: constraint.final = false
     ## 25: event2 = ()
+    ## 25: constraint.value = false
+    ## 25: constraint.final = false
     ## 26: event3 = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
     ## 34: event2 = ()
+    ## 34: constraint.value = false
+    ## 34: constraint.final = false
     ## 35: event3 = ()
+    ## 35: constraint.value = false
+    ## 35: constraint.final = false
     ## 36: event1 = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
     ## ~~~
     def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
 
@@ -1561,7 +1819,9 @@ module TADL2{
     ## in event2: Events[Unit]
     ## in event3: Events[Unit]
     ##
-    ## def constraint= TADL2.StrongSynchronizationConstraint3(event1, event2, event3, 2)
+    ## def tolerance = 2
+    ##
+    ## def constraint= TADL2.StrongSynchronizationConstraint3(event1, event2, event3, tolerance)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -1572,15 +1832,31 @@ module TADL2{
     ## 5: event1 = ()
     ## 5: event2 = ()
     ## 5: event3 = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 15: event1 = ()
     ## 15: event2 = ()
     ## 15: event3 = ()
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
     ## 24: event1 = ()
+    ## 24: constraint.value = false
+    ## 24: constraint.final = false
     ## 25: event2 = ()
+    ## 25: constraint.value = false
+    ## 25: constraint.final = false
     ## 26: event3 = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
     ## 34: event2 = ()
+    ## 34: constraint.value = false
+    ## 34: constraint.final = false
     ## 35: event3 = ()
+    ## 35: constraint.value = false
+    ## 35: constraint.final = false
     ## 36: event1 = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
     ## ~~~
     def StrongSynchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
 
@@ -2094,7 +2370,9 @@ module TADL2{
     ## in response2: Events[Int]
     ## in response3: Events[Int]
     ##
-    ## def constraint= TADL2.outputSynchronizationConstraint3(stimulus, response1, response2, response3, 2)
+    ## def tolerance = 2
+    ##
+    ## def constraint= TADL2.outputSynchronizationConstraint3(stimulus, response1, response2, response3, tolerance)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -2104,17 +2382,31 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,20]
     ## 1: stimulus = 1
+    ## 1: constraint.value = false
+    ## 1: constraint.final = false
     ## 5: response1 = 1
     ## 5: response2 = 1
+    ## 5: constraint.value = false
+    ## 5: constraint.final = false
     ## 6: response3 = 1
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
     ## 11: stimulus = 2
+    ## 11: constraint.value = false
+    ## 11: constraint.final = false
     ## 12: stimulus = 3
+    ## 12: constraint.value = false
+    ## 12: constraint.final = false
     ## 15: response1= 2
     ## 15: response2= 3
     ## 15: response3= 2
+    ## 15: constraint.value = false
+    ## 15: constraint.final = false
     ## 16: response1= 3
     ## 16: response2= 2
     ## 16: response3= 3
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
     ## ~~~
     def outputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], responseStreamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
         ##### Help funtions #####
@@ -2505,7 +2797,9 @@ module TADL2{
     ## in stimulus2: Events[Int]
     ## in stimulus3: Events[Int]
     ##
-    ## def constraint= TADL2.inputSynchronizationConstraint3(stimulus1, stimulus2, stimulus3, response, 2)
+    ## def tolerance = 2
+    ##
+    ## def constraint= TADL2.inputSynchronizationConstraint3(stimulus1, stimulus2, stimulus3, response, tolerance)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -2515,14 +2809,28 @@ module TADL2{
     ## ~~~trace
     ## option timeDomain:[-1,22]
     ## 1: stimulus1 = 1
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
     ## 5: stimulus1 = 1
     ## 5: stimulus2 = 1
     ## 5: stimulus3 = 1
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
     ## 6: response = 1
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
     ## 15: stimulus1 = 2
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
     ## 16: stimulus2 = 2
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
     ## 17: stimulus3 = 2
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
     ## 20: response = 2
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
     ## ~~~
     def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
             Events[fourValuedLogicValue]:= {
