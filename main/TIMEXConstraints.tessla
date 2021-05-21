@@ -1,0 +1,86 @@
+include "t2uConstraints.tessla"
+
+module AUTOSAR_TIMEX {
+
+    def PeriodicEventTriggering[A](events: Events[A], patternPeriod: Int, jitter: Int, minInterArrivalTime: Int):=
+        TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime);
+                
+    def sporadicEventTriggering[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
+            patternPeriod: Int):=
+        slift(TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime), 
+            TADL2.repeatConstraint(events, 0, maxInterArrivalTime, 1),
+            TADL2.fourValuedConjunction);
+    
+    def ConcretePatternEventTriggering[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
+            patternPeriod: Int, patternJitter: Int):= {
+        liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
+            if b == 1 then 1 else a % b;
+        # lower bound for pattern starting point
+        def lowerBoundX: Events[Int] :=  merge (
+            # increase by period and adjust by offset
+            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events)) then
+                max(last(lowerBoundX, events) + patternPeriod - patternJitter,
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
+            #adjust by offset
+            else
+                max(last(lowerBoundX, events),
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
+            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
+        # upper bound for pattern starting point
+        def upperBoundX: Events[Int] :=  merge (
+            # increase by period + jitter and adjust by offset
+            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events))  then
+                min(last(upperBoundX, events) + patternPeriod + patternJitter,
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
+            else
+            # adjust by offset
+                min(last(upperBoundX, events),
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
+            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes= mergeUnit(events, 
+            TADL2.safeDelay(upperBoundX + (if count(events) % Map.size(offset) == 0 then patternPeriod + patternJitter else 0) +
+                Map.get(offset, count(events) % Map.size(offset)), events))
+
+        #evaluation
+        # distance to x is correct-> current true, false otherwise
+        TADL2.stillFulfillabe(
+            if (lowerBoundX + Map.get(offset, (count(events)-1) % Map.size(offset)) <= time(evaluateTimes) &&
+                    time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(events)-1) % Map.size(offset))) then
+                {value= true, final= false}
+            else
+                {value= false, final= true})
+    }
+    
+    def ConcretePatternEventTriggeringNoPeriod[A](events: Events[A], patternLength: Int, offset: Map[Int, Int]):=
+        ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.infty);
+        
+    def ArbitraryEventTriggering[A](events: Events[A], minDist: List[Int], maxDist: List[Int]):=
+        TADL2.arbitraryConstraint(events, minDist, maxDist);
+    
+    def LatencyTimingConstraint(stimulus: Events[Int], response: Events[Int], isLatencyTypeAge: Bool,
+            maximum: Int, minimum: Int, nominal: Int):=
+        if (isLatencyTypeAge) then
+            TADL2.ageConstraint(stimulus, response, minimum, maximum)
+        else
+            TADL2.reactionConstraint(stimulus, response, minimum, maximum)
+
+    def SynchronizationTimingConstraintEvents[A](eventIndices: Events[List[Int]], streamCount: Int, 
+            tolerance : Int, multipleOccurrences: Bool):=
+        if (multipleOccurrences) then
+            TADL2.synchronizationConstraint(eventIndices, streamCount, tolerance)
+        else
+            TADL2.StrongSynchronizationConstraint(eventIndices, streamCount, tolerance)
+    
+    def SynchronizationTimingConstraintResponseSynchronization(eventIndices: Events[Map[Int, Int]],
+            responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
+        slift(TADL2.outputSynchronizationConstraint(eventIndices, responseStreamCount, tolerance),
+            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraint(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance),
+            TADL2.fourValuedConjunction);
+    
+    def SynchronizationTimingConstraintStimulusSynchronization(eventIndices: Events[Map[Int, Int]],
+            responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
+        slift(TADL2.inputSynchronizationConstraint(eventIndices, responseStreamCount, tolerance),
+            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraint(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance),
+            TADL2.fourValuedConjunction);
+}
