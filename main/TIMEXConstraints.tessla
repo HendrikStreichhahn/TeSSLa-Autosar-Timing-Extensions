@@ -2,15 +2,150 @@ include "t2uConstraints.tessla"
 
 module AUTOSAR_TIMEX {
 
+    ## checks the EventTriggeringConstraint.PeriodicEventTriggering defined in AUTOSAR Timex
+    ##
+    ## The events occur in a periodic pattern with an allowed deviation of jitter and a minimal distance of minInterArrivalTime. 
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def patternPeriod = 10
+    ## def jitter = 2
+    ## def minInterArrivalTime = 9
+    ##
+    ## def constraint= AUTOSAR_TIMEX.PeriodicEventTriggering(event, period, jitter, minInterArrivalTime)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## ~~~trace
+    ## 5: event = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
+    ## 17: event = ()
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
+    ## 26: event = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
+    ## 35: event = ()
+    ## 35: constraint.value = true
+    ## 35: constraint.final = false
+    ## 47: event = ()
+    ## 47: constraint.value = true
+    ## 47: constraint.final = false
+    ## 56: event = ()
+    ## 56: constraint.value = true
+    ## 56: constraint.final = false
+    ## 65: event = ()
+    ## 65: constraint.value = true
+    ## 65: constraint.final = false
+    ## ~~~
     def PeriodicEventTriggering[A](events: Events[A], patternPeriod: Int, jitter: Int, minInterArrivalTime: Int):=
-        TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime);
-                
+        TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime)
+    
+    ## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex
+    ##
+    ## The events occur in a periodic pattern, but less strict than in EventTriggeringConstraint.PeriodicEventTriggering defined.
+    ## patternPeriod defines the nomimal, minInterArrivalTime the minimal and maxInterArrivalTime the maximal distance between subsequent events.
+    ## jitter defines the allowed deviation from the periods.
+    ##
+    ## Note that the definition of EventTriggeringConstraint.sporadicEventTriggering left room for different interpretations.
+    ## This implementation uses the exact definition of Timmo-2-Use SporadicConstraint as interpretation.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def patternPeriod = 10
+    ## def maxInterArrivalTime = 15
+    ## def jitter = 0
+    ## def minInterArrivalTime = 11
+    ##
+    ## def constraint= AUTOSAR_TIMEX.sporadicEventTriggering(event, jitter, maxInterArrivalTime, minInterArrivalTime, patternPeriod)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 5: event = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
+    ## 20: event = ()
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
+    ## 31: event = ()
+    ## 31: constraint.value = true
+    ## 31: constraint.final = false
+    ## 45: event = ()
+    ## 45: constraint.value = true
+    ## 45: constraint.final = false
+    ## ~~~
     def sporadicEventTriggering[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
             patternPeriod: Int):=
-        slift(TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime), 
-            TADL2.repeatConstraint(events, 0, maxInterArrivalTime, 1),
-            TADL2.fourValuedConjunction);
-    
+        TADL2.sporadicConstraint (events, patternPeriod, maxInterArrivalTime, jitter, minInterArrivalTime)
+
+    ## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex
+    ##
+    ## The events for the must occur in a concretely given pattern given by offset, but a deviation is allowed, specified by the patternJitter attribute
+    ## The entries of offset must be in ascending order (in keys and values) and the keys must start by 0.
+    ## The patterns are repeating after patternPeriod.
+    ##
+    ## The parameter patternLength does not play a role in monitoring, when patternPeriod is used.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event: Events[Unit]
+    ##
+    ## def patternPeriod = 20
+    ## def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 3), 2, 6)
+    ## def patternLength: Int = 6
+    ## def patternJitter: Int  = 1
+    ##
+    ## def constraint:= AUTOSAR_TIMEX.ConcretePatternEventTriggering(patternLength, offset, patternPeriod,  patternJitter)
+    ##
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## 10: event = ()
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
+    ## 13: event = ()
+    ## 13: constraint.value = true
+    ## 13: constraint.final = false
+    ## 16: event = ()
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
+    ## 31: event = ()
+    ## 31: constraint.value = true
+    ## 31: constraint.final = false
+    ## 33: event = ()
+    ## 33: constraint.value = true
+    ## 33: constraint.final = false
+    ## 36: event = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
+    ## 50: event = ()
+    ## 50: constraint.value = true
+    ## 50: constraint.final = false
+    ## 53: event = ()
+    ## 53: constraint.value = true
+    ## 53: constraint.final = false
+    ## 57: event = ()
+    ## 57: constraint.value = true
+    ## 57: constraint.final = false
+    ## ~~~
     def ConcretePatternEventTriggering[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
             patternPeriod: Int, patternJitter: Int):= {
         liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
@@ -52,19 +187,230 @@ module AUTOSAR_TIMEX {
                 {value= false, final= true})
     }
     
+    ## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex, without the use the parameter patternPeriod.
+    ##
+    ## The events for the must occur in a concretely given pattern given by offset, but a deviation is allowed, specified by the patternJitter attribute
+    ## The entries of offset must be in ascending order (in keys and values) and the keys must start by 0.
+    ## The patterns are repeating after patternPeriod.
+    ##
+    ## See ConcretePatternEventTriggering for more information.
     def ConcretePatternEventTriggeringNoPeriod[A](events: Events[A], patternLength: Int, offset: Map[Int, Int]):=
-        ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.infty);
-        
-    def ArbitraryEventTriggering[A](events: Events[A], minDist: List[Int], maxDist: List[Int]):=
-        TADL2.arbitraryConstraint(events, minDist, maxDist);
+        ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.infty)
     
+    ## Checks the ArbitraryEventTriggering defined in TADL2.
+    ##
+    ## The ArbitraryEventTriggering describes the time distances between several subsequent events
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in x: Events[Unit]
+    ##
+    ## def minDist: List[Int] := List.append(List.append(List.empty[Int], 1), 5)
+    ## def maxDist: List[Int] := List.append(List.append(List.empty[Int], 5), 6)
+    ##
+    ## def constraint = AUTOSAR_TIMEX.ArbitraryEventTriggering(x, minDist, maxDist)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## 1: x = ()
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
+    ## 6: x = ()
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
+    ## 7: x = ()
+    ## 7: constraint.value = true
+    ## 7: constraint.final = false
+    ## 11: x = ()
+    ## 11: constraint.value = true
+    ## 11: constraint.final = false
+    ## 12: x = ()
+    ## 12: constraint.value = true
+    ## 12: constraint.final = false
+    ## 16: x = ()
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
+    ## 17: x = ()
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
+    ## 21: x = ()
+    ## 21: constraint.value = true
+    ## 21: constraint.final = false
+    ## 22: x = ()
+    ## 22: constraint.value = true
+    ## 22: constraint.final = false
+    ## 26: x = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
+    ## 27: x = ()
+    ## 27: constraint.value = true
+    ## 27: constraint.final = false
+    ## 31: x = ()
+    ## 31: constraint.value = true
+    ## 31: constraint.final = false
+    ## 32: x = ()
+    ## 32: constraint.value = true
+    ## 32: constraint.final = false
+    ## 36: x = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
+    ## 37: x = ()
+    ## 37: constraint.value = true
+    ## 37: constraint.final = false
+    ## 41: x = ()
+    ## 41: constraint.value = true
+    ## 41: constraint.final = false
+    ## 42: x = ()
+    ## 42: constraint.value = true
+    ## 42: constraint.final = false
+    ## 46: x = ()
+    ## 46: constraint.value = true
+    ## 46: constraint.final = false
+    ## ~~~
+    def ArbitraryEventTriggering[A](events: Events[A], minDist: List[Int], maxDist: List[Int]):=
+        TADL2.arbitraryConstraint(events, minDist, maxDist)
+    
+    ## Checks the LatencyTimingConstraint defined in the Autosar Timing Extensions.
+    ##
+    ## The LatencyConstraintType if set by isLatencyTypeAge (true-> LatencyConstraintType=age, false LatencyConstraintType->reaction)
+    ##
+    ## If the LatencyConstraintType is age, there must one stimulus event for each reponse event within the specified time range earlier, which has the same color.
+    ## If the LatencyConstraintType is reaction, after each stimulus event, there must be an event in the specified time range later in the response stream with the same color.
+    ## The parameter resetTime specifies the time, after which a falsifying state should be deleted.
+    ##
+    ## The Parameter nominal is unused in the monitoring
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##
+    ## in stimulus: Events[Int]
+    ## in response: Events[Int]
+    ##
+    ## def minimum = 5
+    ## def maximum = 5
+    ## def nominal = 5
+    ## def isLatencyTypeAge = true
+    ## def resetTime = 100
+    ##
+    ## def constraint= AUTOSAR_TIMEX.LatencyTimingConstraint(stimulus, response, isLatencyTypeAge, maximum, minimum, nominal, resetTime)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,25]
+    ## 1: stimulus = 1
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
+    ## 6: response = 1
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
+    ## 8: stimulus = 4
+    ## 8: constraint.value = true
+    ## 8: constraint.final = false
+    ## 10: stimulus = 2
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
+    ## 13: stimulus = 3
+    ## 13: constraint.value = true
+    ## 13: constraint.final = false
+    ## 15: response = 2
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
+    ## 18: response = 3
+    ## 18: constraint.value = true
+    ## 18: constraint.final = false
+    ## ~~~
     def LatencyTimingConstraint(stimulus: Events[Int], response: Events[Int], isLatencyTypeAge: Bool,
-            maximum: Int, minimum: Int, nominal: Int):=
+            maximum: Int, minimum: Int, nominal: Int, resetTime: Int):=
         if (isLatencyTypeAge) then
-            TADL2.ageConstraint(stimulus, response, minimum, maximum)
+            TADL2.ageConstraintReset(stimulus, response, minimum, maximum, resetTime)
         else
-            TADL2.reactionConstraint(stimulus, response, minimum, maximum)
+            TADL2.reactionConstraintReset(stimulus, response, minimum, maximum, resetTime)
 
+    ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
+    ## 
+    ## The SynchronizationTimingConstraint on events describes groups of streams, which events occur in common clusters.
+    ## If the parameter multipleOccurrences is true, each of these streams must have at least one event in each of these intervals.
+    ## If the parameter multipleOccurrences is false, each of these streams must have exactly one event in each of these intervals.
+    ## The parameter tolerance specifies the maximal length of these intervals.
+    ##
+    ## The events of each input timestamp must be placed into an integer list, which contains the index (starting at 1) of all streams, which have an event in this timestamp.
+    ## This list is then used as a parameter for the implementation.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in event1: Events[Unit]
+    ## in event2: Events[Unit]
+    ## in event3: Events[Unit]
+    ##
+    ## def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
+    ## def eventList3:= 
+    ##     if (defaultTime(events3) >= timeNow) then
+    ##        List.prepend(3, List.empty[Int])
+    ##     else
+    ##        List.empty[Int]
+    ##        
+    ## def eventList2:= 
+    ##    if (defaultTime(events2) >= timeNow) then
+    ##        List.prepend(2, eventList3)
+    ##    else
+    ##        eventList3
+    ##            
+    ## def eventList:= 
+    ##    if (defaultTime(events1) >= timeNow) then
+    ##        List.prepend(1, eventList2)
+    ##    else
+    ##        eventList2
+    ##
+    ## def tolerance = 2
+    ## def streamCount = 3
+    ## def multipleOccurrences = true
+    ##
+    ## def constraint= SynchronizationTimingConstraintEvents(eventList, streamCount, tolerance, multipleOccurrences)
+    ## out constraint.value
+    ## out constraint.final
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,50]
+    ## 5: event1 = ()
+    ## 5: event2 = ()
+    ## 5: event3 = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
+    ## 15: event1 = ()
+    ## 15: event2 = ()
+    ## 15: event3 = ()
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
+    ## 24: event1 = ()
+    ## 24: constraint.value = false
+    ## 24: constraint.final = false
+    ## 25: event2 = ()
+    ## 25: constraint.value = false
+    ## 25: constraint.final = false
+    ## 26: event3 = ()
+    ## 26: constraint.value = true
+    ## 26: constraint.final = false
+    ## 34: event2 = ()
+    ## 34: constraint.value = false
+    ## 34: constraint.final = false
+    ## 35: event3 = ()
+    ## 35: constraint.value = false
+    ## 35: constraint.final = false
+    ## 36: event1 = ()
+    ## 36: constraint.value = true
+    ## 36: constraint.final = false
+    ## ~~~
     def SynchronizationTimingConstraintEvents[A](eventIndices: Events[List[Int]], streamCount: Int, 
             tolerance : Int, multipleOccurrences: Bool):=
         if (multipleOccurrences) then
@@ -72,15 +418,146 @@ module AUTOSAR_TIMEX {
         else
             TADL2.StrongSynchronizationConstraint(eventIndices, streamCount, tolerance)
     
+    ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType responseSynchronization as defined in the Autosar Timing Extensions.
+    ##
+    ## The SynchronizationTimingConstraint on event chains for the synchronizationConstraintType responseSynchronization describes groups of streams, which response events occur in common clusters.
+    ## The parameter tolerance specifies the maximal length of these intervals.
+    ## If the parameter multipleOccurrences is true, each of these streams must have at least one event in each of these intervals.
+    ## If the parameter multipleOccurrences is false, each of these streams must have exactly one event in each of these intervals.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in stimulus: Events[Int]
+    ## in response1: Events[Int]
+    ## in response2: Events[Int]
+    ## in response3: Events[Int]
+    ##
+    ## def tolerance = 2
+    ## def timeNow = 
+    ##    merge(time(stimulus),
+    ##    merge(time(response1),
+    ##    merge(time(response2),
+    ##        time(response3))))
+    ##
+    ## def eventStimulus:= if (defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+    ## def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+    ## def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+    ## def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+    ##    
+    ## def responseStreamCount = 3
+    ## def multipleOccurrences = false
+    ##
+    ##
+    ## def constraint= AUTOSAR_TIMEX.SynchronizationTimingConstraintResponseSynchronization(eventResponse3, responseStreamCount, tolerance, multipleOccurrences)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,20]
+    ## 1: stimulus = 1
+    ## 1: constraint.value = false
+    ## 1: constraint.final = false
+    ## 5: response1 = 1
+    ## 5: response2 = 1
+    ## 5: constraint.value = false
+    ## 5: constraint.final = false
+    ## 6: response3 = 1
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
+    ## 11: stimulus = 2
+    ## 11: constraint.value = false
+    ## 11: constraint.final = false
+    ## 12: stimulus = 3
+    ## 12: constraint.value = false
+    ## 12: constraint.final = false
+    ## 15: response1= 2
+    ## 15: response2= 3
+    ## 15: response3= 2
+    ## 15: constraint.value = false
+    ## 15: constraint.final = false
+    ## 16: response1= 3
+    ## 16: response2= 2
+    ## 16: response3= 3
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
+    ## ~~~
     def SynchronizationTimingConstraintResponseSynchronization(eventIndices: Events[Map[Int, Int]],
             responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
         slift(TADL2.outputSynchronizationConstraint(eventIndices, responseStreamCount, tolerance),
             if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraint(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance),
-            TADL2.fourValuedConjunction);
+            TADL2.fourValuedConjunction)
     
+    ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions.
+    ##
+    ## The SynchronizationTimingConstraint on event chains for the synchronizationConstraintType stimulusSynchronization describes groups of streams, which stimulus events occur in common clusters.
+    ## The parameter tolerance specifies the maximal length of these intervals.
+    ## If the parameter multipleOccurrences is true, each of these streams must have at least one event in each of these intervals.
+    ## If the parameter multipleOccurrences is false, each of these streams must have exactly one event in each of these intervals.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in response: Events[Int]
+    ## in stimulus1: Events[Int]
+    ## in stimulus2: Events[Int]
+    ## in stimulus3: Events[Int]
+    ##
+    ## def tolerance = 2
+    ##    def timeNow = 
+    ##        merge(time(stimulus1),
+    ##        merge(time(stimulus2),
+    ##        merge(time(stimulus3),
+    ##            time(response))))
+    ##
+    ##    def eventStimulus:= if (defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+    ##    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
+    ##    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
+    ##    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
+    ##    
+    ## def responseStreamCount = 3
+    ## def multipleOccurrences = false
+    ##
+    ##
+    ## def constraint= AUTOSAR_TIMEX.SynchronizationTimingConstraintResponseSynchronization(eventResponse3, responseStreamCount, tolerance, multipleOccurrences)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## option timeDomain:[-1,22]
+    ## 1: stimulus1 = 1
+    ## 1: constraint.value = true
+    ## 1: constraint.final = false
+    ## 5: stimulus1 = 1
+    ## 5: stimulus2 = 1
+    ## 5: stimulus3 = 1
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
+    ## 6: response = 1
+    ## 6: constraint.value = true
+    ## 6: constraint.final = false
+    ## 15: stimulus1 = 2
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
+    ## 16: stimulus2 = 2
+    ## 16: constraint.value = true
+    ## 16: constraint.final = false
+    ## 17: stimulus3 = 2
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
+    ## 20: response = 2
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
+    ## ~~~
     def SynchronizationTimingConstraintStimulusSynchronization(eventIndices: Events[Map[Int, Int]],
             responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
         slift(TADL2.inputSynchronizationConstraint(eventIndices, responseStreamCount, tolerance),
             if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraint(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance),
-            TADL2.fourValuedConjunction);
+            TADL2.fourValuedConjunction)
 }
