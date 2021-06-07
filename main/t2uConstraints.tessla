@@ -105,7 +105,7 @@ module TADL2{
 		def isFinalFalse: Events[Bool] = 
 			default(last(isFinalFalseReset, events) || (events.final == true && events.value == false), false)
 		# since which timestamp is the value final false?
-		def finalFalseSince: Events[Int] = default(if (events.final && !events.value) then time(events) else last(finalFalseSince, isFinalFalse), infty)
+		def finalFalseSince: Events[Int] = default(if (events.final && !events.value) && !prev(isFinalFalse) then time(events) else last(finalFalseSince, isFinalFalse), infty)
 		def isFinalFalseReset: Events[Bool] = 
 			if (finalFalseSince + resetTime < time (events)) then
 				false
@@ -134,7 +134,7 @@ module TADL2{
     #removes all list elements, that are smaller than A from the list
     # list must be in ascending order
     ## nodoc
-    def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
+    liftable def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
         if (List.size(list) == 0) then
             list
         else
@@ -184,6 +184,53 @@ module TADL2{
     ## 80: constraint.final = false
     ## ~~~
     def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) : Events[fourValuedLogicValue] :={
+        delayConstraintReset(source, target, lower, upper, infty)
+    }
+    
+    ## Checks the DelayConstraint defined in TADL2.
+    ##
+    ## Each source event must be followed by at least one target event, which occurs within a time distance between lower and upper. Additional target events are allowed.
+    ## A final false output will be set to unfinfal after resetTime.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in source: Events[Unit]
+    ## in target: Events[Unit]
+    ## 
+    ## def lower = 15
+    ## def upper = 25
+    ## def resetTime
+    ## 
+    ## def constraint:= TADL2.delayConstraintReset(source, target, lower, upper, resetTime)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## 10: source = ()
+    ## 10: constraint.value = false
+    ## 10: constraint.final = false
+    ## 25: target = ()
+    ## 25: constraint.value = true
+    ## 25: constraint.final = false
+    ## 50: source = ()
+    ## 50: constraint.value = false
+    ## 50: constraint.final = false
+    ## 65: target = ()
+    ## 65: constraint.value = true
+    ## 65: constraint.final = false
+    ## 75: target = ()
+    ## 75: constraint.value = true
+    ## 75: constraint.final = false
+    ## 80: target = ()
+    ## 80: constraint.value = true
+    ## 80: constraint.final = false
+    ## ~~~
+    def delayConstraintReset[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int, resetTime: Int) : Events[fourValuedLogicValue] :={
+
         # timestamps of source events, which did not have matching target event yet,
         # including the timestamps, which matches in this this timestamp
         def unfinishedSourceTimesNewSource: Events[List[Int]] := 
@@ -192,21 +239,27 @@ module TADL2{
                 List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
             else
                 default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+                
+        def unfinishedSourceTimesAfterReset: Events[List[Int]] :=
+            if (List.head(unfinishedSourceTimesNewSource) + resetTime < time(mergeUnit(source, target))) then
+                removeItemsSmallerThanAFromListFront(unfinishedSourceTimesNewSource, time(mergeUnit(source, target)) - upper)
+            else
+                unfinishedSourceTimesNewSource
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
             # 'now' has target event
             if (defaultTime(source) <= defaultTime(target) &&
                     # List has source event without matching target
-                    List.size(unfinishedSourceTimesNewSource) > 0 &&
+                    List.size(unfinishedSourceTimesAfterReset) > 0 &&
                     # target event now matches with oldest source event
-                    List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                    List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                    List.head(unfinishedSourceTimesAfterReset) + lower <= defaultTime(target) &&
+                    List.head(unfinishedSourceTimesAfterReset) + upper >= defaultTime(target)) then
                 #remove matched target events
-                merge(slift(unfinishedSourceTimesNewSource, defaultTime(target) - lower + 1, 
+                merge(slift(unfinishedSourceTimesAfterReset, defaultTime(target) - lower + 1, 
                         removeItemsSmallerThanAFromListFront),
                     List.empty[Int])
             else
-                merge(unfinishedSourceTimesNewSource, List.empty[Int])
+                merge(unfinishedSourceTimesAfterReset, List.empty[Int])
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
             safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
@@ -215,7 +268,7 @@ module TADL2{
                     List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
                 mergeUnit(source, target)))
                 
-        stillFulfillabe(
+        stillFulfillabeReset(
             # no unfinished source events -> current true
             if (List.size(unfinishedSourceTimes) == 0) then
                 {value= true, final= false}
@@ -225,7 +278,8 @@ module TADL2{
                     {value= false, final= false}
                 # oldest source event is too old -> final false
                 else
-                    {value= false, final= true})
+                    {value= false, final= true},
+            resetTime)
     }
 
     ## Checks the StrongDelayConstraint defined in TADL2
