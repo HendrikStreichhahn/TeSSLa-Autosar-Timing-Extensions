@@ -142,6 +142,10 @@ module TADL2{
                 removeItemsSmallerThanAFromListFront(List.tail(list), A)
             else
                 list
+	
+	#returns the head of the given list, or the given value, if the map is empty
+	liftable def listHeadOr[A](aList: List[A], valIfEmpty: A): A = 
+		if (List.size(aList) == 0) then valIfEmpty else List.head(aList)
 
     ## Checks the DelayConstraint defined in TADL2.
     ##
@@ -241,10 +245,13 @@ module TADL2{
                 default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
                 
         def unfinishedSourceTimesAfterReset: Events[List[Int]] :=
-            if (List.head(unfinishedSourceTimesNewSource) + resetTime < time(mergeUnit(source, target))) then
-                removeItemsSmallerThanAFromListFront(unfinishedSourceTimesNewSource, time(mergeUnit(source, target)) - upper)
-            else
-                unfinishedSourceTimesNewSource
+			if (List.size(unfinishedSourceTimesNewSource) != 0) then
+				if (List.head(unfinishedSourceTimesNewSource) + resetTime < time(mergeUnit(source, target))) then
+					removeItemsSmallerThanAFromListFront(unfinishedSourceTimesNewSource, time(mergeUnit(source, target)) - upper)
+				else
+					unfinishedSourceTimesNewSource
+			else
+				List.empty[Int]
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
             # 'now' has target event
@@ -261,13 +268,11 @@ module TADL2{
             else
                 merge(unfinishedSourceTimesAfterReset, List.empty[Int])
         # timestamps, in which the evaluation occurs
-        def evaluateTimes = mergeUnit(mergeUnit(source, target),
-            safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
-                    infty
-                else
-                    List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
-                mergeUnit(source, target)))
-                
+		def evaluateTimes =
+			mergeUnit(mergeUnit(source, target), 
+				TADL2.safeDelay(listHeadOr(unfinishedSourceTimes, TADL2.infty) + upper - time(mergeUnit(source, target))+1, mergeUnit(source, target)))
+		
+
         stillFulfillabeReset(
             # no unfinished source events -> current true
             if (List.size(unfinishedSourceTimes) == 0) then
@@ -318,67 +323,82 @@ module TADL2{
     ## 75: constraint.value = false
     ## 75: constraint.final = true
     ## ~~~
-    def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
+	def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :=
+		strongDelayConstraintReset(source, target, lower, upper, infty)
+	
+	
+	## checks the StrongDelayConstraint defined in TADL2, resets a negative outout after resetTime
+	##
+	## See strongDelayConstraint for more information.
+    def strongDelayConstraintReset[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int, resetTime: Int) :={
         # timestamps of source events, which did not have matching target event yet,
         # including the timestamps, which matches in this this timestamp
         def unfinishedSourceTimesNewSource:=
             #current timeStamp has source event
-            if (defaultTime(source) >= defaultTime(target)) then
+            if (TADL2.defaultTime(source) >= TADL2.defaultTime(target)) then
                 # append timestamp to list
                 List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
             else
                 default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+		# remove events that are older than resetTime
+		def unfinishedSourceTimesAfterReset:= 
+			if List.size(unfinishedSourceTimesNewSource) != 0 then
+				if (List.head(unfinishedSourceTimesNewSource) + resetTime < time(mergeUnit(source, target))) then
+					TADL2.removeItemsSmallerThanAFromListFront(unfinishedSourceTimesNewSource, time(mergeUnit(source, target)) - upper)
+				else
+					unfinishedSourceTimesNewSource
+			else
+				List.empty[Int]
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
-            #current timeStamp has target event
-            if (defaultTime(source) <= defaultTime(target)) then
-                # removing possible-> remove
-                if List.size(unfinishedSourceTimesNewSource) != 0 then
-                    # if matching time distance to oldest stored event
-                    if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                            List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
-                        # just keep tail
-                        List.tail(unfinishedSourceTimesNewSource)
-                    else
-                        # return unchanged
-                        unfinishedSourceTimesNewSource
-                else
-                    # removing not possible-> insert event, that triggers {value= false, final= true}
-                    List.append(List.empty[Int], -infty)
-            else
-                unfinishedSourceTimesNewSource
+			#current timeStamp has target event
+			if (TADL2.defaultTime(source) <= TADL2.defaultTime(target)) then
+				# removing possible-> remove
+				if List.size(unfinishedSourceTimesAfterReset) != 0 then
+					# if matching time distance to oldest stored event
+					if (List.head(unfinishedSourceTimesAfterReset) + lower <= TADL2.defaultTime(target) &&
+							List.head(unfinishedSourceTimesAfterReset) + upper >= TADL2.defaultTime(target)) then
+						# just keep tail
+						List.tail(unfinishedSourceTimesAfterReset)
+					else
+						# return unchanged
+						unfinishedSourceTimesAfterReset
+				else
+					# removing not possible-> insert event, that triggers {value= false, final= true}
+					List.append(List.empty[Int], -TADL2.infty)
+			else
+				unfinishedSourceTimesAfterReset
 
         # timestamps, in which the evaluation occurs
-        def evaluateTimes = mergeUnit(mergeUnit(source, target),
-            safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
-                    infty
-                else
-                    List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
-                mergeUnit(source, target)))
+		def evaluateTimes =
+			mergeUnit(mergeUnit(source, target), 
+				TADL2.safeDelay(listHeadOr(unfinishedSourceTimes, TADL2.infty) + upper - time(mergeUnit(source, target))+1, mergeUnit(source, target)))
+		
         # output
-        stillFulfillabe(
+        stillFulfillabeReset(
             # no unmatched source event-> current true
             if (List.size(unfinishedSourceTimes) == 0) then
                 {value= true, final= false}
             else
                 # target event, but no stored source event-> false
-                if (List.size(unfinishedSourceTimesNewSource) == 0) then
+                if (List.size(unfinishedSourceTimesAfterReset) == 0) then
                     {value= false, final= true}
                 else
-                    # current timestamp has target event
-                    if (defaultTime(target) >= time(evaluateTimes)) then
+                #    # current timestamp has target event
+                    if (TADL2.defaultTime(target) >= time(evaluateTimes)) then
                         # correct distance-> current false
-                        if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                                List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                        if (List.head(unfinishedSourceTimesAfterReset) + lower <= TADL2.defaultTime(target) &&
+                                List.head(unfinishedSourceTimesAfterReset) + upper >= TADL2.defaultTime(target)) then
                             {value= false, final= false}
                         else
                             {value= false, final= true}
                     else
                         # distance must only be smaller than upper
-                        if List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(evaluateTimes) then
+                        if List.head(unfinishedSourceTimesAfterReset) + upper >= TADL2.defaultTime(evaluateTimes) then
                             {value= false, final= false}
                         else
-                            {value= false, final= true})
+                            {value= false, final= true},
+			resetTime)
 
     }
 
