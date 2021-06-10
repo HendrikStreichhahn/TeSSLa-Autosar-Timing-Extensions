@@ -529,52 +529,66 @@ module TADL2{
     ## 70: constraint.value = true
     ## 70: constraint.final = false
     ## ~~~
-    def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedLogicValue] := {
+	def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedLogicValue] := {
+		repetitionConstraintReset(e, lower, upper, span, jitter, infty)
+	}
+	
+	## Checks the RepetitionConstraint defined in TADL2.
+	## Resets a negative output after resetTime.
+	def repetitionConstraintReset[A](events: Events[A], lower: Int, upper: Int, span: Int, jitter: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         # lower bound for current x
         def lowerBoundXNow: Events[Int] =
-            if (List.size(last(LowerBoundX, e)) < span) then
-                time(e)-jitter
+            if (List.size(last(LowerBoundX, events)) < span) then
+                time(events)-jitter
             else
-                max(List.head(last(LowerBoundX, e)), time(e)-jitter)
+                max(List.head(last(LowerBoundX, events)), time(events)-jitter)
         # upper bound for current x
         def upperBoundXNow: Events[Int] =
-            if (List.size(last(UpperBoundX, e)) < span) then
-                time(e)
+            if (List.size(last(UpperBoundX, events)) < span) then
+                time(events)
             else
-                min(List.head(last(UpperBoundX, e)), time(e))
+                min(List.head(last(UpperBoundX, events)), time(events))
 
         # lower bound for span next x
         def LowerBoundX: Events[List[Int]]:= merge(
-            if (List.size(last(LowerBoundX, e)) < span) then
-               List.append(last(LowerBoundX, e), lowerBoundXNow + lower)
-            else
-                List.append(last(List.tail(LowerBoundX), e), lowerBoundXNow + lower),
+			if (last(res, events).final) then
+				List.empty[Int]
+			else
+				if (List.size(last(LowerBoundX, events)) < span) then
+				   List.append(last(LowerBoundX, events), lowerBoundXNow + lower)
+				else
+					List.append(last(List.tail(LowerBoundX), events), lowerBoundXNow + lower),
             List.empty[Int]
         )
             
          # upper bound for span next x
         def UpperBoundX: Events[List[Int]]:= merge(
-            if (List.size(last(UpperBoundX, e)) < span) then
-                List.append(last(UpperBoundX, e), upperBoundXNow+upper)
-            else
-                List.append(last(List.tail(UpperBoundX), e), upperBoundXNow + upper),
+			if (last(res, events).final) then
+				List.empty[Int]
+			else
+				if (List.size(last(UpperBoundX, events)) < span) then
+					List.append(last(UpperBoundX, events), upperBoundXNow+upper)
+				else
+					List.append(last(List.tail(UpperBoundX), events), upperBoundXNow + upper),
             List.empty[Int]
         )
         # timestamps, in which the evaluation occurs
-        def evaluateTimes = mergeUnit(e,
-            safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
-                    jitter - time(e)+1, e))
+        def evaluateTimes = mergeUnit(events,
+            TADL2.safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
+                    jitter - time(events)+1, events))
         # Evaluation        
-        stillFulfillabe(
+        def res:= TADL2.stillFulfillabeReset(
             #first event or correct distance to X
             if (List.size(LowerBoundX) == 0 && List.size(UpperBoundX) == 0) ||
                     lowerBoundXNow <= time(evaluateTimes) &&
                     upperBoundXNow + jitter >= time(evaluateTimes) then
                 {value= true, final= false}
             else
-                {value= false, final= true})
+                {value= false, final= true},
+			resetTime)
+		res
     }
-
+	
     ## Checks the executionTimeConstraint defined in TADL2.
     ##
     ## Checks, if the time between one start event and the next end event, minus the preemptions, is between lower and upper.
@@ -739,7 +753,7 @@ module TADL2{
     ## ~~~
     def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedLogicValue]:=
         # application of repeat and repetititonConstraint
-        slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1), fourValuedConjunction)
+		fourValuedConjunction(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1))
 
     ## Checks the PeriodicConstraint defined in TADL2.
     ##
