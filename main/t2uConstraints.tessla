@@ -444,8 +444,13 @@ module TADL2{
     ## 47: constraint.value = true
     ## 47: constraint.final = false
     ## ~~~
-
-    def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := {
+    def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := 
+		repeatConstraintReset(e, lower, upper, span, infty)
+	
+	## Checks the RepeatConstraint defined in TADL2.
+	##
+	## Resets a negative output after resetTime. See RepeatConstraint for more information.
+	def repeatConstraintReset[A](e: Events[A], lower: Int, upper: Int, span: Int, resetTime: Int): Events[fourValuedLogicValue] := {
 
         #stored state
         def latestSpanEventTimes: Events[List[Int]]:=
@@ -471,7 +476,7 @@ module TADL2{
         def evaluateTimes := 
             mergeUnit(e, safeDelay(delayPeriod, e))
         
-        stillFulfillabe(
+        stillFulfillabeReset(
             # more than span events occured-> distance to span-1^th event is relevant
             if (List.size(latestSpanEventTimes) > span) then
                 if List.head(latestSpanEventTimes) + lower <= time(evaluateTimes) &&
@@ -484,7 +489,8 @@ module TADL2{
                 if List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
                     {value= true, final= false}
                 else
-                    {value= false, final= true})
+                    {value= false, final= true},
+			resetTime)
         
     }
 
@@ -754,6 +760,15 @@ module TADL2{
     def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedLogicValue]:=
         # application of repeat and repetititonConstraint
 		fourValuedConjunction(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1))
+
+	## Checks the SporadicConstraint defined in TADL2.
+	##
+	## Resets negative output after resetTime. The SporadicConstraint is a conjunction of the 
+	## RepetitionConstraint and the RepeatConstraint and the reset is handled by them individually. 
+	def sporadicConstraintReset[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int, ResetTime: Int): Events[fourValuedLogicValue]:=
+        # application of repeat and repetititonConstraint
+		fourValuedConjunction(repetitionConstraintReset(e, lower, upper, 1, jitter, ResetTime),
+			repeatConstraintReset(e, minDist, infty, 1, ResetTime))
 
     ## Checks the PeriodicConstraint defined in TADL2.
     ##
