@@ -45,6 +45,13 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def PeriodicEventTriggering[A](events: Events[A], patternPeriod: Int, jitter: Int, minInterArrivalTime: Int):=
         TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime)
+	
+	## checks the EventTriggeringConstraint.PeriodicEventTriggering defined in AUTOSAR Timex
+	##
+	## A negative output is resetted after resetTime.
+	def PeriodicEventTriggeringReset[A](events: Events[A], patternPeriod: Int, jitter: Int, 
+			minInterArrivalTime: Int, resetTime: Int):=
+        TADL2.periodicConstraintReset(events, patternPeriod, jitter, minInterArrivalTime, resetTime)
     
     ## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex
     ##
@@ -90,6 +97,14 @@ module AUTOSAR_TIMEX {
     def sporadicEventTriggering[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
             patternPeriod: Int):=
         TADL2.sporadicConstraint (events, patternPeriod, maxInterArrivalTime, jitter, minInterArrivalTime)
+	
+	## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex 
+	## a negative output is resetted after resetTime
+    ##
+	## See sporadicEventTriggering for more information
+	def sporadicEventTriggeringReset[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
+            patternPeriod: Int, resetTime: Int):=
+        TADL2.sporadicConstraintReset(events, patternPeriod, maxInterArrivalTime, jitter, minInterArrivalTime, resetTime)
 
     ## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex
     ##
