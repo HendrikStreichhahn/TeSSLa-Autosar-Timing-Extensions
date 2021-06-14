@@ -1169,7 +1169,13 @@ module TADL2{
             else
                 last(unmatchedStimulusEvents, merge(stimulus, response)),
             Map.empty[Int, Int])
-        def unmatchedStimulusEventsRemoveReset: Events[Map[Int, Int]]:= removeEventsAfterReset(unmatchedStimulusEventsNewStimulus, Map.keys(unmatchedStimulusEventsNewStimulus), time(mergeUnit(stimulus, response)), resetTime)
+        def unmatchedStimulusEventsRemoveReset: Events[Map[Int, Int]]:= 
+			default(
+				removeEventsAfterReset(unmatchedStimulusEventsNewStimulus,
+					Map.keys(unmatchedStimulusEventsNewStimulus),
+					time(mergeUnit(stimulus, response)),
+					resetTime),
+				Map.empty[Int, Int])
         # Map with unmatched stimulus events after response
         def unmatchedStimulusEvents := merge (
             if (defaultTime(stimulus) <= defaultTime(response) &&

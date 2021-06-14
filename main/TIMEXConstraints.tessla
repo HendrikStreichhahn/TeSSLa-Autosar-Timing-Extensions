@@ -194,7 +194,7 @@ module AUTOSAR_TIMEX {
 
         #evaluation
         # distance to x is correct-> current true, false otherwise
-        TADL2.stillFulfillabe(
+        TADL2.stillFulfillable(
             if (lowerBoundX + Map.get(offset, (count(events)-1) % Map.size(offset)) <= time(evaluateTimes) &&
                     time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(events)-1) % Map.size(offset))) then
                 {value= true, final= false}
@@ -349,6 +349,7 @@ module AUTOSAR_TIMEX {
             TADL2.ageConstraintReset(stimulus, response, minimum, maximum, resetTime)
         else
             TADL2.reactionConstraintReset(stimulus, response, minimum, maximum, resetTime)
+			
 
     ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
     ## 
