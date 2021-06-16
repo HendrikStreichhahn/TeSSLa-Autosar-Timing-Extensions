@@ -1,3 +1,8 @@
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
 import java.io.IOException;
 
 public abstract class TimeMeasureConstraint{
@@ -13,7 +18,63 @@ public abstract class TimeMeasureConstraint{
     public abstract TraceSet generateTrace(int eventCount);
     
     public abstract boolean generateTeSSLaFile(String fileName);
-    
+	
+	/**
+	*	Compiles a given TeSSLa Specification to a .jar file
+	* 
+	* @param teSSLaJarPath		The path to the TeSSLa executabale file to use for compiling
+	* @param teSSLaFilePath		The path to the TeSSLa specification that should be compiled
+	* @param outputFilePath		The path to wich the compiled specification should be written
+	* @return 					true if no error occurred, else false
+	*/
+	public boolean compileTeSSLaFile(String teSSLaJarPath, String teSSLaFilePath, String outputFilePath){
+		
+		// start the TeSSLa executable
+		try {
+			Process process = Runtime.getRuntime ().exec
+				("java -jar " + teSSLaJarPath + " compile -j " + outputFilePath + " " + teSSLaFilePath);
+			//get the streams 
+			InputStream stderr = process.getErrorStream ();  
+			InputStream stdout = process.getInputStream ();
+			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
+			BufferedReader stderrReader = new BufferedReader(new InputStreamReader(stderr));
+			//wait for compiler to finish
+			process.waitFor();
+			// check for errors on the streams
+			if (stdout.available() == 0 && stderr.available() == 0){
+				stdoutReader.close();
+				stderrReader.close();
+				return true;
+			}
+			if (stdout.available() != 0){
+				System.out.println("Got stdout from compiler: ");
+				while(stdout.available() != 0)
+					System.out.println(stdoutReader.readLine());
+			}
+			if (stderr.available() != 0){
+				System.out.println("Got stderr from compiler: ");
+				while(stderr.available() != 0)
+					System.out.println(stderrReader.readLine());
+			}
+			stdoutReader.close();
+			stderrReader.close();
+			return false;
+		} catch (IOException e) {
+			System.err.println(e);
+			return false;
+		} catch (InterruptedException e) {
+			System.err.println(e);
+			return false;
+		}
+	}
+
+	/**
+	* Measures the runtime for the individual events on a trace.
+	* 
+	* @param trace The Trace, which is used for monitoring
+	* @param tesslaCommand The command line command used to start the monitoring.
+	* @return Instance of SingleMeasureResult containing the minimal, maximal, complete and average runtime
+	*/
     public SingleMeasureResult measureConstraintSingle(TraceSet trace, String tesslaCommand){
         //start TeSSLa
         TimeMeasureProcessInstance program = null;
@@ -37,7 +98,6 @@ public abstract class TimeMeasureConstraint{
         int eventCount;
         //program.setDebugOutput(true);
         try{
-            
             // first timestamp without waiting
             String tesslaInput = trace.getNextTimestampsEvents();
             traceStrings+= tesslaInput + "\n";
@@ -70,7 +130,6 @@ public abstract class TimeMeasureConstraint{
             }
             
         }
-        
         return new SingleMeasureResult(min, max, completeTime, completeTime/eventCount);
     }
     
