@@ -764,8 +764,8 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
         String[] params = new String[numTraces];
         int jitter = 0;
-        for (int i = 0; i < 100; i++){
-            System.out.println("PatternConstraint1 Trace " + (i+1) + " of " + numTraces);
+        for (int i = 0; i < numTraces; i++){
+            System.out.println("PatternConstraint0 Trace " + (i+1) + " of " + numTraces);
             int[] offset = new int[i+1];
             for (int j = 0; j <= i; j++)
                 offset[j] = j+1;
@@ -800,7 +800,6 @@ public class TimeMeasureAll{
 					return;
 				}
 			}
-			i++;
         }
         //save results to file
         writeResults(outputFileName, results, params);
@@ -1025,7 +1024,6 @@ public class TimeMeasureAll{
 					return;
 				}
 			}
-			i++;
         }
         //save results to file
         writeResults(outputFileName, results, params);
