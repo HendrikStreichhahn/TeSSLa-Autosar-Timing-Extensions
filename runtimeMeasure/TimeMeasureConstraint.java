@@ -67,15 +67,32 @@ public abstract class TimeMeasureConstraint{
 			return false;
 		}
 	}
+	
+	/**
+	* Measures the runtime for the individual events on a trace.
+	* Waits between TeSSLa program start and first event for 5000ms, which is long enough for interpreting on
+	* most modern systems.
+	* 
+	* @param trace The Trace, which is used for monitoring
+	* @param tesslaCommand The command line command used to start the monitoring.
+	* @return Instance of SingleMeasureResult containing the minimal, maximal, complete and average runtime
+	*/
+	public SingleMeasureResult measureConstraintSingle(TraceSet trace, String tesslaCommand){
+		return measureConstraintSingle(trace, tesslaCommand, 5000);
+	}
 
 	/**
 	* Measures the runtime for the individual events on a trace.
 	* 
 	* @param trace The Trace, which is used for monitoring
 	* @param tesslaCommand The command line command used to start the monitoring.
+	* @param waitTimeForProgramReady Time(ms) between sending the command to start the program and the first 
+	*	input. For starting compiled TeSSLa specifications, this parameter should be 500, for interpreted 
+	*	TeSSLa specifications, it should be 5000 (on fast systems, it could be lowered, on slow systems, like 
+	*	Raspberry Pis, it should be increased)
 	* @return Instance of SingleMeasureResult containing the minimal, maximal, complete and average runtime
 	*/
-    public SingleMeasureResult measureConstraintSingle(TraceSet trace, String tesslaCommand){
+    public SingleMeasureResult measureConstraintSingle(TraceSet trace, String tesslaCommand, int waitTimeForProgramReady){
         //start TeSSLa
         TimeMeasureProcessInstance program = null;
         try {
@@ -85,11 +102,14 @@ public abstract class TimeMeasureConstraint{
             return null;
         }
         //sleep 5 seconds-> wait until TeSSLa is ready
-        try{
-            Thread.sleep(5*1000);
-        } catch (InterruptedException e){
-            System.out.println(e);
-        }
+		if (waitTimeForProgramReady != 0) {
+			try{
+				//Thread.sleep(5*1000);
+				Thread.sleep(waitTimeForProgramReady);
+			} catch (InterruptedException e){
+				System.out.println(e);
+			}
+		}
         //measure time per event
         trace.initOutput();
         long completeTime = 0;

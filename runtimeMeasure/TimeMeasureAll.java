@@ -22,52 +22,108 @@ public class TimeMeasureAll{
     }
     
     public static void main(String[] args){
-		boolean compile = false;
-		if (args.length== 0)
-			System.out.println("No parameter is given. Time is measured on interpreted specifications.");
-		else
-			if (args[0].equals("-c")){
-				compile = true;
-				System.out.println("Time is measured on compiled specifications.");
-			}
-			
-		measureDelayConstraint("results/DelayResult.txt", 10000, compile);
-        /*measureStrongDelayConstraint("results/StrongDelayResult.txt", 10000);
-        measureRepeatConstraint("results/RepeatResult.txt", 10000);
-        measureRepetitionConstraint("results/RepetitionResult.txt", 10000);
-        measureSynchronizationConstraint("results/SynchronizationResult.txt", 10000);
-        measureSynchronizationConstraint2("results/SynchronizationResult2.txt", 10000);
-        measureStrongSynchronizationConstraint("results/StrongSynchronizationResult.txt", 10000);
-        measureStrongSynchronizationConstraint2("results/StrongSynchronizationResult2.txt", 10000);
-        measureExecutionTimeConstraint("results/ExecutionTimeResult.txt", 10000);
-        measureOrderConstraint("results/OrderResult.txt", 10000);
-        measureSporadicConstraint("results/SporadicResult.txt", 10000);
-        measurePeriodicConstraint("results/PeriodicResult.txt", 10000);
-        measurePatternConstraint("results/PatternResult.txt", 10000);
-        measurePatternConstraint1("results/Pattern1Result.txt", 10000);
-        measurePatternConstraint2("results/Pattern2Result.txt", 10000);
-        measurePatternConstraint3("results/Pattern3Result.txt", 10000);
-        measureArbitraryConstraint("results/ArbitraryResult.txt", 10000);
-        measureArbitraryConstraint1("results/Arbitrary1Result.txt", 10000);
-        measureArbitraryConstraint2("results/Arbitrary2Result.txt", 10000);
-        measureArbitraryConstraint3("results/Arbitrary3Result.txt", 10000);
-        measureBurstConstraint("results/BurstResult.txt", 10000);
-        measureReactionConstraint("results/ReactionResult.txt", 10000);
-        measureAgeConstraint("results/AgeResult.txt", 10000);
-        measureInputSynchronizationConstraint("results/InputSynchronizationResult.txt", 10000);
-        measureOutputSynchronizationConstraint("results/OutputSynchronizationResult.txt", 10000);
-        measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2.txt", 10000);
-        measureInputSynchronizationConstraint2("results/InputSynchronizationResult2.txt", 10000);
+		boolean compile= false;
+		boolean interpreter = false;
+		for (int i = 0; i < args.length; ++i)
+		{
+			if (args[i].charAt(0) == '-')
+				switch (args[i].charAt(1))
+				{
+					case 'i':
+					case 'I':
+						interpreter = true;
+						break;
+					case 'c':
+					case 'C':
+						compile = true;
+						break;
+				}
+		}
+		if (compile){
+			System.out.println("Start measuring compiled TeSSLa specifications.");
+			measureCompiled();
+		}
+		if (interpreter){
+			System.out.println("Start measuring interpreted TeSSLa specifications.");
+			measureInterpreted();
+		}
+		if (!compile && !interpreter){
+			System.out.println("No Argument given!");
+			System.out.println("usage: java TimeMeasureAll [-c] [-i]");
+			System.out.println("\t [-c] For compiled specifications");
+			System.out.println("\t [-i] For interpreting specifications");
+		}
+	}
+	
+	private static void measureCompiled(){
+		measureDelayConstraint("results/DelayResultCompiled.txt", 10000, true);
+        measureStrongDelayConstraint("results/StrongDelayResultCompiled.txt", 10000, true);
+        measureRepeatConstraint("results/RepeatResultCompiled.txt", 10000, true);
+        measureRepetitionConstraint("results/RepetitionResultCompiled.txt", 10000, true);
+        measureSynchronizationConstraint("results/SynchronizationResultCompiled.txt", 10000, true);
+        measureSynchronizationConstraint2("results/SynchronizationResult2Compiled.txt", 10000, true);
+        measureStrongSynchronizationConstraint("results/StrongSynchronizationResultCompiled.txt", 10000, true);
+        measureStrongSynchronizationConstraint2("results/StrongSynchronizationResult2Compiled.txt", 10000, true);
+        measureExecutionTimeConstraint("results/ExecutionTimeResultCompiled.txt", 10000, true);
+        measureOrderConstraint("results/OrderResultCompiled.txt", 10000, true);
+        measureSporadicConstraint("results/SporadicResultCompiled.txt", 10000, true);
+        measurePeriodicConstraint("results/PeriodicResultCompiled.txt", 10000, true);
+        measurePatternConstraint("results/PatternResultCompiled.txt", 10000, true);
+        measurePatternConstraint1("results/Pattern1ResultCompiled.txt", 10000, true);
+        measurePatternConstraint2("results/Pattern2ResultCompiled.txt", 10000, true);
+        measurePatternConstraint3("results/Pattern3ResultCompiled.txt", 10000, true);
+        measureArbitraryConstraint("results/ArbitraryResultCompiled.txt", 10000, true);
+        measureArbitraryConstraint1("results/Arbitrary1ResultCompiled.txt", 10000, true);
+        measureArbitraryConstraint2("results/Arbitrary2ResultCompiled.txt", 10000, true);
+        measureArbitraryConstraint3("results/Arbitrary3ResultCompiled.txt", 10000, true);
+        measureBurstConstraint("results/BurstResultCompiled.txt", 10000, true);
+        measureReactionConstraint("results/ReactionResultCompiled.txt", 10000, true);
+        measureAgeConstraint("results/AgeResultCompiled.txt", 10000, true);
+        measureInputSynchronizationConstraint("results/InputSynchronizationResultCompiled.txt", 10000, true);
+        measureOutputSynchronizationConstraint("results/OutputSynchronizationResultCompiled.txt", 10000, true);
+        measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2Compiled.txt", 10000, true);
+        measureInputSynchronizationConstraint2("results/InputSynchronizationResult2Compiled.txt", 10000, true);
         
-        measureCheckEventChain("results/CheckEventChainResult.txt", 10000);*/
+        measureCheckEventChain("results/CheckEventChainResultCompiled.txt", 10000, true);
+	}
+	
+	private static void measureInterpreted(){
+		measureDelayConstraint("results/DelayResultInterpreted.txt", 10000, false);
+        measureStrongDelayConstraint("results/StrongDelayResultInterpreted.txt", 10000, false);
+        measureRepeatConstraint("results/RepeatResultInterpreted.txt", 10000, false);
+        measureRepetitionConstraint("results/RepetitionResultInterpreted.txt", 10000, false);
+        measureSynchronizationConstraint("results/SynchronizationResultInterpreted.txt", 10000, false);
+        measureSynchronizationConstraint2("results/SynchronizationResult2Interpreted.txt", 10000, false);
+        measureStrongSynchronizationConstraint("results/StrongSynchronizationResultInterpreted.txt", 10000, false);
+        measureStrongSynchronizationConstraint2("results/StrongSynchronizationResult2Interpreted.txt", 10000, false);
+        measureExecutionTimeConstraint("results/ExecutionTimeResultInterpreted.txt", 10000, false);
+        measureOrderConstraint("results/OrderResultInterpreted.txt", 10000, false);
+        measureSporadicConstraint("results/SporadicResultInterpreted.txt", 10000, false);
+        measurePeriodicConstraint("results/PeriodicResultInterpreted.txt", 10000, false);
+        measurePatternConstraint("results/PatternResultInterpreted.txt", 10000, false);
+        measurePatternConstraint1("results/Pattern1ResultInterpreted.txt", 10000, false);
+        measurePatternConstraint2("results/Pattern2ResultInterpreted.txt", 10000, false);
+        measurePatternConstraint3("results/Pattern3ResultInterpreted.txt", 10000, false);
+        measureArbitraryConstraint("results/ArbitraryResultInterpreted.txt", 10000, false);
+        measureArbitraryConstraint1("results/Arbitrary1ResultInterpreted.txt", 10000, false);
+        measureArbitraryConstraint2("results/Arbitrary2ResultInterpreted.txt", 10000, false);
+        measureArbitraryConstraint3("results/Arbitrary3ResultInterpreted.txt", 10000, false);
+        measureBurstConstraint("results/BurstResultInterpreted.txt", 10000, false);
+        measureReactionConstraint("results/ReactionResultInterpreted.txt", 10000, false);
+        measureAgeConstraint("results/AgeResultInterpreted.txt", 10000, false);
+        measureInputSynchronizationConstraint("results/InputSynchronizationResultInterpreted.txt", 10000, false);
+        measureOutputSynchronizationConstraint("results/OutputSynchronizationResultInterpreted.txt", 10000, false);
+        measureOutputSynchronizationConstraint2("results/OutputSynchronizationResult2Interpreted.txt", 10000, false);
+        measureInputSynchronizationConstraint2("results/InputSynchronizationResult2Interpreted.txt", 10000, false);
         
-    }
+        measureCheckEventChain("results/CheckEventChainResultInterpreted.txt", 10000, false);
+	}
     
     //static final String PATHTOTESSLA = "java -Xmx1024m -Xss1024m -jar ../../tessla-assembly-1.2.2.jar interpreter";
     static final String PATHTOTESSLA = "../../tessla-assembly-1.2.2.jar";
     
-    private static void measureJustOutput(String outputFileName, int traceSize){
-        /*final String TESSLAFILEPATH = "tmp/JustOutputTimeMeasure.tessla";
+    private static void measureJustOutput(String outputFileName, int traceSize, boolean compiled){
+        final String TESSLAFILEPATH = "tmp/JustOutputTimeMeasure.tessla";
         final int traceCount = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
@@ -77,17 +133,36 @@ public class TimeMeasureAll{
             TimeMeasureJustOutput constraint = new TimeMeasureJustOutput();
             TraceSet trace = constraint.generateTrace(traceSize);
             //generate TesslaFile
-            if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                System.out.println(TESSLAFILEPATH + " could not be created!");
-            //measure time per event
-            results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-            if (results[i] == null){
-                System.out.println("result is null");
-                return;
-            }
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/JustOutputTimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
         }
         //save results to file
-        writeResults(outputFileName, results, params);*/
+        writeResults(outputFileName, results, params);
     }
     
     private static void measureDelayConstraint(String outputFileName, int traceSize, boolean compiled){
@@ -106,8 +181,10 @@ public class TimeMeasureAll{
 					new TimeMeasureDelayConstraint(lower, upper, sourceDistance);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
                     System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
 				if (compiled){
 					final String COMPILED_SPEC_PATH = "tmp/DelayConstraintTimeMeasure.jar";
 					constraint.compileTeSSLaFile(PATHTOTESSLA, 
@@ -115,7 +192,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH);
+						"java -jar " + COMPILED_SPEC_PATH, 500);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -130,7 +207,6 @@ public class TimeMeasureAll{
 						return;
 					}
 				}
-
                 i++;
                     
             }
@@ -139,37 +215,56 @@ public class TimeMeasureAll{
     }
 
     
-    /*private static void measureStrongDelayConstraint(String outputFileName, int traceSize){
+    private static void measureStrongDelayConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/StrongDelayConstraintTimeMeasure.tessla";
         final int traceCount = 102;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
         int i = 0;
         for (int lower = 100; lower <= 1000; lower += 100)
-                for (int sourceDistance = 1; sourceDistance <= 2*lower; sourceDistance*= 2){
-                    int upper = lower;
-                    System.out.println("StrongDelayConstraint Trace " + (i+1) + " of " + traceCount);
-                    params[i] = ("lower = " + lower + " upper = " + upper + " sourceDistance = " + sourceDistance);
-                    System.out.println(params[i]);
-                    TimeMeasureStrongDelayConstraint constraint = new TimeMeasureStrongDelayConstraint(lower, upper, sourceDistance);
-                    TraceSet trace = constraint.generateTrace(traceSize);
-                    //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null){
-                        System.out.println("result is null");
-                        return;
-                    }
-                    i++;
-                    
+			for (int sourceDistance = 1; sourceDistance <= 2*lower; sourceDistance*= 2){
+				int upper = lower;
+				System.out.println("StrongDelayConstraint Trace " + (i+1) + " of " + traceCount);
+				params[i] = ("lower = " + lower + " upper = " + upper + " sourceDistance = " + sourceDistance);
+				System.out.println(params[i]);
+				TimeMeasureStrongDelayConstraint constraint = 
+					new TimeMeasureStrongDelayConstraint(lower, upper, sourceDistance);
+				TraceSet trace = constraint.generateTrace(traceSize);
+				//generate TesslaFile
+				//generate TesslaFile
+                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+                    System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/StrongDelayConstraintTimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+                i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureRepeatConstraint(String outputFileName, int traceSize){
+    private static void measureRepeatConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/RepeatConstraintTimeMeasure.tessla";
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
@@ -186,20 +281,39 @@ public class TimeMeasureAll{
                         span);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    System.out.println(results[i]);
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/RepeatConstraintTimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureRepetitionConstraint(String outputFileName, int traceSize){
+    private static void measureRepetitionConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/RepetitionConstraintTimeMeasure.tessla";
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
@@ -217,20 +331,40 @@ public class TimeMeasureAll{
                     TimeMeasureRepetitionConstraint constraint = new TimeMeasureRepetitionConstraint(lower,
                         upper, span, jitter);
                     TraceSet trace = constraint.generateTrace(traceSize);
-                    //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    i++;
+					//generate TesslaFile
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/RepetitionConstraintTimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureSynchronizationConstraint(String outputFileName, int traceSize){
+    private static void measureSynchronizationConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/SynchronizationConstraintTimeMeasure.tessla";
         int numTraces = 16;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
@@ -240,29 +374,52 @@ public class TimeMeasureAll{
         int clusterDistance = 64;
         int tolerance = 2;
         for (int numStreams = 2; numStreams <= 32; numStreams+= 2){
-                        System.out.println("Synchronization Trace " + (i+1) + " of " + numTraces);
-                        params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
-                            " maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
-                            + clusterDistance;
-                        System.out.println(params[i]);
-                        TimeMeasureSynchronizationConstraint constraint = 
-                            new TimeMeasureSynchronizationConstraint(tolerance, numStreams,
-                                maxEventsPerCluster, clusterDistance, clusterDistance);
-                        TraceSet trace = constraint.generateTrace(traceSize);
-                        //generate TesslaFile
-                        if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                            System.out.println(TESSLAFILEPATH + " could not be created!");
-                        //measure time per event
-                        results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA +
-                            " " + TESSLAFILEPATH);
-                        System.out.println(results[i]);
-                        i++;
-                    }
+			System.out.println("Synchronization Trace " + (i+1) + " of " + numTraces);
+			params[i] = "|event| = " + numStreams + " tolerance = " + tolerance +
+				" maxEventsPerCluster = " + maxEventsPerCluster + " clusterDistance = "
+				+ clusterDistance;
+			System.out.println(params[i]);
+			TimeMeasureSynchronizationConstraint constraint = 
+				new TimeMeasureSynchronizationConstraint(tolerance, numStreams,
+					maxEventsPerCluster, clusterDistance, clusterDistance);
+			TraceSet trace = constraint.generateTrace(traceSize);
+			//generate TesslaFile
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+			//generate TesslaFile
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/SynchronizationConstraint1TimeMeasureConstraintTimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
+		}
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureSynchronizationConstraint2(String outputFileName, int traceSize){
+    private static void measureSynchronizationConstraint2(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/SynchronizationConstraintTimeMeasure2.tessla";
         int numTraces = 116;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
@@ -282,19 +439,39 @@ public class TimeMeasureAll{
                         maxEventsPerCluster, clusterDistance, clusterDistance);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA +
-                    " " + TESSLAFILEPATH);
-                System.out.println(results[i]);
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/SynchronizationConstraint2TimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureStrongSynchronizationConstraint(String outputFileName, int traceSize){
+    private static void measureStrongSynchronizationConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/StrongSynchronizationConstraintTimeMeasure.tessla";
         int traceCount = 116;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -311,19 +488,39 @@ public class TimeMeasureAll{
                             clusterDistance, clusterDistance);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA +
-                        " " + TESSLAFILEPATH);
-                    System.out.println(results[i]);
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/StrongSynchronizationConstraint1TimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureStrongSynchronizationConstraint2(String outputFileName, int traceSize){
+    private static void measureStrongSynchronizationConstraint2(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/StrongSynchronizationConstraintTimeMeasure2.tessla";
         int traceCount = 16;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -340,21 +537,41 @@ public class TimeMeasureAll{
                         new TimeMeasureStrongSynchronizationConstraint(tolerance, numStreams,
                             clusterDistance, clusterDistance);
                     TraceSet trace = constraint.generateTrace(traceSize);
-                    //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA +
-                        " " + TESSLAFILEPATH);
-                    System.out.println(results[i]);
-                    i++;
+					//generate TesslaFile
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/StrongSynchronizationConstraint2TimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }    
 
     
-    private static void measureExecutionTimeConstraint(String outputFileName, int traceSize){
+    private static void measureExecutionTimeConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/ExecutionTimeConstraintTimeMeasure.tessla";
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
@@ -371,18 +588,39 @@ public class TimeMeasureAll{
                     TraceSet trace = constraint.generateTrace(traceSize, lower, upper, numPreemptions,
                         upper);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " "
-                        + TESSLAFILEPATH);
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/ExecutionTimeConstraintTimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureOrderConstraint(String outputFileName, int traceSize){
+    private static void measureOrderConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/OrderTimeMeasure.tessla";
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
@@ -396,17 +634,39 @@ public class TimeMeasureAll{
                 TimeMeasureOrderConstraint constraint = new TimeMeasureOrderConstraint();
                 TraceSet trace = constraint.generateTrace(traceSize, maxDistSource, maxDistSourceTarget);     
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/OrderConstraintTimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureSporadicConstraint(String outputFileName, int traceSize){
+    private static void measureSporadicConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/SporadicConstraintTimeMeasure.tessla";
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
@@ -421,19 +681,39 @@ public class TimeMeasureAll{
                         upper, jitter);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/SporadicConstraintTimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measurePeriodicConstraint(String outputFileName, int traceSize){
+    private static void measurePeriodicConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/PeriodicConstraintTimeMeasure.tessla";
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
@@ -446,19 +726,39 @@ public class TimeMeasureAll{
                         jitter);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/PeriodicConstraintTimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measurePatternConstraint(String outputFileName, int traceSize){
+    private static void measurePatternConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/PatternConstraintTimeMeasure.tessla";
         int numTraces = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
@@ -473,19 +773,40 @@ public class TimeMeasureAll{
             params[i] = "period= " + period + " |offset|= " + (i+1) + " jitter=0";
             TimeMeasurePatternConstraint constraint = new TimeMeasurePatternConstraint(period, offset, jitter);
             TraceSet trace = constraint.generateTrace(traceSize);
-                //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                if (results[i] == null)
-                    return;
+			//generate TesslaFile
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/PatternConstraint0TimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
         }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measurePatternConstraint1(String outputFileName, int traceSize){
+    private static void measurePatternConstraint1(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/PatternConstraintTimeMeasure1.tessla";
         
         int numTraces = 5*5*5;
@@ -508,19 +829,39 @@ public class TimeMeasureAll{
                         offset, jitter);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/PatternConstraint1TimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measurePatternConstraint2(String outputFileName, int traceSize){
+    private static void measurePatternConstraint2(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/PatternConstraintTimeMeasure2.tessla";
         
         int numTraces = 5*5*5;
@@ -545,19 +886,39 @@ public class TimeMeasureAll{
                         offset, jitter);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/PatternConstraint2TimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measurePatternConstraint3(String outputFileName, int traceSize){
+    private static void measurePatternConstraint3(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/PatternConstraintTimeMeasure3.tessla";
         
         int numTraces = 5*3*3*3;
@@ -587,19 +948,39 @@ public class TimeMeasureAll{
                             offset, jitter);
                         TraceSet trace = constraint.generateTrace(traceSize);
                         //generate TesslaFile
-                        if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                            System.out.println(TESSLAFILEPATH + " could not be created!");
-                        //measure time per event
-                        results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                        if (results[i] == null)
-                            return;
-                        i++;
+						if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+							System.out.println(TESSLAFILEPATH + " could not be created!");
+							return;
+						}
+						if (compiled){
+							final String COMPILED_SPEC_PATH = "tmp/PatternConstraint3TimeMeasure.jar";
+							constraint.compileTeSSLaFile(PATHTOTESSLA, 
+								TESSLAFILEPATH, 
+								COMPILED_SPEC_PATH);
+							//measure time per event
+							results[i] = constraint.measureConstraintSingle(trace, 
+								"java -jar " + COMPILED_SPEC_PATH, 500);
+							if (results[i] == null){
+								System.out.println("result is null");
+								return;
+							}
+						} else {
+							//measure time per event
+							results[i] = constraint.measureConstraintSingle(trace,
+								"java -jar " + PATHTOTESSLA + " interpreter " + 
+								TESSLAFILEPATH);
+							if (results[i] == null){
+								System.out.println("result is null");
+								return;
+							}
+						}
+						i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureArbitraryConstraint(String outputFileName, int traceSize){
+    private static void measureArbitraryConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/ArbitraryConstraintTimeMeasure.tessla";
         int numTraces = 60;
         SingleMeasureResult[] results = new SingleMeasureResult[numTraces];
@@ -618,18 +999,39 @@ public class TimeMeasureAll{
             TimeMeasureArbitraryConstraint constraint = new TimeMeasureArbitraryConstraint(minimum, maximum);
             TraceSet trace = constraint.generateTrace(traceSize);
             //generate TesslaFile
-            if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                System.out.println(TESSLAFILEPATH + " could not be created!");
-            //measure time per event
-            results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-            if (results[i] == null)
-                return;
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/ArbitraryConstraint0TimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
         }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureArbitraryConstraint1(String outputFileName, int traceSize){
+    private static void measureArbitraryConstraint1(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/ArbitraryConstraintTimeMeasure1.tessla";
         final int traceCount = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -651,20 +1053,40 @@ public class TimeMeasureAll{
                 TimeMeasureArbitraryConstraint constraint = new TimeMeasureArbitraryConstraint(minimum, maximum);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                if (results[i] == null)
-                    return;
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/ArbitraryConstraint1TimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             }
 
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureArbitraryConstraint2(String outputFileName, int traceSize){
+    private static void measureArbitraryConstraint2(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/ArbitraryConstraintTimeMeasure2.tessla";
         final int traceCount = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -688,19 +1110,39 @@ public class TimeMeasureAll{
                 TimeMeasureArbitraryConstraint constraint = new TimeMeasureArbitraryConstraint(minimum, maximum);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                if (results[i] == null)
-                    return;
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/ArbitraryConstraint2TimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureArbitraryConstraint3(String outputFileName, int traceSize){
+    private static void measureArbitraryConstraint3(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/ArbitraryConstraintTimeMeasure3.tessla";
         final int traceCount = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -726,19 +1168,39 @@ public class TimeMeasureAll{
                 TimeMeasureArbitraryConstraint constraint = new TimeMeasureArbitraryConstraint(minimum, maximum);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                if (results[i] == null)
-                    return;
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/ArbitraryConstraint3TimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureBurstConstraint(String outputFileName, int traceSize){
+    private static void measureBurstConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/BurstConstraintTimeMeasure.tessla";
         final int traceCount = 100;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -752,19 +1214,39 @@ public class TimeMeasureAll{
             TimeMeasureBurstConstraint constraint = new TimeMeasureBurstConstraint(length, maxOccurrences);
             TraceSet trace = constraint.generateTrace(traceSize);
             //generate TesslaFile
-            if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                System.out.println(TESSLAFILEPATH + " could not be created!");
-            //measure time per event
-            results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-            if (results[i] == null)
-                return;
-            i++;
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/BurstConstraintTimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
         }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureReactionConstraint(String outputFileName, int traceSize){
+    private static void measureReactionConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/ReactionConstraintTimeMeasure.tessla";
         final int traceCount = 102;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -779,19 +1261,39 @@ public class TimeMeasureAll{
                     maximum, stimulusDistance, stimulusDistance);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                if (results[i] == null)
-                    return;
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/ReactionConstraintTimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             } 
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureAgeConstraint(String outputFileName, int traceSize){
+    private static void measureAgeConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/AgeConstraintTimeMeasure.tessla";
         final int traceCount = 102;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -808,21 +1310,40 @@ public class TimeMeasureAll{
                         maximum, stimulusDistance, stimulusDistance);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    System.out.println(results[i]);
-                    if (results[i] == null)
-                        return;
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/AgeConstraintTimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 } 
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
     
-    private static void measureOutputSynchronizationConstraint(String outputFileName, int traceSize){
+    private static void measureOutputSynchronizationConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/OutputSynchronizationConstraintTimeMeasure.tessla";
         final int traceCount = 148;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -841,20 +1362,39 @@ public class TimeMeasureAll{
                             tolerance);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    System.out.println(results[i]);
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/OutputSynchronizationConstraint1TimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureOutputSynchronizationConstraint2(String outputFileName, int traceSize){
+    private static void measureOutputSynchronizationConstraint2(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/OutputSynchronizationConstraintTimeMeasure2.tessla";
         final int traceCount = 31;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -863,32 +1403,50 @@ public class TimeMeasureAll{
         int clusterDistance = 64;
         int tolerance = 2;
         for (int streamCount = 2; streamCount <= 32; streamCount+=1){
-                    System.out.println("OutputSynchronizationConstraint2 Trace " + (i+1) + " of "
-                        + traceCount);
-                    params[i] = "responseCount: " + streamCount + " tolerance: " + tolerance + 
-                        " clusterDistance: " + clusterDistance;
-                    System.out.println(params[i]);
-                    TimeMeasureOutputSynchronizationConstraint constraint =
-                        new TimeMeasureOutputSynchronizationConstraint(streamCount, clusterDistance,
-                            tolerance);
-                    TraceSet trace = constraint.generateTrace(traceSize);
-                    //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    System.out.println(results[i]);
-                    if (results[i] == null)
-                        return;
-                    System.out.println(results[i]);
-                    i++;
-                }
+			System.out.println("OutputSynchronizationConstraint2 Trace " + (i+1) + " of "
+				+ traceCount);
+			params[i] = "responseCount: " + streamCount + " tolerance: " + tolerance + 
+				" clusterDistance: " + clusterDistance;
+			System.out.println(params[i]);
+			TimeMeasureOutputSynchronizationConstraint constraint =
+				new TimeMeasureOutputSynchronizationConstraint(streamCount, clusterDistance,
+					tolerance);
+			TraceSet trace = constraint.generateTrace(traceSize);
+			//generate TesslaFile
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/OutputSynchronizationConstraint2TimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
+		}
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
     
-    private static void measureInputSynchronizationConstraint(String outputFileName, int traceSize){
+    private static void measureInputSynchronizationConstraint(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/InputSynchronizationConstraintTimeMeasure.tessla";
         final int traceCount = 148;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -907,20 +1465,39 @@ public class TimeMeasureAll{
                             tolerance);
                     TraceSet trace = constraint.generateTrace(traceSize);
                     //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    System.out.println(results[i]);
-                    i++;
+					if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+						System.out.println(TESSLAFILEPATH + " could not be created!");
+						return;
+					}
+					if (compiled){
+						final String COMPILED_SPEC_PATH = "tmp/InputSynchronizationConstraint1TimeMeasure.jar";
+						constraint.compileTeSSLaFile(PATHTOTESSLA, 
+							TESSLAFILEPATH, 
+							COMPILED_SPEC_PATH);
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace, 
+							"java -jar " + COMPILED_SPEC_PATH, 500);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					} else {
+						//measure time per event
+						results[i] = constraint.measureConstraintSingle(trace,
+							"java -jar " + PATHTOTESSLA + " interpreter " + 
+							TESSLAFILEPATH);
+						if (results[i] == null){
+							System.out.println("result is null");
+							return;
+						}
+					}
+					i++;
                 }
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-        private static void measureInputSynchronizationConstraint2(String outputFileName, int traceSize){
+        private static void measureInputSynchronizationConstraint2(String outputFileName, int traceSize, boolean compiled){
         final String TESSLAFILEPATH = "tmp/InputSynchronizationConstraintTimeMeasure2.tessla";
         final int traceCount = 64;
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
@@ -929,29 +1506,48 @@ public class TimeMeasureAll{
         int clusterDistance = 64;
         int tolerance = 2;
         for (int streamCount = 2; streamCount <= 128; streamCount+=2){
-                    System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
-                        + traceCount);
-                    params[i] = "stimulusCount: " + streamCount + " tolerance: " + tolerance + 
-                        " clusterDistance: " + clusterDistance;
-                    TimeMeasureInputSynchronizationConstraint constraint =
-                        new TimeMeasureInputSynchronizationConstraint(streamCount, clusterDistance,
-                            tolerance);
-                    TraceSet trace = constraint.generateTrace(traceSize);
-                    //generate TesslaFile
-                    if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                        System.out.println(TESSLAFILEPATH + " could not be created!");
-                    //measure time per event
-                    results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                    if (results[i] == null)
-                        return;
-                    System.out.println(results[i]);
-                    i++;
-                }
+			System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
+				+ traceCount);
+			params[i] = "stimulusCount: " + streamCount + " tolerance: " + tolerance + 
+				" clusterDistance: " + clusterDistance;
+			TimeMeasureInputSynchronizationConstraint constraint =
+				new TimeMeasureInputSynchronizationConstraint(streamCount, clusterDistance,
+					tolerance);
+			TraceSet trace = constraint.generateTrace(traceSize);
+			//generate TesslaFile
+			if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+				System.out.println(TESSLAFILEPATH + " could not be created!");
+				return;
+			}
+			if (compiled){
+				final String COMPILED_SPEC_PATH = "tmp/InputSynchronizationConstraint2TimeMeasure.jar";
+				constraint.compileTeSSLaFile(PATHTOTESSLA, 
+					TESSLAFILEPATH, 
+					COMPILED_SPEC_PATH);
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace, 
+					"java -jar " + COMPILED_SPEC_PATH, 500);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			} else {
+				//measure time per event
+				results[i] = constraint.measureConstraintSingle(trace,
+					"java -jar " + PATHTOTESSLA + " interpreter " + 
+					TESSLAFILEPATH);
+				if (results[i] == null){
+					System.out.println("result is null");
+					return;
+				}
+			}
+			i++;
+		}
         //save results to file
         writeResults(outputFileName, results, params);
     }
     
-    private static void measureCheckEventChain(String outputFileName, int traceSize){
+    private static void measureCheckEventChain(String outputFileName, int traceSize, boolean compiled){
         
         final String TESSLAFILEPATH = "tmp/CheckEventChainTimeMeasure.tessla";
         final int traceCount = 102;
@@ -967,17 +1563,37 @@ public class TimeMeasureAll{
                     maximum, stimulusDistance, stimulusDistance);
                 TraceSet trace = constraint.generateTrace(traceSize);
                 //generate TesslaFile
-                if (!constraint.generateTeSSLaFile(TESSLAFILEPATH))
-                    System.out.println(TESSLAFILEPATH + " could not be created!");
-                //measure time per event
-                results[i] = constraint.measureConstraintSingleInterpreter(trace, PATHTOTESSLA + " " + TESSLAFILEPATH);
-                if (results[i] == null)
-                    return;
-                i++;
+				if (!constraint.generateTeSSLaFile(TESSLAFILEPATH)){
+					System.out.println(TESSLAFILEPATH + " could not be created!");
+					return;
+				}
+				if (compiled){
+					final String COMPILED_SPEC_PATH = "tmp/CheckEventChainTimeMeasure.jar";
+					constraint.compileTeSSLaFile(PATHTOTESSLA, 
+						TESSLAFILEPATH, 
+						COMPILED_SPEC_PATH);
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace, 
+						"java -jar " + COMPILED_SPEC_PATH, 500);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				} else {
+					//measure time per event
+					results[i] = constraint.measureConstraintSingle(trace,
+						"java -jar " + PATHTOTESSLA + " interpreter " + 
+						TESSLAFILEPATH);
+					if (results[i] == null){
+						System.out.println("result is null");
+						return;
+					}
+				}
+				i++;
             } 
         //save results to file
         writeResults(outputFileName, results, params);
-    }*/
+    }
     
     private static SingleMeasureResult overallAverage(SingleMeasureResult[] results){
         long min = 0;
