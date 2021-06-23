@@ -1,6 +1,7 @@
 module TADL2{
     ## nodoc
-    def infty : Int := 9223372036854775807
+    def pseudoInfty : Int := 9223372036854775807
+    #def infty : Int := 9223372036854775807
 
     ## Four valued logic value
     ##
@@ -25,13 +26,13 @@ module TADL2{
     # time of the event, or 0, if there wasn't an event before
     ## nodoc
     def defaultTime[T](stream: Events[T]): Events[Int]:=
-        default(time(stream), -infty)
+        default(time(stream), -1)
         
     # searchest for the smallest value in a [Int, Int]-map
     ## nodoc
     def mapMinimumValueRec(aMap: Map[Int, Int], keys: List[Int]) : Int :=
         if (List.size(keys) == 0) then
-            infty
+            pseudoInfty
         else
             min(Map.get(aMap, List.head(keys)),
                 mapMinimumValueRec(aMap, List.tail(keys)))
@@ -106,7 +107,7 @@ module TADL2{
     # delay, but delay is infty, if delay value is negative
     ## nodoc
     def safeDelay[T](delays: Events[Int], resets: Events[T]): Events[Unit] :=
-        delay(if(delays > 0) then delays else infty, resets)
+		delay(if(delays > 0) then delays else pseudoInfty - time(delays), resets)
         
     #removes all list elements, that are smaller than A from the list
     # list must be in ascending order
@@ -187,7 +188,7 @@ module TADL2{
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
             safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
-                    infty
+                    -1
                 else
                     List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
                 mergeUnit(source, target)))
@@ -267,14 +268,14 @@ module TADL2{
                         unfinishedSourceTimesNewSource
                 else
                     # removing not possible-> insert event, that triggers {value= false, final= true}
-                    List.append(List.empty[Int], -infty)
+                    List.append(List.empty[Int], -pseudoInfty)
             else
                 unfinishedSourceTimesNewSource
 
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
             safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
-                    infty
+                    -1
                 else
                     List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
                 mergeUnit(source, target)))
@@ -347,7 +348,6 @@ module TADL2{
     ## 47: constraint.value = true
     ## 47: constraint.final = false
     ## ~~~
-
     def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := {
 
         #stored state
@@ -366,10 +366,13 @@ module TADL2{
         
         # timestamps, in which the evaluation occurs
         def delayPeriod :=
-            if (defaultTime(e) == defaultTime(firstEvent(e))) then
-                List.head(latestSpanEventTimes) + upper - time(e) + 1
-            else
-                List.head(List.tail(latestSpanEventTimes)) + upper - time(e) + 1
+			if (upper == pseudoInfty || upper < 0) then
+				-1
+			else
+				if (defaultTime(e) == defaultTime(firstEvent(e))) then
+					List.head(latestSpanEventTimes) + upper - time(e) + 1
+				else
+					List.head(List.tail(latestSpanEventTimes)) + upper - time(e) + 1
         
         def evaluateTimes := 
             mergeUnit(e, safeDelay(delayPeriod, e))
@@ -378,13 +381,13 @@ module TADL2{
             # more than span events occured-> distance to span-1^th event is relevant
             if (List.size(latestSpanEventTimes) > span) then
                 if List.head(latestSpanEventTimes) + lower <= time(evaluateTimes) &&
-                        List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
+                        (upper == pseudoInfty || List.head(latestSpanEventTimes) + upper >= time(evaluateTimes)) then
                     {value= true, final= false}
                 else
                     {value= false, final= true}
             else
                 # less than span events occurred-> first event must be younger than upper
-                if List.head(latestSpanEventTimes) + upper >= time(evaluateTimes) then
+                if (upper == pseudoInfty || List.head(latestSpanEventTimes) + upper >= time(evaluateTimes)) then
                     {value= true, final= false}
                 else
                     {value= false, final= true})
@@ -531,7 +534,7 @@ module TADL2{
                                                     time(inputTimes) != defaultTime(preempt)) then
                                                 upper - execTime + 1
                                             else
-                                                infty, inputTimes))
+                                                -1, inputTimes))
 
         # evaluation
         def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
@@ -591,7 +594,7 @@ module TADL2{
         stillFulfillabe(
             #number of events on both streams equal-> currently true
             if count(source) == count(target) then
-                if (defaultTime(source) == defaultTime(target) && defaultTime(source) != -infty) then
+                if (defaultTime(source) == defaultTime(target) && defaultTime(source) != -1) then
                     {value= false, final= true}
                 else
                     {value= true, final= false}
@@ -642,7 +645,7 @@ module TADL2{
     ## ~~~
     def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedLogicValue]:=
         # application of repeat and repetititonConstraint
-        slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, infty, 1), fourValuedConjunction)
+        slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, pseudoInfty, 1), fourValuedConjunction)
 
     ## Checks the PeriodicConstraint defined in TADL2.
     ##
@@ -831,7 +834,7 @@ module TADL2{
     ## ~~~
     def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[fourValuedLogicValue] :=
         # application of repeatConstraint
-        slift(repeatConstraint(e, length, infty, maxOccurences), repeatConstraint(e, minDist, infty, 1),
+        slift(repeatConstraint(e, length, pseudoInfty, maxOccurences), repeatConstraint(e, minDist, pseudoInfty, 1),
             fourValuedConjunction)
 
     ## Checks the patternConstraint defined in TADL2.
@@ -925,7 +928,7 @@ module TADL2{
             else
                 {value= false, final= true},
             # application of the repeatConstraint
-            repeatConstraint(e, minDist, infty, 1),
+            repeatConstraint(e, minDist, pseudoInfty, 1),
             fourValuedConjunction)
     }
 
@@ -1355,7 +1358,7 @@ module TADL2{
             
         def timeOldestUnfulfilledEvent(storedEvents: List[SynchronizationEventInfo]): Int :=
             if (List.size(storedEvents) == 0) then
-                infty
+                pseudoInfty
             else
                 if !List.head(storedEvents).fulfilled then
                     List.head(storedEvents).eventTime
@@ -1369,7 +1372,7 @@ module TADL2{
         #Evaluation
         #no unfullfilled event-> current true
         stillFulfillabe(
-            if (slift1(storedEvents, timeOldestUnfulfilledEvent) == infty) then
+            if (slift1(storedEvents, timeOldestUnfulfilledEvent) == pseudoInfty) then
                 {value= true, final= false}
             else
                 #check, if all removed events are fulfilled(had a cluster)-> current false, but not final
@@ -1908,7 +1911,7 @@ module TADL2{
                 safeDelay(if (List.size(activeClusters) != 0) then
                          List.head(activeClusters).startTime+ tolerance - time(eventIndices)+1
                      else
-                        infty, eventIndices)))
+                        -1, eventIndices)))
         
         #no unfulfilled clusters-> current true
         stillFulfillabe(if List.size(activeClusters) == 0 then
@@ -2509,7 +2512,7 @@ module TADL2{
         liftable def startTimeOldestCluster(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster],
                 keys: List[Int]): Int :=
             if (List.size(keys) == 0) then
-                infty
+                pseudoInfty
             else
                 min(Map.get(storedClustersBeforeRemove, List.head(keys)).startTime,
                     startTimeOldestCluster(storedClustersBeforeRemove, List.tail(keys)))
@@ -2866,25 +2869,25 @@ module TADL2{
         def timeOldestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
             #static if (Map.size(latestEvents) == 0 || List.size(remainingKeys) == 0) then
             if (List.size(remainingKeys) == 0) then
-                infty
+                pseudoInfty
             else
                 if (Map.contains(Map.get(latestEvents, List.head(remainingKeys)), color)) then
                     min(Map.get(Map.get(latestEvents, List.head(remainingKeys)), color),
                         timeOldestEvent(latestEvents, color, List.tail(remainingKeys)))
                 else
-                    -infty
+                    -pseudoInfty
 
         # time of the youngest event of the given color
         def timeYoungestEvent(latestEvents: Map[Int, Map[Int, Int]], color: Int, remainingKeys: List[Int]): Int :=
             #static if (Map.size(latestEvents) == 0 || List.size(remainingKeys) == 0) then
             if (List.size(remainingKeys) == 0) then
-                -infty
+                -pseudoInfty
             else
                 if (Map.contains(Map.get(latestEvents, List.head(remainingKeys)), color)) then
                     max(Map.get(Map.get(latestEvents, List.head(remainingKeys)), color),
                         timeYoungestEvent(latestEvents, color, List.tail(remainingKeys)))
                 else
-                    infty
+                    pseudoInfty
 
         # checks, if the synchronization cluster for the given color is fulfilled
         def clusterFulfilled(latestEventTimes: Map[Int, Map[Int, Int]], color: Int, tolerance: Int) : Bool =

@@ -1,0 +1,9 @@
+include "../main/t2uConstraints.tessla"
+
+in e: Events[Unit]
+
+def lower = 5
+def upper = TADL2.pseudoInfty
+def span = 2
+
+out TADL2.repeatConstraint(e, lower, upper, span)
