@@ -30,11 +30,11 @@ public abstract class TimeMeasureConstraint{
 	public boolean compileTeSSLaFile(String teSSLaJarPath, String teSSLaFilePath, String outputFilePath){
 		
 		// start the TeSSLa executable
-		try {
+		try {            
 			Process process = Runtime.getRuntime ().exec
 				("java -jar " + teSSLaJarPath + " compile -j " + outputFilePath + " " + teSSLaFilePath);
 			//get the streams 
-			InputStream stderr = process.getErrorStream ();  
+			InputStream stderr = process.getErrorStream ();
 			InputStream stdout = process.getInputStream ();
 			BufferedReader stdoutReader = new BufferedReader(new InputStreamReader(stdout));
 			BufferedReader stderrReader = new BufferedReader(new InputStreamReader(stderr));
@@ -60,9 +60,11 @@ public abstract class TimeMeasureConstraint{
 			stderrReader.close();
 			return false;
 		} catch (IOException e) {
+            System.out.println("TimeMeasureConstraint.compileTeSSLaFile IOException");
 			System.err.println(e);
 			return false;
 		} catch (InterruptedException e) {
+            System.out.println("TimeMeasureConstraint.compileTeSSLaFile InterruptedException");
 			System.err.println(e);
 			return false;
 		}
@@ -120,18 +122,13 @@ public abstract class TimeMeasureConstraint{
         try{
             // first timestamp without waiting
             String tesslaInput = trace.getNextTimestampsEvents();
-            traceStrings+= tesslaInput + "\n";
+            //traceStrings+= tesslaInput + "\n";
             program.writeNoWait(tesslaInput);
-            //int eventThisTimeStamp = numEvents(tesslaInput);
             eventCount = 1;
-            //System.out.print("write: " + tesslaInput);
             for (tesslaInput = trace.getNextTimestampsEvents(); tesslaInput != ""; 
                     tesslaInput = trace.getNextTimestampsEvents()){
-                //eventThisTimeStamp = numEvents(tesslaInput);
-                //System.out.print("write: " + tesslaInput);
-                traceStrings+= tesslaInput + "\n";
+                //traceStrings+= tesslaInput + "\n";
                 long time = program.timeToAnswer(tesslaInput);
-                //System.out.println("answer after: " + time);
                 //update time vals
                 min = Math.min(min, time);
                 max = Math.max(max, time);
