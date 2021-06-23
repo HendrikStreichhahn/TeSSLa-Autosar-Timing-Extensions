@@ -144,7 +144,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -171,7 +171,10 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
         int i = 0;
+        boolean recompile = true;
         for (int lower = 100; lower <= 1000; lower += 100)
+        {
+            recompile = true;
             for (int sourceDistance = 1; sourceDistance <= 2*lower; sourceDistance*= 2){
                 int upper = lower;
                 System.out.println("DelayConstraint Trace " + (i+1) + " of " + traceCount);
@@ -187,12 +190,14 @@ public class TimeMeasureAll{
 				}
 				if (compiled){
 					final String COMPILED_SPEC_PATH = "tmp/DelayConstraintTimeMeasure.jar";
-					constraint.compileTeSSLaFile(PATHTOTESSLA, 
-						TESSLAFILEPATH, 
-						COMPILED_SPEC_PATH);
+                    if (recompile)
+                        constraint.compileTeSSLaFile(PATHTOTESSLA, 
+                            TESSLAFILEPATH, 
+                            COMPILED_SPEC_PATH);
+                    recompile= false;
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -210,6 +215,7 @@ public class TimeMeasureAll{
                 i++;
                     
             }
+        }
         //save results to file
         writeResults(outputFileName, results, params);
     }
@@ -221,7 +227,7 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
         String[] params = new String[traceCount];
         int i = 0;
-        for (int lower = 100; lower <= 1000; lower += 100)
+        for (int lower = 100; lower <= 1000; lower += 100){
 			for (int sourceDistance = 1; sourceDistance <= 2*lower; sourceDistance*= 2){
 				int upper = lower;
 				System.out.println("StrongDelayConstraint Trace " + (i+1) + " of " + traceCount);
@@ -243,7 +249,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -260,6 +266,7 @@ public class TimeMeasureAll{
 				}
                 i++;
             }
+        }
         //save results to file
         writeResults(outputFileName, results, params);
     }
@@ -292,7 +299,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -343,7 +350,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -398,7 +405,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -450,7 +457,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -499,7 +506,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -549,7 +556,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -576,12 +583,15 @@ public class TimeMeasureAll{
         SingleMeasureResult[] results = new SingleMeasureResult[100];
         String[] params = new String[100];
         int i = 0;
+        boolean recompile = true;
         for (int lower = 100; lower <= 900; lower += 200)//5
             for (int upper = lower + 100; upper <= lower + 2100; upper += 500)//4
+            {
                 for (int numPreemptions = 1; numPreemptions <= 31; numPreemptions+=10){//4
                     System.out.println("ExecutionTimeConstraint Trace " + (i+1) + " of " + 100);
                     params[i] = "lower = " + lower + " upper = " + upper + " numPreemptions = " +
                         numPreemptions;
+                    System.out.println(params[i]);
                     //generate trace
                     TimeMeasureExecutionTimeConstraint constraint =
                         new TimeMeasureExecutionTimeConstraint(lower, upper);
@@ -594,12 +604,14 @@ public class TimeMeasureAll{
 					}
 					if (compiled){
 						final String COMPILED_SPEC_PATH = "tmp/ExecutionTimeConstraintTimeMeasure.jar";
-						constraint.compileTeSSLaFile(PATHTOTESSLA, 
-							TESSLAFILEPATH, 
-							COMPILED_SPEC_PATH);
-						//measure time per event
+                        if (recompile)
+                            constraint.compileTeSSLaFile(PATHTOTESSLA, 
+                                TESSLAFILEPATH, 
+                                COMPILED_SPEC_PATH);
+                        recompile = false;
+                        //measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -615,6 +627,8 @@ public class TimeMeasureAll{
 						}
 					}
 					i++;
+                }
+                recompile= true;
             }
         //save results to file
         writeResults(outputFileName, results, params);
@@ -645,7 +659,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -692,7 +706,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -737,7 +751,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -785,7 +799,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -839,7 +853,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -896,7 +910,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -958,7 +972,7 @@ public class TimeMeasureAll{
 								COMPILED_SPEC_PATH);
 							//measure time per event
 							results[i] = constraint.measureConstraintSingle(trace, 
-								"java -jar " + COMPILED_SPEC_PATH, 500);
+								"java -jar " + COMPILED_SPEC_PATH, 1000);
 							if (results[i] == null){
 								System.out.println("result is null");
 								return;
@@ -1009,7 +1023,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -1062,7 +1076,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -1119,7 +1133,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -1177,7 +1191,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -1223,7 +1237,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -1270,7 +1284,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;
@@ -1319,7 +1333,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -1371,7 +1385,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -1422,7 +1436,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -1474,7 +1488,7 @@ public class TimeMeasureAll{
 							COMPILED_SPEC_PATH);
 						//measure time per event
 						results[i] = constraint.measureConstraintSingle(trace, 
-							"java -jar " + COMPILED_SPEC_PATH, 500);
+							"java -jar " + COMPILED_SPEC_PATH, 1000);
 						if (results[i] == null){
 							System.out.println("result is null");
 							return;
@@ -1524,7 +1538,7 @@ public class TimeMeasureAll{
 					COMPILED_SPEC_PATH);
 				//measure time per event
 				results[i] = constraint.measureConstraintSingle(trace, 
-					"java -jar " + COMPILED_SPEC_PATH, 500);
+					"java -jar " + COMPILED_SPEC_PATH, 1000);
 				if (results[i] == null){
 					System.out.println("result is null");
 					return;
@@ -1572,7 +1586,7 @@ public class TimeMeasureAll{
 						COMPILED_SPEC_PATH);
 					//measure time per event
 					results[i] = constraint.measureConstraintSingle(trace, 
-						"java -jar " + COMPILED_SPEC_PATH, 500);
+						"java -jar " + COMPILED_SPEC_PATH, 1000);
 					if (results[i] == null){
 						System.out.println("result is null");
 						return;

@@ -39,13 +39,14 @@ public class TimeMeasureProcessInstance {
     }
 
     public long timeToAnswer(String stdinString) throws IOException{
+        //System.out.println("TimeMeasureProcessInstance.timeToAnswer(" + stdinString + ")");
         byte[] byteArr = stdinString.getBytes();
         //time measure start
         long time1 = System.nanoTime();
         // write to stdin
         stdin.write(byteArr);
         stdin.flush();
-        
+        //System.out.println("TimeMeasureProcessInstance.timeToAnswer b");
             
             
         int availableErr = 0;
@@ -53,16 +54,21 @@ public class TimeMeasureProcessInstance {
 
         //wait, until something is in stoud or stdin
         do {
+            //System.out.println("TimeMeasureProcessInstance.timeToAnswer c");
             availableErr = stderr.available();
+            //System.out.println("TimeMeasureProcessInstance.timeToAnswer d");
             availableOut = stdout.available();
         } while(availableErr == 0 && availableOut == 0);
+        //System.out.println("TimeMeasureProcessInstance.timeToAnswer f");
         //System.out.println("got answer");
         // time measure end
         long time2 = System.nanoTime();
         
         // read bytes from streams, output errors if existent 
+        //System.out.println("TimeMeasureProcessInstance.timeToAnswer h");
         if (availableErr != 0)
             System.out.println(stderrReader.readLine());
+        //System.out.println("TimeMeasureProcessInstance.timeToAnswer i");
         if (availableOut != 0){
             String answer = stdoutReader.readLine();
             //System.out.println(stdinString.replace('\n', ' ') + "=>" + answer);
