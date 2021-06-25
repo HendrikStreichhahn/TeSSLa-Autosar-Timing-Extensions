@@ -30,7 +30,6 @@
 50: response1 = 8
 50: response2 = 8
 50: response3 = 8
-# no fail
 60: response1 = 1
 62: response2 = 1
 68: response3 = 1
