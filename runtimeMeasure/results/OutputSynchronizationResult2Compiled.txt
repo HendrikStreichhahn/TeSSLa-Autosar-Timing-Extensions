@@ -1,0 +1,34 @@
+average: Minimum: 0.110574ms Maximum: 426.24152ms Complete: 21.293188ms Average: 0.229257 ms
+minimum: Minimum: 0.0755ms Maximum: 6.7088ms Complete: 323.6ms Average: 0.095629 ms
+maximum: Minimum: 0.1445ms Maximum: 36.0738ms Complete: 798.21954ms Average: 0.389993 ms
+responseCount: 2 tolerance: 2 clusterDistance: 64 => Minimum: 0.0755ms Maximum: 6.7088ms Complete: 798.21954ms Average: 0.095629 ms
+responseCount: 3 tolerance: 2 clusterDistance: 64 => Minimum: 0.0774ms Maximum: 7.7913ms Complete: 713.8075ms Average: 0.104008 ms
+responseCount: 4 tolerance: 2 clusterDistance: 64 => Minimum: 0.078ms Maximum: 9.2645ms Complete: 644.9577ms Average: 0.112303 ms
+responseCount: 5 tolerance: 2 clusterDistance: 64 => Minimum: 0.0842ms Maximum: 16.8002ms Complete: 595.4765ms Average: 0.122023 ms
+responseCount: 6 tolerance: 2 clusterDistance: 64 => Minimum: 0.0873ms Maximum: 17.3497ms Complete: 569.3158ms Average: 0.134813 ms
+responseCount: 7 tolerance: 2 clusterDistance: 64 => Minimum: 0.0898ms Maximum: 17.77ms Complete: 512.0573ms Average: 0.137797 ms
+responseCount: 8 tolerance: 2 clusterDistance: 64 => Minimum: 0.0893ms Maximum: 17.6761ms Complete: 489.7789ms Average: 0.148148 ms
+responseCount: 9 tolerance: 2 clusterDistance: 64 => Minimum: 0.0908ms Maximum: 17.4156ms Complete: 444.7971ms Average: 0.14916 ms
+responseCount: 10 tolerance: 2 clusterDistance: 64 => Minimum: 0.0977ms Maximum: 17.3732ms Complete: 456.5167ms Average: 0.168146 ms
+responseCount: 11 tolerance: 2 clusterDistance: 64 => Minimum: 0.0991ms Maximum: 17.2683ms Complete: 445.8602ms Average: 0.178988 ms
+responseCount: 12 tolerance: 2 clusterDistance: 64 => Minimum: 0.0978ms Maximum: 17.1401ms Complete: 434.5044ms Average: 0.188832 ms
+responseCount: 13 tolerance: 2 clusterDistance: 64 => Minimum: 0.1067ms Maximum: 17.7766ms Complete: 411.1569ms Average: 0.192759 ms
+responseCount: 14 tolerance: 2 clusterDistance: 64 => Minimum: 0.1063ms Maximum: 18.0082ms Complete: 385.9647ms Average: 0.193952 ms
+responseCount: 15 tolerance: 2 clusterDistance: 64 => Minimum: 0.1066ms Maximum: 17.7557ms Complete: 394.5608ms Average: 0.211334 ms
+responseCount: 16 tolerance: 2 clusterDistance: 64 => Minimum: 0.1063ms Maximum: 18.1905ms Complete: 384.4051ms Average: 0.218536 ms
+responseCount: 17 tolerance: 2 clusterDistance: 64 => Minimum: 0.0999ms Maximum: 18.0097ms Complete: 329.2552ms Average: 0.198825 ms
+responseCount: 18 tolerance: 2 clusterDistance: 64 => Minimum: 0.0992ms Maximum: 17.8138ms Complete: 325.7092ms Average: 0.206799 ms
+responseCount: 19 tolerance: 2 clusterDistance: 64 => Minimum: 0.1181ms Maximum: 17.8234ms Complete: 323.6ms Average: 0.217619 ms
+responseCount: 20 tolerance: 2 clusterDistance: 64 => Minimum: 0.1176ms Maximum: 25.7312ms Complete: 343.0019ms Average: 0.240534 ms
+responseCount: 21 tolerance: 2 clusterDistance: 64 => Minimum: 0.1199ms Maximum: 18.2679ms Complete: 332.24838ms Average: 0.245745 ms
+responseCount: 22 tolerance: 2 clusterDistance: 64 => Minimum: 0.1247ms Maximum: 18.1919ms Complete: 348.6871ms Average: 0.268634 ms
+responseCount: 23 tolerance: 2 clusterDistance: 64 => Minimum: 0.1274ms Maximum: 18.2167ms Complete: 336.3313ms Average: 0.270362 ms
+responseCount: 24 tolerance: 2 clusterDistance: 64 => Minimum: 0.1279ms Maximum: 18.1618ms Complete: 339.0487ms Average: 0.284198 ms
+responseCount: 25 tolerance: 2 clusterDistance: 64 => Minimum: 0.1355ms Maximum: 32.1974ms Complete: 363.8034ms Average: 0.318566 ms
+responseCount: 26 tolerance: 2 clusterDistance: 64 => Minimum: 0.1348ms Maximum: 31.6379ms Complete: 362.40808ms Average: 0.326788 ms
+responseCount: 27 tolerance: 2 clusterDistance: 64 => Minimum: 0.1357ms Maximum: 31.8737ms Complete: 350.79718ms Average: 0.327847 ms
+responseCount: 28 tolerance: 2 clusterDistance: 64 => Minimum: 0.1362ms Maximum: 36.0738ms Complete: 354.84988ms Average: 0.34418 ms
+responseCount: 29 tolerance: 2 clusterDistance: 64 => Minimum: 0.1374ms Maximum: 35.6274ms Complete: 364.5748ms Average: 0.365671 ms
+responseCount: 30 tolerance: 2 clusterDistance: 64 => Minimum: 0.1387ms Maximum: 34.9749ms Complete: 351.40338ms Average: 0.367192 ms
+responseCount: 31 tolerance: 2 clusterDistance: 64 => Minimum: 0.1375ms Maximum: 35.4033ms Complete: 353.44443ms Average: 0.377611 ms
+responseCount: 32 tolerance: 2 clusterDistance: 64 => Minimum: 0.1445ms Maximum: 35.7952ms Complete: 352.94427ms Average: 0.389993 ms
