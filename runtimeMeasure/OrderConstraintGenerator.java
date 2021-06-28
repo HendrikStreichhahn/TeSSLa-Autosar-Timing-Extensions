@@ -25,7 +25,7 @@ public class OrderConstraintGenerator extends TraceSet{
             boolean inserted = false;
             targetTime = timeNow + rand.nextInt(maxDistSourceTarget+1);
             while(!inserted){
-                inserted = traces[1].insertEvent(new Event(targetTime, 0));
+                inserted = traces[1].insertEvent(new Event(targetTime+1, 0));
                 targetTime++;
             }
             eventCount-= 2;

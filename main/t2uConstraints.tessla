@@ -2512,7 +2512,7 @@ module TADL2{
         liftable def startTimeOldestCluster(storedClustersBeforeRemove: Map[Int, outputSynchronizationCluster],
                 keys: List[Int]): Int :=
             if (List.size(keys) == 0) then
-                pseudoInfty
+                pseudoInfty-tolerance
             else
                 min(Map.get(storedClustersBeforeRemove, List.head(keys)).startTime,
                     startTimeOldestCluster(storedClustersBeforeRemove, List.tail(keys)))
