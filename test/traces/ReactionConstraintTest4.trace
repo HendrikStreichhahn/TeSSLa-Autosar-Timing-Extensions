@@ -1,0 +1,8 @@
+5: stimulus = 1
+10: response = 1
+15: stimulus = 2
+# fail
+30: response = 2
+#wait long time
+5000: stimulus = 3
+5001: response = 3

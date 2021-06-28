@@ -1,0 +1,16 @@
+# testing upper bound for jitter
+5: events = ()
+15: events = ()
+
+26: events = ()
+37: events = ()
+48: events = ()
+
+58: events = ()
+68: events = ()
+78: events = ()
+
+#fail-> too late
+
+89: events = ()
+99: events = ()

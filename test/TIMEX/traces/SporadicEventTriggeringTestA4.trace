@@ -1,0 +1,8 @@
+# testing upper bound for jitter and max inter arrival time
+5: events = ()
+15: events = ()
+
+27: events = ()
+35: events = ()
+# fail here
+48: events = ()

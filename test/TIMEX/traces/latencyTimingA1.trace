@@ -1,0 +1,17 @@
+10: stimulus = 1
+15: stimulus = 2
+20: stimulus = 3
+25: stimulus = 4
+30: stimulus = 5
+35: stimulus = 6
+40: stimulus = 7
+40: response = 1
+45: response = 2
+50: response = 3
+55: response = 4
+60: response = 5
+65: response = 6
+70: response = 7
+1000: stimulus = 10000
+#fail here
+1035: response = 10000

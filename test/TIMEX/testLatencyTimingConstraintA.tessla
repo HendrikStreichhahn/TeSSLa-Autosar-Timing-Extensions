@@ -1,0 +1,9 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in stimulus: Events[Int]
+in response: Events[Int]
+
+def minVal = 15
+def maxVal = 30
+
+out AUTOSAR_TIMEX.LatencyTimingConstraint(stimulus, response, true, maxVal, minVal, minVal)
