@@ -8,6 +8,9 @@ module TADL2{
     ##  * fourValuedLogicValue.value: current logical value
     ##  * fourValuedLogicValue.final: is the current value final? -> will not change in future
     type fourValuedLogicValue = {value: Bool, final: Bool}
+	
+    ## nodoc
+	liftable def makeFourValuedLogicValue(val: Bool, fin: Bool) : fourValuedLogicValue = {value= val, final= fin}
 
     ## Conjunction operator on four valued logic values
     liftable def fourValuedConjunction(a: fourValuedLogicValue, b: fourValuedLogicValue):=
@@ -86,7 +89,7 @@ module TADL2{
     }
 
     ## Ensures that a four valued logic value, which is {value= false, final= true}, stays {value= false, final= true}.
-    def stillFulfillabe(events: Events[fourValuedLogicValue]): Events[fourValuedLogicValue] :={
+    def stillFulfillable(events: Events[fourValuedLogicValue]): Events[fourValuedLogicValue] :={
         def storage: Events[Bool] := 
             default(last(storage, events), true) && events != {value= false, final= true}
 
@@ -95,6 +98,26 @@ module TADL2{
         else
             {value= false, final= true}
     }
+	
+	## Ensures that a four valued logic value, which is {value= false, final= true}, stays {value= false, final= true}.
+	## reset to {value= false, final= true} after resetPeriod
+	def stillFulfillableReset(events: Events[fourValuedLogicValue], resetTime: Int): Events[fourValuedLogicValue] :={
+		# is the value currently final false?
+		def isFinalFalse: Events[Bool] = 
+			default(last(isFinalFalseReset, events) || (events.final == true && events.value == false), false)
+		# since which timestamp is the value final false?
+		def finalFalseSince: Events[Int] = default(if (events.final && !events.value) && !prev(isFinalFalse) then time(events) else last(finalFalseSince, isFinalFalse), pseudoInfty)
+		def isFinalFalseReset: Events[Bool] = 
+			if (finalFalseSince + resetTime < time (events)) then
+				false
+			else
+				isFinalFalse
+		#output
+		if (isFinalFalseReset) then
+			{value= false, final= true}
+		else
+			events
+	}
 
     # builds a map with [1, init], [2, init], ..., [size, init]
     ## nodoc
@@ -112,7 +135,7 @@ module TADL2{
     #removes all list elements, that are smaller than A from the list
     # list must be in ascending order
     ## nodoc
-    def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
+    liftable def removeItemsSmallerThanAFromListFront(list: List[Int], A: Int): List[Int] :=
         if (List.size(list) == 0) then
             list
         else
@@ -120,6 +143,10 @@ module TADL2{
                 removeItemsSmallerThanAFromListFront(List.tail(list), A)
             else
                 list
+	
+	#returns the head of the given list, or the given value, if the map is empty
+	liftable def listHeadOr[A](aList: List[A], valIfEmpty: A): A = 
+		if (List.size(aList) == 0) then valIfEmpty else List.head(aList)
 
     ## Checks the DelayConstraint defined in TADL2.
     ##
@@ -162,6 +189,53 @@ module TADL2{
     ## 80: constraint.final = false
     ## ~~~
     def delayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) : Events[fourValuedLogicValue] :={
+        delayConstraintReset(source, target, lower, upper, pseudoInfty)
+    }
+    
+    ## Checks the DelayConstraint defined in TADL2.
+    ##
+    ## Each source event must be followed by at least one target event, which occurs within a time distance between lower and upper. Additional target events are allowed.
+    ## A final false output will be set to unfinfal after resetTime.
+    ##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ## in source: Events[Unit]
+    ## in target: Events[Unit]
+    ## 
+    ## def lower = 15
+    ## def upper = 25
+    ## def resetTime
+    ## 
+    ## def constraint:= TADL2.delayConstraintReset(source, target, lower, upper, resetTime)
+    ## out constraint.value
+    ## out constraint.final
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## 10: source = ()
+    ## 10: constraint.value = false
+    ## 10: constraint.final = false
+    ## 25: target = ()
+    ## 25: constraint.value = true
+    ## 25: constraint.final = false
+    ## 50: source = ()
+    ## 50: constraint.value = false
+    ## 50: constraint.final = false
+    ## 65: target = ()
+    ## 65: constraint.value = true
+    ## 65: constraint.final = false
+    ## 75: target = ()
+    ## 75: constraint.value = true
+    ## 75: constraint.final = false
+    ## 80: target = ()
+    ## 80: constraint.value = true
+    ## 80: constraint.final = false
+    ## ~~~
+    def delayConstraintReset[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int, resetTime: Int) : Events[fourValuedLogicValue] :={
+
         # timestamps of source events, which did not have matching target event yet,
         # including the timestamps, which matches in this this timestamp
         def unfinishedSourceTimesNewSource: Events[List[Int]] := 
@@ -170,21 +244,30 @@ module TADL2{
                 List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
             else
                 default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+                
+        def unfinishedSourceTimesAfterReset: Events[List[Int]] :=
+			if (List.size(unfinishedSourceTimesNewSource) != 0) then
+				if (List.head(unfinishedSourceTimesNewSource) + resetTime < time(mergeUnit(source, target))) then
+					removeItemsSmallerThanAFromListFront(unfinishedSourceTimesNewSource, time(mergeUnit(source, target)) - upper)
+				else
+					unfinishedSourceTimesNewSource
+			else
+				List.empty[Int]
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
             # 'now' has target event
             if (defaultTime(source) <= defaultTime(target) &&
                     # List has source event without matching target
-                    List.size(unfinishedSourceTimesNewSource) > 0 &&
+                    List.size(unfinishedSourceTimesAfterReset) > 0 &&
                     # target event now matches with oldest source event
-                    List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                    List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                    List.head(unfinishedSourceTimesAfterReset) + lower <= defaultTime(target) &&
+                    List.head(unfinishedSourceTimesAfterReset) + upper >= defaultTime(target)) then
                 #remove matched target events
-                merge(slift(unfinishedSourceTimesNewSource, defaultTime(target) - lower + 1, 
+                merge(slift(unfinishedSourceTimesAfterReset, defaultTime(target) - lower + 1, 
                         removeItemsSmallerThanAFromListFront),
                     List.empty[Int])
             else
-                merge(unfinishedSourceTimesNewSource, List.empty[Int])
+                merge(unfinishedSourceTimesAfterReset, List.empty[Int])
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
             safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
@@ -192,8 +275,8 @@ module TADL2{
                 else
                     List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
                 mergeUnit(source, target)))
-                
-        stillFulfillabe(
+
+        stillFulfillableReset(
             # no unfinished source events -> current true
             if (List.size(unfinishedSourceTimes) == 0) then
                 {value= true, final= false}
@@ -203,7 +286,8 @@ module TADL2{
                     {value= false, final= false}
                 # oldest source event is too old -> final false
                 else
-                    {value= false, final= true})
+                    {value= false, final= true},
+            resetTime)
     }
 
     ## Checks the StrongDelayConstraint defined in TADL2
@@ -242,67 +326,85 @@ module TADL2{
     ## 75: constraint.value = false
     ## 75: constraint.final = true
     ## ~~~
-    def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :={
+	def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :=
+		strongDelayConstraintReset(source, target, lower, upper, pseudoInfty)
+	
+	
+	## checks the StrongDelayConstraint defined in TADL2, resets a negative outout after resetTime
+	##
+	## See strongDelayConstraint for more information.
+    def strongDelayConstraintReset[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int, resetTime: Int) :={
         # timestamps of source events, which did not have matching target event yet,
         # including the timestamps, which matches in this this timestamp
         def unfinishedSourceTimesNewSource:=
             #current timeStamp has source event
-            if (defaultTime(source) >= defaultTime(target)) then
+            if (TADL2.defaultTime(source) >= TADL2.defaultTime(target)) then
                 # append timestamp to list
                 List.append(default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int]), time(source))
             else
                 default(last(unfinishedSourceTimes, mergeUnit(source, target)), List.empty[Int])
+		# remove events that are older than resetTime
+		def unfinishedSourceTimesAfterReset:= 
+			if List.size(unfinishedSourceTimesNewSource) != 0 then
+				if (List.head(unfinishedSourceTimesNewSource) + resetTime < time(mergeUnit(source, target))) then
+					TADL2.removeItemsSmallerThanAFromListFront(unfinishedSourceTimesNewSource, time(mergeUnit(source, target)) - upper)
+				else
+					unfinishedSourceTimesNewSource
+			else
+				List.empty[Int]
         # timestamps of source events, which did not have matching target event yet
         def unfinishedSourceTimes: Events[List[Int]]:=
             #current timeStamp has target event
             if (defaultTime(source) <= defaultTime(target)) then
                 # removing possible-> remove
-                if List.size(unfinishedSourceTimesNewSource) != 0 then
+                if List.size(unfinishedSourceTimesAfterReset) != 0 then
                     # if matching time distance to oldest stored event
-                    if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                            List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                    if (List.head(unfinishedSourceTimesAfterReset) + lower <= defaultTime(target) &&
+                            List.head(unfinishedSourceTimesAfterReset) + upper >= defaultTime(target)) then
                         # just keep tail
-                        List.tail(unfinishedSourceTimesNewSource)
+                        List.tail(unfinishedSourceTimesAfterReset)
                     else
                         # return unchanged
-                        unfinishedSourceTimesNewSource
+                        unfinishedSourceTimesAfterReset
                 else
                     # removing not possible-> insert event, that triggers {value= false, final= true}
                     List.append(List.empty[Int], -pseudoInfty)
             else
-                unfinishedSourceTimesNewSource
+                unfinishedSourceTimesAfterReset
 
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(source, target),
-            safeDelay(if (List.size(unfinishedSourceTimes) == 0) then#
+            safeDelay(if (List.size(unfinishedSourceTimes) == 0) then
                     -1
                 else
                     List.head(unfinishedSourceTimes) + upper - time(mergeUnit(source, target))+1, 
                 mergeUnit(source, target)))
+
         # output
-        stillFulfillabe(
+        stillFulfillableReset(
             # no unmatched source event-> current true
             if (List.size(unfinishedSourceTimes) == 0) then
                 {value= true, final= false}
             else
                 # target event, but no stored source event-> false
-                if (List.size(unfinishedSourceTimesNewSource) == 0) then
+                if (List.size(unfinishedSourceTimesAfterReset) == 0) then
                     {value= false, final= true}
                 else
-                    # current timestamp has target event
-                    if (defaultTime(target) >= time(evaluateTimes)) then
+                #    # current timestamp has target event
+                    if (TADL2.defaultTime(target) >= time(evaluateTimes)) then
                         # correct distance-> current false
-                        if (List.head(unfinishedSourceTimesNewSource) + lower <= defaultTime(target) &&
-                                List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(target)) then
+                        if (List.head(unfinishedSourceTimesAfterReset) + lower <= TADL2.defaultTime(target) &&
+                                List.head(unfinishedSourceTimesAfterReset) + upper >= TADL2.defaultTime(target)) then
                             {value= false, final= false}
                         else
                             {value= false, final= true}
                     else
                         # distance must only be smaller than upper
-                        if List.head(unfinishedSourceTimesNewSource) + upper >= defaultTime(evaluateTimes) then
+                        if List.head(unfinishedSourceTimesAfterReset) + upper >= TADL2.defaultTime(evaluateTimes) then
                             {value= false, final= false}
                         else
-                            {value= false, final= true})
+                            {value= false, final= true},
+			resetTime)
 
     }
 
@@ -348,8 +450,13 @@ module TADL2{
     ## 47: constraint.value = true
     ## 47: constraint.final = false
     ## ~~~
-    def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := {
-
+    def repeatConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int): Events[fourValuedLogicValue] := 
+		repeatConstraintReset(e, lower, upper, span, pseudoInfty)
+	
+	## Checks the RepeatConstraint defined in TADL2.
+	##
+	## Resets a negative output after resetTime. See RepeatConstraint for more information.
+	def repeatConstraintReset[A](e: Events[A], lower: Int, upper: Int, span: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         #stored state
         def latestSpanEventTimes: Events[List[Int]]:=
             if TADL2.defaultTime(e) == 0 then
@@ -377,7 +484,7 @@ module TADL2{
         def evaluateTimes := 
             mergeUnit(e, safeDelay(delayPeriod, e))
         
-        stillFulfillabe(
+        stillFulfillableReset(
             # more than span events occured-> distance to span-1^th event is relevant
             if (List.size(latestSpanEventTimes) > span) then
                 if List.head(latestSpanEventTimes) + lower <= time(evaluateTimes) &&
@@ -390,7 +497,8 @@ module TADL2{
                 if (upper == pseudoInfty || List.head(latestSpanEventTimes) + upper >= time(evaluateTimes)) then
                     {value= true, final= false}
                 else
-                    {value= false, final= true})
+                    {value= false, final= true},
+			resetTime)
         
     }
 
@@ -435,52 +543,66 @@ module TADL2{
     ## 70: constraint.value = true
     ## 70: constraint.final = false
     ## ~~~
-    def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedLogicValue] := {
+	def repetitionConstraint[A](e: Events[A], lower: Int, upper: Int, span: Int, jitter: Int): Events[fourValuedLogicValue] := {
+		repetitionConstraintReset(e, lower, upper, span, jitter, pseudoInfty)
+	}
+	
+	## Checks the RepetitionConstraint defined in TADL2.
+	## Resets a negative output after resetTime.
+	def repetitionConstraintReset[A](events: Events[A], lower: Int, upper: Int, span: Int, jitter: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         # lower bound for current x
         def lowerBoundXNow: Events[Int] =
-            if (List.size(last(LowerBoundX, e)) < span) then
-                time(e)-jitter
+            if (List.size(last(LowerBoundX, events)) < span) then
+                time(events)-jitter
             else
-                max(List.head(last(LowerBoundX, e)), time(e)-jitter)
+                max(List.head(last(LowerBoundX, events)), time(events)-jitter)
         # upper bound for current x
         def upperBoundXNow: Events[Int] =
-            if (List.size(last(UpperBoundX, e)) < span) then
-                time(e)
+            if (List.size(last(UpperBoundX, events)) < span) then
+                time(events)
             else
-                min(List.head(last(UpperBoundX, e)), time(e))
+                min(List.head(last(UpperBoundX, events)), time(events))
 
         # lower bound for span next x
         def LowerBoundX: Events[List[Int]]:= merge(
-            if (List.size(last(LowerBoundX, e)) < span) then
-               List.append(last(LowerBoundX, e), lowerBoundXNow + lower)
-            else
-                List.append(last(List.tail(LowerBoundX), e), lowerBoundXNow + lower),
+			if (last(res, events).final) then
+				List.empty[Int]
+			else
+				if (List.size(last(LowerBoundX, events)) < span) then
+				   List.append(last(LowerBoundX, events), lowerBoundXNow + lower)
+				else
+					List.append(last(List.tail(LowerBoundX), events), lowerBoundXNow + lower),
             List.empty[Int]
         )
             
          # upper bound for span next x
         def UpperBoundX: Events[List[Int]]:= merge(
-            if (List.size(last(UpperBoundX, e)) < span) then
-                List.append(last(UpperBoundX, e), upperBoundXNow+upper)
-            else
-                List.append(last(List.tail(UpperBoundX), e), upperBoundXNow + upper),
+			if (last(res, events).final) then
+				List.empty[Int]
+			else
+				if (List.size(last(UpperBoundX, events)) < span) then
+					List.append(last(UpperBoundX, events), upperBoundXNow+upper)
+				else
+					List.append(last(List.tail(UpperBoundX), events), upperBoundXNow + upper),
             List.empty[Int]
         )
         # timestamps, in which the evaluation occurs
-        def evaluateTimes = mergeUnit(e,
-            safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
-                    jitter - time(e)+1, e))
+        def evaluateTimes = mergeUnit(events,
+            TADL2.safeDelay((if (List.size(UpperBoundX) == 0) then 0 else List.head(UpperBoundX)) +
+                    jitter - time(events)+1, events))
         # Evaluation        
-        stillFulfillabe(
+        def res:= TADL2.stillFulfillableReset(
             #first event or correct distance to X
             if (List.size(LowerBoundX) == 0 && List.size(UpperBoundX) == 0) ||
                     lowerBoundXNow <= time(evaluateTimes) &&
                     upperBoundXNow + jitter >= time(evaluateTimes) then
                 {value= true, final= false}
             else
-                {value= false, final= true})
+                {value= false, final= true},
+			resetTime)
+		res
     }
-
+	
     ## Checks the executionTimeConstraint defined in TADL2.
     ##
     ## Checks, if the time between one start event and the next end event, minus the preemptions, is between lower and upper.
@@ -540,7 +662,7 @@ module TADL2{
         def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
         # 'now' is end event
             
-        stillFulfillabe(
+        stillFulfillable(
             #first event or correct distance to X
             if (if (time(evaluateTimes) == defaultTime(end)) then
                     lower <= execTime && execTime <= upper
@@ -591,7 +713,7 @@ module TADL2{
     ## 40: constraint.final = false
     ## ~~~
     def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedLogicValue] :=
-        stillFulfillabe(
+        stillFulfillable(
             #number of events on both streams equal-> currently true
             if count(source) == count(target) then
                 if (defaultTime(source) == defaultTime(target) && defaultTime(source) != -1) then
@@ -645,8 +767,16 @@ module TADL2{
     ## ~~~
     def sporadicConstraint[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int): Events[fourValuedLogicValue]:=
         # application of repeat and repetititonConstraint
-        slift(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, pseudoInfty, 1), fourValuedConjunction)
+		fourValuedConjunction(repetitionConstraint(e, lower, upper, 1, jitter), repeatConstraint(e, minDist, pseudoInfty, 1))
 
+	## Checks the SporadicConstraint defined in TADL2.
+	##
+	## Resets negative output after resetTime. The SporadicConstraint is a conjunction of the 
+	## RepetitionConstraint and the RepeatConstraint and the reset is handled by them individually. 
+	def sporadicConstraintReset[A](e: Events[A], lower: Int, upper: Int, jitter: Int, minDist: Int, ResetTime: Int): Events[fourValuedLogicValue]:=
+        # application of repeat and repetititonConstraint
+		fourValuedConjunction(repetitionConstraintReset(e, lower, upper, 1, jitter, ResetTime),
+			repeatConstraintReset(e, minDist, pseudoInfty, 1, ResetTime))
     ## Checks the PeriodicConstraint defined in TADL2.
     ##
     ## The events occur in a periodic pattern with an allowed deviation of upper and a minimal distance of minDist.
@@ -692,16 +822,23 @@ module TADL2{
     ## ~~~
     def periodicConstraint[A](events: Events[A], period: Int, jitter: Int, minDist: Int) :=
         sporadicConstraint(events, period, period, jitter, minDist)
+	
+    ## Checks the PeriodicConstraint defined in TADL2. Resets a negative output after resetTime
+    ##
+    ## See PeriodicConstraint for more information.
+	def periodicConstraintReset[A](events: Events[A], period: Int, jitter: Int, minDist: Int, resetTime: Int) :=
+        sporadicConstraintReset(events, period, period, jitter, minDist, resetTime)
 
     ## nodoc
-    def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int): Events[fourValuedLogicValue] :=
+    def arbitraryConstraintRec[A](e: Events[A], minDist: List[Int], maxDist: List[Int], ctr: Int,
+			resetTime: Int): Events[fourValuedLogicValue] :=
         #recursive application of the repeatConstraint
         static if (List.size(minDist) > 1 && List.size(maxDist) > 1) then
-            slift(arbitraryConstraintRec(e, List.tail(minDist), List.tail(maxDist), ctr+1),
-                repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr),
-                fourValuedConjunction)
+			fourValuedConjunction(
+				arbitraryConstraintRec(e, List.tail(minDist), List.tail(maxDist), ctr+1, resetTime),
+				repeatConstraintReset(e, List.head(minDist), List.head(maxDist), ctr, resetTime))
         else
-            repeatConstraint(e, List.head(minDist), List.head(maxDist), ctr)
+            repeatConstraintReset(e, List.head(minDist), List.head(maxDist), ctr, resetTime)
 
     ## Checks the ArbitraryConstraint defined in TADL2.
     ##
@@ -779,7 +916,15 @@ module TADL2{
     ## 46: constraint.final = false
     ## ~~~
     def arbitraryConstraint[A](e: Events[A], minDist: List[Int], maxDist: List[Int]): Events[fourValuedLogicValue] :=
-        arbitraryConstraintRec(e, minDist, maxDist, 1)
+        arbitraryConstraintRec(e, minDist, maxDist, 1, pseudoInfty)
+	
+	## Checks the ArbitraryConstraint defined in TADL2.
+	##
+	## Resets a negative output after resetTime.
+	##
+	## See arbitraryConstraint for more information.
+	def arbitraryConstraintReset[A](e: Events[A], minDist: List[Int], maxDist: List[Int], resetTime: Int): Events[fourValuedLogicValue] :=
+        arbitraryConstraintRec(e, minDist, maxDist, 1, resetTime)
 
     ## Checks the BurstConstraint defined in TADL2.
     ##
@@ -832,10 +977,15 @@ module TADL2{
     ## 22: constraint.value = true
     ## 22: constraint.final = false
     ## ~~~
-    def burstConstraint[A](e: Events[A], length: Int, maxOccurences: Int, minDist: Int): Events[fourValuedLogicValue] :=
+    def burstConstraint[A](e: Events[A], length: Int, maxOccurrences: Int, minDist: Int): Events[fourValuedLogicValue] :=
+		burstConstraintReset(e, length, maxOccurrences, minDist, pseudoInfty)
+		
+	
+	def burstConstraintReset[A](e: Events[A], length: Int, maxOccurrences: Int, minDist: Int,
+			resetTime: Int): Events[fourValuedLogicValue] :=
         # application of repeatConstraint
-        slift(repeatConstraint(e, length, pseudoInfty, maxOccurences), repeatConstraint(e, minDist, pseudoInfty, 1),
-            fourValuedConjunction)
+		fourValuedConjunction(repeatConstraintReset(e, length, pseudoInfty, maxOccurrences, resetTime),
+			repeatConstraintReset(e, minDist, pseudoInfty, 1, resetTime))
 
     ## Checks the patternConstraint defined in TADL2.
     ##
@@ -891,46 +1041,61 @@ module TADL2{
     ## 57: constraint.value = true
     ## 57: constraint.final = false
     ## ~~~
-    def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedLogicValue] := {
-        liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
+    def patternConstraint[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, minDist: Int) : Events[fourValuedLogicValue] :=
+        patternConstraintReset(e, periodX, offset, jitter, minDist, pseudoInfty)
+	
+	## Checks the patternConstraint defined in TADL2.
+	##
+	## resets a negative output after resetTime. See patternConstraint for more information.
+	def patternConstraintReset[A](e: Events[A], periodX: Int, offset: Map[Int, Int], jitter: Int, 
+			minDist: Int, resetTime: Int) : Events[fourValuedLogicValue] := {
+	   liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
             if b == 1 then 1 else a % b;
         # lower bound for latest x
-        def lowerBoundX: Events[Int] :=  merge (
-            # increase by period and adjust by offset and jitter
-            if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e)) then
-                max(last(lowerBoundX, e) + periodX,
-                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter) 
-            #adjust by offset and jitter
-            else
-                max(last(lowerBoundX, e),
-                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))-jitter),
-            time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)) - jitter)
+        def lowerBoundX: Events[Int] := 
+			if (last(res, e).final) then
+				on(e, 0)
+			else
+				merge (
+					# increase by period and adjust by offset and jitter
+					if (aModuloBOr1if1(resetCount(e, filter(e, last(res, e).final)), Map.size(offset))== 1 && !isFirst(e)) then
+						max(last(lowerBoundX, e) + periodX,
+							time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))-jitter) 
+					#adjust by offset and jitter
+					else
+						max(last(lowerBoundX, e),
+							time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))-jitter),
+					time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)) - jitter)
         # lower bound for latest x
-        def upperBoundX: Events[Int] :=  merge (
-            # increase by period and adjust by offset and jitter
-            if (aModuloBOr1if1(count(e), Map.size(offset))== 1 && !isFirst(e))  then
-                min(last(upperBoundX, e) + periodX,
-                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))) 
-            else
-            # adjust by offset and jitter
-                min(last(upperBoundX, e),
-                    time(e) - Map.get(offset, (count(e)-1) % Map.size(offset))),
-            time(e) - Map.get(offset, (count(e)-1) % Map.size(offset)))
+        def upperBoundX: Events[Int] :=  
+			if (last(res, e).final) then
+				on(e, pseudoInfty)
+			else		
+				merge (
+					# increase by period and adjust by offset and jitter
+					if (aModuloBOr1if1(resetCount(e, filter(e, last(res, e).final)), Map.size(offset))== 1 && !isFirst(e))  then
+						min(last(upperBoundX, e) + periodX,
+							time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))) 
+					else
+					# adjust by offset and jitter
+						min(last(upperBoundX, e),
+							time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))),
+					time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)))
         # timestamps, in which the evaluation occurs
-        def evaluateTimes= mergeUnit(e, safeDelay(upperBoundX + (if count(e) % Map.size(offset) == 0 then periodX else 0) +
-            Map.get(offset, count(e) % Map.size(offset)) + jitter - time(e) + 1, e))
+        def evaluateTimes= mergeUnit(e, TADL2.safeDelay(upperBoundX + (if resetCount(e, filter(e, last(res, e).final)) % Map.size(offset) == 0 then periodX else 0) +
+            Map.get(offset, resetCount(e, filter(e, last(res, e).final)) % Map.size(offset)) + jitter - time(e) + 1, e))
         #evaluation
-        slift(
-            # distance to x is correct-> current true, false otherwise
-            if (lowerBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) <= time(evaluateTimes) &&
-                    time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(e)-1) % Map.size(offset)) + jitter) then
-                {value= true, final= false}
-            else
-                {value= false, final= true},
-            # application of the repeatConstraint
-            repeatConstraint(e, minDist, pseudoInfty, 1),
-            fourValuedConjunction)
-    }
+		def res: Events[fourValuedLogicValue]= TADL2.stillFulfillableReset(default(TADL2.fourValuedConjunction(
+				# distance to x is correct-> current true, false otherwise
+				if (lowerBoundX + Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)) <= time(evaluateTimes) &&
+						time(evaluateTimes) <= upperBoundX + Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)) + jitter) then
+					{value= true, final= false}
+				else
+					{value= false, final= true},
+				TADL2.repeatConstraintReset(e, minDist, pseudoInfty, 1, resetTime)),
+			{final= false, value = true}), resetTime)
+		res
+   }
 
     ## Checks the ReactionConstraint defined in TADL2.
     ##
@@ -948,7 +1113,7 @@ module TADL2{
     ## def minTimeDiff = 5
     ## def maxTimeDiff = 5
     ##
-    ## def constraint= TADL2.reactionConstraint(stimulus, response, minTimeDiff, maxTimeDiff)
+    ## def constraint= TADL2.reactionConstraintReset(stimulus, response, minTimeDiff, maxTimeDiff)
     ## out constraint.value
     ## out constraint.final
     ##~~~
@@ -979,8 +1144,28 @@ module TADL2{
     ## 18: constraint.value = true
     ## 18: constraint.final = false
     ## ~~~
-    def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] := {
-        # Map with unmatched stimulus events after stimulus
+    def reactionConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] :=
+        reactionConstraintReset(stimulus, response, minTimeDiff, maxTimeDiff, pseudoInfty)
+    
+    ## nodoc
+    liftable def removeEventsAfterReset(aMap: Map[Int, Int], remainingKeys: List[Int], timeNow: Int, resetTime: Int): Map[Int, Int]=
+        if (List.size(remainingKeys) == 0) then
+            aMap
+        else
+            removeEventsAfterReset(
+                if (Map.get(aMap, List.head(remainingKeys)) + resetTime < timeNow) then
+                    Map.remove(aMap, List.head(remainingKeys)) 
+                else
+                    aMap,
+                List.tail(remainingKeys), timeNow, resetTime)
+                
+    ## Checks the ReactionConstraint defined in TADL2.
+    ##
+    ## Any state that leads to a final negative answer is resetted after resetTime.
+    ##
+    ## See ReactionConstraint for more information.
+	def reactionConstraintReset(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int, resetTime: Int): Events[fourValuedLogicValue] := {
+        # Map with unmatched stimulus events after stimulus (color->timestamp)
         def unmatchedStimulusEventsNewStimulus : Events[Map[Int, Int]]:= merge(
             if defaultTime(stimulus) >= defaultTime(response) &&
                     !Map.contains(last(unmatchedStimulusEvents, merge(stimulus, response)), stimulus) then
@@ -988,16 +1173,23 @@ module TADL2{
             else
                 last(unmatchedStimulusEvents, merge(stimulus, response)),
             Map.empty[Int, Int])
+        def unmatchedStimulusEventsRemoveReset: Events[Map[Int, Int]]:= 
+			default(
+				removeEventsAfterReset(unmatchedStimulusEventsNewStimulus,
+					Map.keys(unmatchedStimulusEventsNewStimulus),
+					time(mergeUnit(stimulus, response)),
+					resetTime),
+				Map.empty[Int, Int])
         # Map with unmatched stimulus events after response
         def unmatchedStimulusEvents := merge (
             if (defaultTime(stimulus) <= defaultTime(response) &&
-                    Map.contains(unmatchedStimulusEventsNewStimulus, merge(response, -1)) &&
-                    Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
-                    Map.get(unmatchedStimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
-                Map.remove(unmatchedStimulusEventsNewStimulus, response)
+                    Map.contains(unmatchedStimulusEventsRemoveReset, merge(response, -1)) &&
+                    Map.get(unmatchedStimulusEventsRemoveReset, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
+                    Map.get(unmatchedStimulusEventsRemoveReset, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
+                Map.remove(unmatchedStimulusEventsRemoveReset, response)
             else
-                unmatchedStimulusEventsNewStimulus,
-            unmatchedStimulusEventsNewStimulus)
+                unmatchedStimulusEventsRemoveReset,
+            unmatchedStimulusEventsRemoveReset)
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(mergeUnit(stimulus, response),
                 safeDelay(slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff -
@@ -1006,15 +1198,15 @@ module TADL2{
                     
         #evaluation
         # no unmatched stimulus events-> currently true
-        stillFulfillabe(if (Map.size(unmatchedStimulusEvents) == 0) then
+        stillFulfillableReset(if (Map.size(unmatchedStimulusEvents) == 0) then
             {value= true, final= false}
         else
             # all unmatched stimulus events can still be matched-> currently false
             if (slift1(unmatchedStimulusEvents, mapMinimumValue) + maxTimeDiff >= time(evaluateTimes)) then
                 {value= false, final= false}
             else
-                {value= false, final= true})
-    }
+                {value= false, final= true}, resetTime)
+	}
 
     ## Checks the AgeConstraint defined in TADL2.
     ##
@@ -1063,7 +1255,10 @@ module TADL2{
     ## 18: constraint.value = true
     ## 18: constraint.final = false
     ## ~~~
-    def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] := {
+    def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] :=
+        ageConstraintReset(stimulus, response, minTimeDiff, maxTimeDiff, pseudoInfty)
+	
+	def ageConstraintReset(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         #removes colors, that were before timeBound, from the list
         def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
                 colorTimeStamps: Map[Int, Int], timeBound: Int): List[Int] :=
@@ -1120,14 +1315,15 @@ module TADL2{
             
         #evaluation
         # 'now' has response event => time matches to unmatched stimulus event
-        stillFulfillabe(
+        stillFulfillableReset(
             if ((!(defaultTime(stimulus) <= defaultTime(response))) || 
                     Map.contains(stimulusEventsNewStimulus, merge(response, -1)) &&
                     Map.get(stimulusEventsNewStimulus, merge(response, -1)) + minTimeDiff <= defaultTime(response) &&
                     Map.get(stimulusEventsNewStimulus, merge(response, -1)) + maxTimeDiff >= defaultTime(response)) then
                 {value= true, final= false}
             else
-                {value= false, final= true})
+                {value= false, final= true},
+			resetTime)
     }
 
     ## The function checkEventChain checks the correctness of event chains. Any stimulus event of a specific color must occur before the first response event with the same color.
@@ -1179,7 +1375,7 @@ module TADL2{
         # colors that occured in response-> not allows in stimulus anymore
         def previousResponseColors: Events[Set[Int]]:=
             merge(Set.add(last(previousResponseColors, response), response), Set.empty[Int])
-        stillFulfillabe(
+        stillFulfillable(
             if on(merge(stimulus, response),
                 # stimulus event-> color didn't occur in response earlier
                     if (defaultTime(stimulus) >= defaultTime(response)) then 
@@ -1371,7 +1567,7 @@ module TADL2{
             
         #Evaluation
         #no unfullfilled event-> current true
-        stillFulfillabe(
+        stillFulfillable(
             if (slift1(storedEvents, timeOldestUnfulfilledEvent) == pseudoInfty) then
                 {value= true, final= false}
             else
@@ -1914,7 +2110,7 @@ module TADL2{
                         -1, eventIndices)))
         
         #no unfulfilled clusters-> current true
-        stillFulfillabe(if List.size(activeClusters) == 0 then
+        stillFulfillable(if List.size(activeClusters) == 0 then
             {value= true, final= false}
         else
             # unfulfilled clusters exists, but not too old-> current false
@@ -2544,7 +2740,7 @@ module TADL2{
             safeDelay(slift(storedClusters, Map.keys(storedClusters), startTimeOldestCluster) + tolerance - time(eventStreamIndices) + 1, eventStreamIndices)))
         
         #no unfinished synchronization clusters and no unmatched Stimulus colors
-        stillFulfillabe(if (Set.size(unmatchedStimulusColors) == 0 && Map.size(storedClusters) == 0) then
+        stillFulfillable(if (Set.size(unmatchedStimulusColors) == 0 && Map.size(storedClusters) == 0) then
             {value= true, final= false}
         else
             # unfulfilled stimulus colors exist, all clusters are still fulfillable-> current false
@@ -2909,7 +3105,7 @@ module TADL2{
 
         
         #evaluation
-        stillFulfillabe(
+        stillFulfillable(
             # response event-> valid cluster of the same color must exists
             if (Map.contains(eventStreamIndices, 0)) then
                 if slift3(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, clusterFulfilled) then
