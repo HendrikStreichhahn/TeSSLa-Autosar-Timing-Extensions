@@ -1,7 +1,6 @@
 module TADL2{
     ## nodoc
     def pseudoInfty : Int := 9223372036854775807
-    #def infty : Int := 9223372036854775807
 
     ## Four valued logic value
     ##
@@ -549,6 +548,7 @@ module TADL2{
 	
 	## Checks the RepetitionConstraint defined in TADL2.
 	## Resets a negative output after resetTime.
+	## See RepetitionConstraint for more information
 	def repetitionConstraintReset[A](events: Events[A], lower: Int, upper: Int, span: Int, jitter: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         # lower bound for current x
         def lowerBoundXNow: Events[Int] =
@@ -648,6 +648,14 @@ module TADL2{
     ## ~~~
     def executionTimeConstraint[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
             lower: Int, upper: Int): Events[fourValuedLogicValue] :={
+        executionTimeConstraintReset(start, end, preempt, resume, lower, upper, pseudoInfty)
+    }
+	
+	## Checks the executionTimeConstraint defined in TADL2.
+	## Resets a negative output after resetTime.
+	## See executionTimeConstraint for more information
+	def executionTimeConstraintReset[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
+            lower: Int, upper: Int, resetTime: Int): Events[fourValuedLogicValue] :={
         # timestamps, when the constraint is evaluated
         def inputTimes: Events[Unit] := mergeUnit(mergeUnit(mergeUnit(start, end), preempt), resume)
         # timestamps, in which the evaluation occurs
@@ -662,7 +670,7 @@ module TADL2{
         def execTime : Events[Int] := runtime(start, evaluateTimes) - resetSum(runtime(preempt, resume), start)
         # 'now' is end event
             
-        stillFulfillable(
+        stillFulfillableReset(
             #first event or correct distance to X
             if (if (time(evaluateTimes) == defaultTime(end)) then
                     lower <= execTime && execTime <= upper
@@ -671,7 +679,8 @@ module TADL2{
                     execTime <= upper) then
                 {value= true, final= false}
             else
-                {value= false, final= true})
+                {value= false, final= true},
+			resetTime)
     }
 
     ## Checks the OrderConstraint defined in TADL2.
@@ -712,21 +721,46 @@ module TADL2{
     ## 40: constraint.value = true
     ## 40: constraint.final = false
     ## ~~~
-    def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedLogicValue] :=
-        stillFulfillable(
+	def orderConstraint[A, B](source: Events[A], target: Events[B]): Events[fourValuedLogicValue] := 
+		orderConstraintReset(source, target, pseudoInfty)
+	
+	## Checks the OrderConstraint defined in TADL2.
+	## Resets a negative output after resetTime.
+	## See orderConstraint for more information
+	def orderConstraintReset[A, B](source: Events[A], target: Events[B], resetTime: Int): Events[fourValuedLogicValue] := {
+		# next timestamp after 'falling flank'
+		def failingTimeStamps: Events[Unit] =
+			filter(mergeUnit(source, target), last(result.final, mergeUnit(source, target)) &&
+					!(last(last(result.final, mergeUnit(source, target)), mergeUnit(source, target))))
+		#timestamps, in which the state of the monitor is resetted
+		def resets: Events[Unit]=
+			delay(const(resetTime, failingTimeStamps)-(time(mergeUnit(source, target)) -
+					prev(time(mergeUnit(source, target)))),
+				failingTimeStamps)
+		
+		#reset count for both streams
+		def sourceCount: Events[Int] = resetCount(source, resets)
+		def targetCount: Events[Int] = resetCount(target, resets)
+	
+        def result := stillFulfillableReset(
             #number of events on both streams equal-> currently true
-            if count(source) == count(target) then
+            if sourceCount == targetCount then
                 if (defaultTime(source) == defaultTime(target) && defaultTime(source) != -1) then
                     {value= false, final= true}
                 else
                     {value= true, final= false}
             else
                 # more source than target events-> currently false
-                if (count(source) >= count(target)) then
+                if (sourceCount >= targetCount) then
                     {value= false, final= false}
                 else
                     # more target than source events-> false
-                    {value= false, final= true})
+                    {value= false, final= true},
+			resetTime)
+		#output
+		result
+	}
+
 
     ## Checks the SporadicConstraint defined in TADL2.
     ##
@@ -1258,6 +1292,11 @@ module TADL2{
     def ageConstraint(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int): Events[fourValuedLogicValue] :=
         ageConstraintReset(stimulus, response, minTimeDiff, maxTimeDiff, pseudoInfty)
 	
+	## Checks the AgeConstraint defined in TADL2.
+    ##
+    ## Any state that leads to a final negative answer is resetted after resetTime.
+    ##
+    ## See AgeConstraint for more information.
 	def ageConstraintReset(stimulus: Events[Int], response: Events[Int], minTimeDiff: Int, maxTimeDiff: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         #removes colors, that were before timeBound, from the list
         def removeOldStimulusColorsFromList(latestStimulusColors: List[Int],
@@ -1371,11 +1410,32 @@ module TADL2{
     ## 14: constraint.value = true
     ## 14: constraint.final = false
     ## ~~~
-    def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedLogicValue]:= {
-        # colors that occured in response-> not allows in stimulus anymore
-        def previousResponseColors: Events[Set[Int]]:=
-            merge(Set.add(last(previousResponseColors, response), response), Set.empty[Int])
-        stillFulfillable(
+    def checkEventChain(stimulus: Events[Int], response: Events[Int]): Events[fourValuedLogicValue]:= 
+		checkEventChainReset(stimulus, response, pseudoInfty)
+	
+	## Checks the correctness of EventChains as defined in TADL2.
+    ##
+    ## Any state that leads to a final negative answer is resetted after resetTime.
+    ##
+    ## See checkEventChain for more information.
+	def checkEventChainReset(stimulus: Events[Int], response: Events[Int], resetTime: Int): 
+			Events[fourValuedLogicValue]:= {
+		# next timestamp after 'falling flank'
+		def failingTimeStamps: Events[Unit] =
+			filter(mergeUnit(stimulus, response), last(result.final, mergeUnit(stimulus, response)) &&
+					!(last(last(result.final, mergeUnit(stimulus, response)), mergeUnit(stimulus, response))))
+		#timestamps, in which the state of the monitor is resetted
+		def resets: Events[Unit]=
+			delay(const(resetTime, failingTimeStamps)-(time(mergeUnit(stimulus, response)) -
+					prev(time(mergeUnit(stimulus, response)))),
+				failingTimeStamps)
+		
+		        # colors that occured in response-> not allows in stimulus anymore
+        def previousResponseColors: Events[Set[Int]]:= 
+			merge(merge(const(Set.empty[Int], resets),
+					Set.add(last(previousResponseColors, response), response)),
+				Set.empty[Int])
+        def result:= stillFulfillableReset(
             if on(merge(stimulus, response),
                 # stimulus event-> color didn't occur in response earlier
                     if (defaultTime(stimulus) >= defaultTime(response)) then 
@@ -1384,8 +1444,10 @@ module TADL2{
                         true) then
                 {value= true, final= false}
             else
-                {value= false, final= true})
-    }
+                {value= false, final= true},
+			resetTime)
+		result
+	}
     
     # state information of synchronization constraint for each event:
     #   streamIndex: index of the stream, in which the event occurred
@@ -1446,7 +1508,8 @@ module TADL2{
     ## 36: constraint.value = true
     ## 36: constraint.final = false
     ## ~~~
-    def synchronizationConstraint(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int): Events[fourValuedLogicValue]:= {
+	def synchronizationConstraintReset(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int,
+			resetTime: Int): Events[fourValuedLogicValue]:= {
 
         def buildSynchronizationEventInfo(streamInd: Int, evtTime: Int, flflld: Bool) : SynchronizationEventInfo:=
             {streamIndex= streamInd, eventTime= evtTime, fulfilled= flflld}
@@ -1564,10 +1627,19 @@ module TADL2{
         # timestamps, in which the evaluation occurs
         def evaluateTimes = mergeUnit(eventIndices,
             safeDelay(slift1(storedEvents, timeOldestUnfulfilledEvent) + tolerance - time(eventIndices)+1, eventIndices))
+		
+		def failingTimeStamps: Events[Unit] =
+			filter(evaluateTimes, last(result.final, evaluateTimes) &&
+					!(last(last(result.final, evaluateTimes), evaluateTimes)))
+		#timestamps, in which the state of the monitor is resetted
+		def resets: Events[Unit]=
+			delay(const(resetTime, failingTimeStamps)-(time(evaluateTimes) -
+					prev(time(evaluateTimes))),
+				failingTimeStamps)
             
         #Evaluation
         #no unfullfilled event-> current true
-        stillFulfillable(
+        def result := stillFulfillableReset(
             if (slift1(storedEvents, timeOldestUnfulfilledEvent) == pseudoInfty) then
                 {value= true, final= false}
             else
@@ -1576,14 +1648,26 @@ module TADL2{
                 if (slift1(storedEventsBeforeRemove, timeOldestUnfulfilledEvent) >= time(evaluateTimes) - tolerance) then
                     {value= false, final= false}
                 else
-                    {value= false, final= true})
+                    {value= false, final= true},
+			resetTime)
+		
+		result
     }
 
     ## Checks the SynchronizationConstraint for two streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int):
-            Events[fourValuedLogicValue]:={
+	def synchronizationConstraint2[A, B](events1: Events[A], events2: Events[B], tolerance: Int
+			): Events[fourValuedLogicValue]:=
+		synchronizationConstraint2Reset(events1, events2, tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for two streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraint2Reset[A, B](events1: Events[A], events2: Events[B], tolerance: Int,
+			resetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(events1, events2))
         
         def eventList2:= 
@@ -1598,14 +1682,23 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 2, tolerance)
+        synchronizationConstraintReset(eventList, 2, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for three streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], tolerance: Int):
-            Events[fourValuedLogicValue]:={
+    def synchronizationConstraint3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C], 
+			tolerance: Int): Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset3(events1, events2, events3, tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for three streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+	def synchronizationConstraintReset3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C],
+			tolerance: Int, ResetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
         
         def eventList3:= 
@@ -1626,14 +1719,23 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 3, tolerance)
+        synchronizationConstraintReset(eventList, 3, tolerance, ResetTime)
     }
 
     ## Checks the SynchronizationConstraint for four streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], 
+			events4: Events[D], tolerance: Int): Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset4(events1, events2, events3, events4, tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for four streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset4[A, B, C, D](events1: Events[A], events2: Events[B], events3: Events[C], 
+            events4: Events[D], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(events1, events2), events3), events4))
         
         def eventList4:= 
@@ -1660,14 +1762,23 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 4, tolerance)
+        synchronizationConstraintReset(eventList, 4, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for five streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            events5: Events[E], tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], 
+			events4: Events[D], events5: Events[E], tolerance: Int): Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset5(events1, events2, events3, events4, events5, tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for five streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset5[A, B, C, D, E](events1: Events[A], events2: Events[B], events3: Events[C], 
+            events4: Events[D], events5: Events[E], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
             events1, events2), events3), events4), events5))
          
@@ -1701,14 +1812,26 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 5, tolerance)
+        synchronizationConstraintReset(eventList, 5, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for six streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            events5: Events[E], events6: Events[F], tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], events3: Events[C], 
+			events4: Events[D], events5: Events[E], events6: Events[F], tolerance: Int): 
+			Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset6(events1, events2, events3, events4, events5, events6, tolerance,
+			pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for six streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset6[A, B, C, D, E, F](events1: Events[A], events2: Events[B], 
+            events3: Events[C], events4: Events[D], events5: Events[E], events6: Events[F], tolerance: Int, 
+			resetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
             events1, events2), events3), events4), events5), events6))
             
@@ -1748,14 +1871,26 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 6, tolerance)
+        synchronizationConstraintReset(eventList, 6, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for seven streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint7[A, B, C, D, E, F, G](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            events5: Events[E], events6: Events[F], events7: Events[G], tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint7[A, B](events1: Events[A], events2: Events[B], events3: Events[B], 
+			events4: Events[B], events5: Events[B], events6: Events[B], events7: Events[B], tolerance: Int): 
+			Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset7(events1, events2, events3, events4, events5, events6, events7,
+			tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for seven streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset7[A, B, C, D, E, F, G](events1: Events[A], events2: Events[B], events3: 
+			Events[C], events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G], 
+			tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
             events1, events2), events3), events4), events5), events6), events7))
 
@@ -1801,14 +1936,26 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 7, tolerance)
+        synchronizationConstraintReset(eventList, 7, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for eight streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: Events[C], 
+			events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H],
+			tolerance: Int): Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset8(events1, events2, events3, events4, events5, events6, events7, events8,
+			tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for eight streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset8[A, B, C, D, E, F, G, H](events1: Events[A], events2: Events[B], events3: 
+			Events[C], events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G], events8: 
+			Events[H], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
             events1, events2), events3), events4), events5), events6), events7), events8))
          
@@ -1860,14 +2007,27 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 8, tolerance)
+        synchronizationConstraintReset(eventList, 8, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for nine streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], events3: Events[C], 
+			events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H],
+			events9: Events[I], tolerance: Int): Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset9(events1, events2, events3, events4, events5, events6, events7, events8,
+			events9, tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for nine streams.
+    ##
+	## Resets a negative output after ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset9[A, B, C, D, E, F, G, H, I](events1: Events[A], events2: Events[B], 
+			events3: Events[C], events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G],
+			events8: Events[H], events9: Events[I], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:={
+			
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
             events1, events2), events3), events4), events5), events6), events7), events8), events9))
             
@@ -1925,14 +2085,27 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 9, tolerance)
+        synchronizationConstraintReset(eventList, 9, tolerance, resetTime)
     }
 
     ## Checks the SynchronizationConstraint for ten streams.
     ##
     ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
-    def synchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], events3: Events[C], events4: Events[D],
-            events5: Events[E], events6: Events[F], events7: Events[G], events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[fourValuedLogicValue]:={
+	def synchronizationConstraint10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], 
+			events3: Events[C], events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G],
+			events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int): Events[fourValuedLogicValue]:=
+		synchronizationConstraintReset10(events1, events2, events3, events4, events5, events6, events7, events8,
+			events9, events10, tolerance, pseudoInfty)
+	
+	## Checks the SynchronizationConstraint for ten streams.
+    ##
+	## Resets a negative output ten ResetTime
+	##
+    ## See [`SynchronizationConstraint`](tadl2#synchronizationconstraint) for further information.
+    def synchronizationConstraintReset10[A, B, C, D, E, F, G, H, I, J](events1: Events[A], events2: Events[B], 
+			events3: Events[C], events4: Events[D], events5: Events[E], events6: Events[F], events7: Events[G], 
+			events8: Events[H], events9: Events[I], events10: Events[J], tolerance: Int, resetTime: Int): 
+			Events[fourValuedLogicValue]:={
         def timeNow: Events[Int] := time(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(mergeUnit(
             events1, events2), events3), events4), events5), events6), events7), events8), events9), events10))
         
@@ -1996,7 +2169,7 @@ module TADL2{
             else
                 eventList2
 
-        synchronizationConstraint(eventList, 10, tolerance)
+        synchronizationConstraintReset(eventList, 10, tolerance, resetTime)
     }
     
     # State information of strongSynchronizationConstraints for currently active snchronization clusters
@@ -2120,6 +2293,86 @@ module TADL2{
                 # unfulfilled clusters are too old-> def. false
                 {value= false, final= true})
     }
+	
+	def StrongSynchronizationConstraintReset(eventIndices: Events[List[Int]], streamCount: Int, tolerance: Int,
+		resetTime: Int): Events[fourValuedLogicValue]:= {
+
+               # inserts one events to the active clusters. Creates new cluster, if needed.
+        # insertes only, if cluster not too old
+        # runtime: list.length(activeClusters)
+        liftable def insertEvent(activeClusters: List[synchronizationCluster], eventIndex: Int, timeNow: Int): List[synchronizationCluster] :=
+            # no more clusters to check -> create new cluster
+            if (List.size(activeClusters) == 0) then
+                List.append(activeClusters, {startTime= timeNow, 
+                    fulfilledStreams= Map.add(TADL2.buildMap(streamCount, false), eventIndex, true)})
+            else
+                # stream index already was in head cluster or too old-> check next one
+                if (Map.get(List.head(activeClusters).fulfilledStreams, eventIndex) ||
+                        List.head(activeClusters).startTime + tolerance < timeNow) then
+                    List.prepend(List.head(activeClusters), insertEvent(List.tail(activeClusters), eventIndex, timeNow))
+                #found matching cluster-> set stream in this cluster to true
+                else
+                    List.prepend({startTime= List.head(activeClusters).startTime, 
+                                fulfilledStreams= Map.add(List.head(activeClusters).fulfilledStreams, eventIndex, true)},
+                        List.tail(activeClusters))
+        
+        # inserts all events from eventIndices to the active clusters.
+        # runtime: List.length(eventIndices) * list.length(activeClusters)
+        liftable def insertEventsList(activeClusters: List[synchronizationCluster], eventIndices: List[Int], timeNow: Int): List[synchronizationCluster] :=
+            if (List.size(eventIndices) == 0) then
+                activeClusters
+            else
+                insertEventsList(insertEvent(activeClusters, List.head(eventIndices), timeNow), 
+                    List.tail(eventIndices), timeNow)
+        
+        # runtime: min(tolerance, List.length(eventIndices) * list.length(activeClusters))
+        liftable def removeFulfilledClusters(activeClusters: List[synchronizationCluster]): List[synchronizationCluster]:=
+            #head of list is fulfilled-> remove and check next list entry
+            if (List.size(activeClusters) != 0 && TADL2.mapAllTrue(List.head(activeClusters).fulfilledStreams)) then
+                removeFulfilledClusters(List.tail(activeClusters))
+            # head of list is unfulfilled-> don't remove, rest can't be fulfilled either
+            else
+                activeClusters
+                
+        #state
+        # list of active clusters
+        def activeClusters: Events[List[synchronizationCluster]]:= merge(
+			on(resets, List.empty[synchronizationCluster]),
+            removeFulfilledClusters(insertEventsList(default(last(activeClusters, eventIndices), List.empty[synchronizationCluster]),
+                    eventIndices, time(eventIndices))))
+        #delay
+        def evalTimes:= 
+            time(mergeUnit(eventIndices,
+                TADL2.safeDelay(if (List.size(activeClusters) != 0) then
+                         List.head(activeClusters).startTime+ tolerance - time(eventIndices)+1
+                     else
+                        -1, eventIndices)))
+		
+		# next timestamp after 'falling flank'
+		def failingTimeStamps: Events[Unit] =
+			filter(const((), eventIndices), last(result.final, eventIndices) &&
+					!(last(last(result.final, eventIndices), eventIndices)))
+		#timestamps, in which the state of the monitor is resetted
+		def resets: Events[Unit]=
+			delay(if (const(resetTime, failingTimeStamps)-(time(eventIndices) - prev(time(eventIndices))) > 0) then 
+				const(resetTime, failingTimeStamps)-(time(eventIndices) - prev(time(eventIndices))) else 1,
+				failingTimeStamps)
+        
+        #no unfulfilled clusters-> current true
+        def result:= TADL2.stillFulfillableReset(
+			if List.size(activeClusters) == 0 then
+				{final= false, value= true}
+			else
+				# unfulfilled clusters exists, but not too old-> current false
+				if (List.head(activeClusters).startTime + tolerance > evalTimes) then
+					{final= false, value= false}
+				else
+					# unfulfilled clusters are too old-> def. false
+					{final= true, value= false},
+			resetTime)
+		
+		result
+    }
 
     ## Checks the StrongSynchronizationConstraint for two streams.
     ##
@@ -2169,6 +2422,31 @@ module TADL2{
                 eventList2
 
         StrongSynchronizationConstraint(eventList, 3, tolerance)
+    }
+	
+	def StrongSynchronizationConstraintReset3[A, B, C](events1: Events[A], events2: Events[B], events3: Events[C],
+			tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:={
+        def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
+        
+        def eventList3:= 
+            if (defaultTime(events3) >= timeNow) then
+                List.prepend(3, List.empty[Int])
+            else
+                List.empty[Int]
+            
+        def eventList2:= 
+            if (defaultTime(events2) >= timeNow) then
+                List.prepend(2, eventList3)
+            else
+                eventList3
+                
+        def eventList:= 
+            if (defaultTime(events1) >= timeNow) then
+                List.prepend(1, eventList2)
+            else
+                eventList2
+
+        StrongSynchronizationConstraintReset(eventList, 3, tolerance, resetTime)
     }
 
     ## Checks the StrongSynchronizationConstraint for four streams.

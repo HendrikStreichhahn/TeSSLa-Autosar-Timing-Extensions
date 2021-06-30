@@ -1,0 +1,8 @@
+include "../main/t2uConstraints.tessla"
+
+in source: Events[Unit]
+in target: Events[Unit]
+
+def resetTime: Int = 100
+
+out TADL2.orderConstraintReset(source, target, resetTime)

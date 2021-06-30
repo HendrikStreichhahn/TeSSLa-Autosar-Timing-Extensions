@@ -1,0 +1,92 @@
+
+10: start
+11: preempt
+12: resume
+18: end
+
+20: start
+21: preempt
+22: resume
+26: end
+
+30: start
+31: preempt
+32: resume
+37: end
+
+40: start
+41: preempt
+42: resume
+48: end
+
+50: start
+51: preempt
+52: resume
+59: end
+
+60: start
+61: preempt
+62: resume
+70: end
+
+#fail-> too short
+80: start
+81: preempt
+90: resume
+91: end
+
+100: start
+101: preempt
+102: resume
+108: end
+
+110: start
+111: preempt
+112: resume
+118: end
+
+120: start
+121: preempt
+122: resume
+128: end
+
+130: start
+131: preempt
+132: resume
+138: end
+
+140: start
+141: preempt
+142: resume
+148: end
+
+150: start
+151: preempt
+152: resume
+158: end
+
+160: start
+161: preempt
+162: resume
+168: end
+
+170: start
+171: preempt
+172: resume
+178: end
+
+180: start
+181: preempt
+182: resume
+188: end
+
+#fail reset expected at 191
+190: start
+191: preempt
+192: resume
+198: end
+
+200: start
+201: preempt
+202: resume
+208: end

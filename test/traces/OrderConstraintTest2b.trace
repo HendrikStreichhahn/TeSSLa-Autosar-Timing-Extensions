@@ -1,0 +1,34 @@
+10: source
+30: target
+50: source
+51: target
+60: source
+80: source
+90: target
+100: target
+150: source
+175: target
+#fail
+176: target
+190: target
+191: target
+192: target
+193: target
+194: target
+195: target
+196: target
+197: target
+198: target
+199: target
+
+#fail reset expected at 276
+277: source
+280: target
+287: source
+290: target
+297: source
+300: target
+307: source
+310: target
+317: source
+320: target

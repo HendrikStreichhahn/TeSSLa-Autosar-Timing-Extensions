@@ -1,0 +1,36 @@
+1: stimulus = 1
+2: stimulus = 2
+3: stimulus = 3
+4: stimulus = 4
+5: stimulus = 5
+11: response = 1
+12: response = 2
+13: response = 3
+14: response = 4
+15: response = 5
+#fail
+21: stimulus = 1
+22: stimulus = 2
+23: stimulus = 3
+24: stimulus = 4
+25: stimulus = 5
+# reset expected at 121
+122: stimulus = 6
+123: stimulus = 7
+124: stimulus = 8
+125: stimulus = 9
+126: stimulus = 10
+130: response = 6
+132: response = 7
+133: response = 8
+134: response = 9
+135: response = 10
+#fail again
+151: stimulus = 6
+152: stimulus = 7
+153: stimulus = 8
+154: stimulus = 9
+155: stimulus = 10
+# reset at 251
+251: stimulus = 11
+252: response = 11
