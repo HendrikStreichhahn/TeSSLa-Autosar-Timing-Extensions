@@ -3459,8 +3459,8 @@ module TADL2{
     ## 20: constraint.value = true
     ## 20: constraint.final = false
     ## ~~~
-    def inputSynchronizationConstraint(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, tolerance: Int):
-            Events[fourValuedLogicValue]:= {
+    def inputSynchronizationConstraintReset(eventStreamIndices: Events[Map[Int, Int]], stimulusStreamCount: Int, 
+			tolerance: Int, resetTime: Int): Events[fourValuedLogicValue]:= {
         # Help functions
         
         #builds the starting point for the state Map
@@ -3533,7 +3533,7 @@ module TADL2{
 
         
         #evaluation
-        stillFulfillable(
+	   stillFulfillableReset(
             # response event-> valid cluster of the same color must exists
             if (Map.contains(eventStreamIndices, 0)) then
                 if slift3(latestEventTimes, Map.get(eventStreamIndices, 0), tolerance, clusterFulfilled) then
@@ -3542,15 +3542,25 @@ module TADL2{
                     {value= false, final= true}
             else
                 # no response event-> invalid trace
-                {value= true, final= false})
+                {value= true, final= false},
+			resetTime)
 
     }
 
-    ## Checks the InputSynchronizationConstraint for two streams.
+    ## Checks the InputSynchronizationConstraint for two stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[Int], response: Events[Int],
-            tolerance: Int): Events[fourValuedLogicValue] := {
+	def inputSynchronizationConstraint2(stimulus1: Events[Int], stimulus2: Events[Int], response: Events[Int],
+            tolerance: Int): Events[fourValuedLogicValue] := 
+		inputSynchronizationConstraintReset2(stimulus1, stimulus2, response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for two stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset2(stimulus1: Events[Int], stimulus2: Events[Int], response: Events[Int],
+            tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3560,14 +3570,23 @@ module TADL2{
         def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
         def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
         
-        inputSynchronizationConstraint(eventResponse2, 2, tolerance)
+        inputSynchronizationConstraintReset(eventResponse2, 2, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for three streams.
+    ## Checks the InputSynchronizationConstraint for three stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
-            response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+	def inputSynchronizationConstraint3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+			response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := 
+		inputSynchronizationConstraintReset3(stimulus1, stimulus2, stimulus3, response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for three stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset3(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            response: Events[Int], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3579,14 +3598,24 @@ module TADL2{
         def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
         def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
         
-        inputSynchronizationConstraint(eventResponse3, 3, tolerance)
+        inputSynchronizationConstraintReset(eventResponse3, 3, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for four streams.
+    ## Checks the InputSynchronizationConstraint for four stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
-            stimulus4: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+	def inputSynchronizationConstraint4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] :=
+		inputSynchronizationConstraintReset4(stimulus1, stimulus2, stimulus3, stimulus4, response, tolerance,
+			pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for four stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset4(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], response: Events[Int], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3600,14 +3629,26 @@ module TADL2{
         def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
         def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
         
-        inputSynchronizationConstraint(eventResponse4, 4, tolerance)
+        inputSynchronizationConstraintReset(eventResponse4, 4, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for five streams.
+    ## Checks the InputSynchronizationConstraint for five stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
     def inputSynchronizationConstraint5(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
-            stimulus4: Events[Int], stimulus5: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+            stimulus4: Events[Int], stimulus5: Events[Int], response: Events[Int], tolerance: Int):
+			Events[fourValuedLogicValue] := 
+		inputSynchronizationConstraintReset5(stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, response,
+			tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for five stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+	def inputSynchronizationConstraintReset5(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], response: Events[Int], tolerance: Int, resetTime: Int):
+			Events[fourValuedLogicValue] :={
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3623,15 +3664,26 @@ module TADL2{
         def eventResponse4:= if (defaultTime(stimulus4)  >= timeNow) then Map.add(eventResponse3, 4, default(stimulus4, -1)) else eventResponse3
         def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
         
-        inputSynchronizationConstraint(eventResponse5, 5, tolerance)
+        inputSynchronizationConstraintReset(eventResponse5, 5, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for six streams.
+    ## Checks the InputSynchronizationConstraint for six stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+	def inputSynchronizationConstraint6(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
             stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], response: Events[Int],
-            tolerance: Int): Events[fourValuedLogicValue] := {
+            tolerance: Int): Events[fourValuedLogicValue] :=
+		inputSynchronizationConstraintReset6(stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, stimulus6,
+			response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for six stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset6(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], response: Events[Int],
+            tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3649,15 +3701,26 @@ module TADL2{
         def eventResponse5:= if (defaultTime(stimulus5)  >= timeNow) then Map.add(eventResponse4, 5, default(stimulus5, -1)) else eventResponse4
         def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
         
-        inputSynchronizationConstraint(eventResponse6, 6, tolerance)
+        inputSynchronizationConstraintReset(eventResponse6, 6, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for seven streams.
+    ## Checks the InputSynchronizationConstraint for seven stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+	def inputSynchronizationConstraint7(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
             stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
-            response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+            response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] :=
+		inputSynchronizationConstraintReset7(stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, stimulus6,
+			stimulus7, response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for seven stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset7(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            response: Events[Int], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3677,15 +3740,26 @@ module TADL2{
         def eventResponse6:= if (defaultTime(stimulus6)  >= timeNow) then Map.add(eventResponse5, 6, default(stimulus6, -1)) else eventResponse5
         def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
         
-        inputSynchronizationConstraint(eventResponse7, 7, tolerance)
+        inputSynchronizationConstraintReset(eventResponse7, 7, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for eight streams.
+    ## Checks the InputSynchronizationConstraint for eight stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+	def inputSynchronizationConstraint8(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
             stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
-            stimulus8: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+            stimulus8: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] :=
+		inputSynchronizationConstraintReset8(stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, stimulus6,
+			stimulus7, stimulus8, response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for eight stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset8(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            stimulus8: Events[Int], response: Events[Int], tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3707,15 +3781,28 @@ module TADL2{
         def eventResponse7:= if (defaultTime(stimulus7)  >= timeNow) then Map.add(eventResponse6, 7, default(stimulus7, -1)) else eventResponse6
         def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
         
-        inputSynchronizationConstraint(eventResponse8, 8, tolerance)
+        inputSynchronizationConstraintReset(eventResponse8, 8, tolerance, resetTime)
     }
 
-    ## Checks the InputSynchronizationConstraint for nine streams.
+    ## Checks the InputSynchronizationConstraint for nine stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+	def inputSynchronizationConstraint9(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
             stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
-            stimulus8: Events[Int], stimulus9: Events[Int], response: Events[Int], tolerance: Int): Events[fourValuedLogicValue] := {
+            stimulus8: Events[Int], stimulus9: Events[Int], response: Events[Int], tolerance: Int): 
+			Events[fourValuedLogicValue] := 
+		inputSynchronizationConstraintReset9(stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, stimulus6,
+			stimulus7, stimulus8, stimulus9, response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for nine stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset9(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            stimulus8: Events[Int], stimulus9: Events[Int], response: Events[Int], tolerance: Int, resetTime: Int):
+			Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3739,17 +3826,29 @@ module TADL2{
         def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
         def eventResponse9:= if (defaultTime(stimulus9)  >= timeNow) then Map.add(eventResponse8, 9, default(stimulus9, -1)) else eventResponse8
         
-        inputSynchronizationConstraint(eventResponse9, 9, tolerance)
+        inputSynchronizationConstraintReset(eventResponse9, 9, tolerance, resetTime)
     }
 
 
-    ## Checks the InputSynchronizationConstraint for ten streams.
+    ## Checks the InputSynchronizationConstraint for ten stimulus streams.
     ##
     ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
-    def inputSynchronizationConstraint10(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+	def inputSynchronizationConstraint10(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
             stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
             stimulus8: Events[Int], stimulus9: Events[Int], stimulus10: Events[Int], response: Events[Int],
-            tolerance: Int): Events[fourValuedLogicValue] := {
+            tolerance: Int): Events[fourValuedLogicValue] :=
+		inputSynchronizationConstraintReset10(stimulus1, stimulus2, stimulus3, stimulus4, stimulus5, stimulus6,
+			stimulus7, stimulus8, stimulus9, stimulus10, response, tolerance, pseudoInfty)
+	
+	## Checks the InputSynchronizationConstraint for ten stimulus streams.
+    ##
+	## resets a negative output and invalid state after resetTime
+	##
+    ## See [`InputSynchronizationConstraint`](tadl2#inputsynchronizationconstraint) for further information.
+    def inputSynchronizationConstraintReset10(stimulus1: Events[Int], stimulus2: Events[Int], stimulus3: Events[Int],
+            stimulus4: Events[Int], stimulus5: Events[Int], stimulus6: Events[Int], stimulus7: Events[Int],
+            stimulus8: Events[Int], stimulus9: Events[Int], stimulus10: Events[Int], response: Events[Int],
+            tolerance: Int, resetTime: Int): Events[fourValuedLogicValue] := {
         def timeNow = 
             merge(time(stimulus1),
             merge(time(stimulus2),
@@ -3774,6 +3873,6 @@ module TADL2{
         def eventResponse8:= if (defaultTime(stimulus8)  >= timeNow) then Map.add(eventResponse7, 8, default(stimulus8, -1)) else eventResponse7
         def eventResponse9:= if (defaultTime(stimulus9)  >= timeNow) then Map.add(eventResponse8, 9, default(stimulus9, -1)) else eventResponse8
         def eventResponse10:= if (defaultTime(stimulus10)  >= timeNow) then Map.add(eventResponse9, 10, default(stimulus10, -1)) else eventResponse9
-        inputSynchronizationConstraint(eventResponse10, 10, tolerance)
+        inputSynchronizationConstraintReset(eventResponse10, 10, tolerance, resetTime)
     }
 }
