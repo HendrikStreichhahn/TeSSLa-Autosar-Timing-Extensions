@@ -66,7 +66,7 @@ public class TimeMeasureStrongSynchronizationConstraint extends TimeMeasureConst
             fileWriter.write(writeEventsNow(streamCount-1)+"\n");
             fileWriter.write("def eventsNow:=eventList"+(streamCount-1)+"\n");
             
-            fileWriter.write("def constraint := TADL2.StrongSynchronizationConstraint(eventsNow, "+streamCount+","+tolerance +")\n");
+            fileWriter.write("def constraint := TADL2.StrongSynchronizationConstraintReset(eventsNow, "+streamCount+","+tolerance +", TADL2.pseudoInfty)\n");
 
             fileWriter.write("out constraint\n");
             fileWriter.close();

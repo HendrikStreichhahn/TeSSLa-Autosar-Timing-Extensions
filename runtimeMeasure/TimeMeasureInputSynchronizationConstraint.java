@@ -64,7 +64,7 @@ public class TimeMeasureInputSynchronizationConstraint extends TimeMeasureConstr
             fileWriter.write(writeEventsNow()+ "\n");
 
             //output
-            fileWriter.write("def constraint :=  TADL2.inputSynchronizationConstraint(eventsNow, " + streamCount +" ," + tolerance + ")\n");    
+            fileWriter.write("def constraint :=  TADL2.inputSynchronizationConstraintReset(eventsNow, " + streamCount +" ," + tolerance + ", TADL2.pseudoInfty)\n");
             fileWriter.write("out constraint");
             fileWriter.close();
         } catch (IOException e) {
