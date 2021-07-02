@@ -1,0 +1,63 @@
+1: stimulus = 1
+2: stimulus = 2
+
+12: response1 = 1
+15: response2 = 1
+
+16: response1 = 2
+16: response2 = 2
+16: response3 = 2
+#fail at 18-> delay für color 1
+25: response3 = 1
+
+70: response1 = 100
+# reset expected at 118
+80: stimulus = 3
+81: response1 = 3
+81: response2 = 3
+81: response3 = 3
+
+90: stimulus = 4
+91: response1 = 4
+91: response2 = 4
+91: response3 = 4
+
+100: stimulus = 5
+101: response1 = 5
+101: response2 = 5
+101: response3 = 5
+
+110: stimulus = 6
+111: response1 = 6
+111: response2 = 6
+111: response3 = 6
+
+120: stimulus = 7
+121: response1 = 7
+121: response2 = 7
+121: response3 = 7
+
+130: stimulus = 8
+131: response1 = 8
+131: response2 = 8
+131: response3 = 8
+
+140: stimulus = 9
+141: response1 = 9
+141: response2 = 9
+141: response3 = 9
+
+150: stimulus = 10
+151: response1 = 10
+151: response2 = 10
+151: response3 = 10
+
+160: stimulus = 11
+161: response1 = 11
+161: response2 = 11
+161: response3 = 11
+
+170: stimulus = 12
+171: response1 = 12
+171: response2 = 12
+171: response3 = 12
