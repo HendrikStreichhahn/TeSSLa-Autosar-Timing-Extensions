@@ -1,0 +1,13 @@
+include "../main/t2uConstraints.tessla"
+
+in response: Events[Int]
+in stimulus1: Events[Int]
+in stimulus2: Events[Int]
+in stimulus3: Events[Int]
+
+
+def stimulusStreamCount: Int = 3
+def tolerance: Int = 5
+def resetTime: Int = 100
+
+out TADL2.inputSynchronizationConstraintReset3(stimulus1, stimulus2, stimulus3, response, tolerance, resetTime)

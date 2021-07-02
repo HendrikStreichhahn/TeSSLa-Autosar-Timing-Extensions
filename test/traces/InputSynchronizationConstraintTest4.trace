@@ -1,0 +1,68 @@
+# no fail
+5: stimulus1 = 1
+6: stimulus2 = 1
+7: stimulus3 = 1
+
+11: stimulus1 = 2
+12: stimulus2 = 2
+13: stimulus3 = 2
+
+20: stimulus1 = 3
+20: stimulus2 = 3
+20: stimulus3 = 3
+
+40: stimulus3 = 1
+
+# fail
+50: response = 1
+51: response = 2
+52: response = 3
+
+60: stimulus1 = 4
+60: stimulus2 = 4
+60: stimulus3 = 4
+
+70: stimulus1 = 5
+70: stimulus2 = 5
+70: stimulus3 = 5
+
+80: stimulus1 = 6
+80: stimulus2 = 6
+80: stimulus3 = 6
+
+90: stimulus1 = 7
+90: stimulus2 = 7
+90: stimulus3 = 7
+
+100: stimulus1 = 8
+100: stimulus2 = 8
+100: stimulus3 = 8
+
+110: stimulus1 = 9
+110: stimulus2 = 9
+110: stimulus3 = 9
+
+120: stimulus1 = 10
+120: stimulus2 = 10
+120: stimulus3 = 10
+
+130: stimulus1 = 11
+130: stimulus2 = 11
+130: stimulus3 = 11
+
+140: stimulus1 = 12
+140: stimulus2 = 12
+140: stimulus3 = 12
+
+#fail reset expected at 150
+150: stimulus1 = 13
+150: stimulus2 = 13
+150: stimulus3 = 13
+
+160: stimulus1 = 14
+160: stimulus2 = 14
+160: stimulus3 = 14
+
+170: stimulus1 = 15
+170: stimulus2 = 15
+170: stimulus3 = 15

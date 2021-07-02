@@ -1,0 +1,137 @@
+# no fail
+5: stimulus1 = 1
+6: stimulus2 = 1
+7: stimulus3 = 1
+
+11: stimulus1 = 2
+12: stimulus2 = 2
+13: stimulus3 = 2
+
+20: stimulus1 = 3
+20: stimulus2 = 3
+20: stimulus3 = 3
+
+40: stimulus3 = 1
+
+# fail
+50: response = 1
+51: response = 2
+52: response = 3
+
+60: stimulus1 = 4
+60: stimulus2 = 4
+60: stimulus3 = 4
+61: response = 4
+
+70: stimulus1 = 5
+70: stimulus2 = 5
+70: stimulus3 = 5
+71: response = 5
+
+80: stimulus1 = 6
+80: stimulus2 = 6
+80: stimulus3 = 6
+81: response = 6
+
+90: stimulus1 = 7
+90: stimulus2 = 7
+90: stimulus3 = 7
+91: response = 7
+
+100: stimulus1 = 8
+100: stimulus2 = 8
+100: stimulus3 = 8
+101: response = 8
+
+110: stimulus1 = 9
+110: stimulus2 = 9
+110: stimulus3 = 9
+111: response = 9
+
+120: stimulus1 = 10
+120: stimulus2 = 10
+120: stimulus3 = 10
+121: response = 10
+
+130: stimulus1 = 11
+130: stimulus2 = 11
+130: stimulus3 = 11
+131: response = 11
+
+140: stimulus1 = 12
+140: stimulus2 = 12
+140: stimulus3 = 12
+141: response = 12
+
+#fail reset expected at 151
+150: stimulus1 = 13
+150: stimulus2 = 13
+150: stimulus3 = 13
+151: response = 13
+
+160: stimulus1 = 14
+160: stimulus2 = 14
+160: stimulus3 = 14
+161: response = 14
+
+#fail again
+170: stimulus1 = 15
+170: stimulus2 = 15
+
+171: response = 15
+
+180: stimulus1 = 16
+180: stimulus2 = 16
+180: stimulus3 = 16
+181: response = 16
+
+190: stimulus1 = 17
+190: stimulus2 = 17
+190: stimulus3 = 17
+191: response = 17
+
+200: stimulus1 = 18
+200: stimulus2 = 18
+200: stimulus3 = 18
+201: response = 18
+
+210: stimulus1 = 19
+210: stimulus2 = 19
+210: stimulus3 = 19
+211: response = 19
+
+220: stimulus1 = 20
+220: stimulus2 = 20
+220: stimulus3 = 20
+221: response = 20
+
+230: stimulus1 = 21
+230: stimulus2 = 21
+230: stimulus3 = 21
+231: response = 21
+
+240: stimulus1 = 22
+240: stimulus2 = 22
+240: stimulus3 = 22
+241: response = 22
+
+250: stimulus1 = 23
+250: stimulus2 = 23
+250: stimulus3 = 23
+251: response = 23
+
+260: stimulus1 = 23
+260: stimulus2 = 23
+260: stimulus3 = 23
+261: response = 23
+
+#fail reset expeted at 171
+270: stimulus1 = 33
+270: stimulus2 = 33
+270: stimulus3 = 33
+271: response = 33
+
+280: stimulus1 = 33
+280: stimulus2 = 33
+280: stimulus3 = 33
+281: response = 33
