@@ -201,6 +201,48 @@ module AUTOSAR_TIMEX {
             else
                 {value= false, final= true})
     }
+	
+	def ConcretePatternEventTriggeringReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
+            patternPeriod: Int, patternJitter: Int, resetTime: Int):= {
+		liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
+            if b == 1 then 1 else a % b;
+        # lower bound for pattern starting point
+        def lowerBoundX: Events[Int] :=  merge (
+            # increase by period and adjust by offset
+            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events)) then
+                max(last(lowerBoundX, events) + patternPeriod - patternJitter,
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
+            #adjust by offset
+            else
+                max(last(lowerBoundX, events),
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
+            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
+        # upper bound for pattern starting point
+        def upperBoundX: Events[Int] :=  merge (
+            # increase by period + jitter and adjust by offset
+            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events))  then
+                min(last(upperBoundX, events) + patternPeriod + patternJitter,
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
+            else
+            # adjust by offset
+                min(last(upperBoundX, events),
+                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
+            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
+        # timestamps, in which the evaluation occurs
+        def evaluateTimes= mergeUnit(events, 
+            TADL2.safeDelay(upperBoundX + (if count(events) % Map.size(offset) == 0 then patternPeriod + patternJitter else 0) +
+                Map.get(offset, count(events) % Map.size(offset)), events))
+
+        #evaluation
+        # distance to x is correct-> current true, false otherwise
+        TADL2.stillFulfillableReset(
+            if (lowerBoundX + Map.get(offset, (count(events)-1) % Map.size(offset)) <= time(evaluateTimes) &&
+                    time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(events)-1) % Map.size(offset))) then
+                {value= true, final= false}
+            else
+                {value= false, final= true},
+			resetTime)
+	}
     
     ## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex, without the use the parameter patternPeriod.
     ##
@@ -210,7 +252,7 @@ module AUTOSAR_TIMEX {
     ##
     ## See ConcretePatternEventTriggering for more information.
     def ConcretePatternEventTriggeringNoPeriod[A](events: Events[A], patternLength: Int, offset: Map[Int, Int]):=
-        ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.infty)
+        ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.pseudoInfty)
     
     ## Checks the ArbitraryEventTriggering defined in TADL2.
     ##
@@ -349,7 +391,6 @@ module AUTOSAR_TIMEX {
             TADL2.ageConstraintReset(stimulus, response, minimum, maximum, resetTime)
         else
             TADL2.reactionConstraintReset(stimulus, response, minimum, maximum, resetTime)
-			
 
     ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
     ## 
@@ -430,9 +471,9 @@ module AUTOSAR_TIMEX {
     def SynchronizationTimingConstraintEvents[A](eventIndices: Events[List[Int]], streamCount: Int, 
             tolerance : Int, multipleOccurrences: Bool):=
         if (multipleOccurrences) then
-            TADL2.synchronizationConstraint(eventIndices, streamCount, tolerance)
+            TADL2.synchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
         else
-            TADL2.StrongSynchronizationConstraint(eventIndices, streamCount, tolerance)
+            TADL2.StrongSynchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
     
     ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType responseSynchronization as defined in the Autosar Timing Extensions.
     ##
@@ -503,10 +544,10 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def SynchronizationTimingConstraintResponseSynchronization(eventIndices: Events[Map[Int, Int]],
             responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
-        slift(TADL2.outputSynchronizationConstraint(eventIndices, responseStreamCount, tolerance),
-            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraint(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance),
+        slift(TADL2.outputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance, TADL2.pseudoInfty),
+            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance, TADL2.pseudoInfty),
             TADL2.fourValuedConjunction)
-    
+
     ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions.
     ##
     ## The SynchronizationTimingConstraint on event chains for the synchronizationConstraintType stimulusSynchronization describes groups of streams, which stimulus events occur in common clusters.
@@ -573,7 +614,7 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def SynchronizationTimingConstraintStimulusSynchronization(eventIndices: Events[Map[Int, Int]],
             responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
-        slift(TADL2.inputSynchronizationConstraint(eventIndices, responseStreamCount, tolerance),
-            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraint(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance),
+        slift(TADL2.inputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance, TADL2.pseudoInfty),
+            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance, TADL2.pseudoInfty),
             TADL2.fourValuedConjunction)
 }
