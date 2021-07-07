@@ -10,7 +10,7 @@ module AUTOSAR_TIMEX {
 
     ## checks the EventTriggeringConstraint.PeriodicEventTriggering defined in AUTOSAR Timex
     ##
-    ## The events occur in a periodic pattern with an allowed deviation of jitter and a minimal distance of minInterArrivalTime. 
+    ## The events occur in a periodic pattern with an allowed deviation of jitter and a minimal distance of minInterArrivalTime.
     ##
     ## **Usage Example**
     ##
@@ -51,14 +51,14 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def PeriodicEventTriggering[A](events: Events[A], patternPeriod: Int, jitter: Int, minInterArrivalTime: Int):=
         TADL2.periodicConstraint(events, patternPeriod, jitter, minInterArrivalTime)
-	
+
 	## checks the EventTriggeringConstraint.PeriodicEventTriggering defined in AUTOSAR Timex
 	##
 	## A negative output is resetted after resetTime.
-	def PeriodicEventTriggeringReset[A](events: Events[A], patternPeriod: Int, jitter: Int, 
+	def PeriodicEventTriggeringReset[A](events: Events[A], patternPeriod: Int, jitter: Int,
 			minInterArrivalTime: Int, resetTime: Int):=
         TADL2.periodicConstraintReset(events, patternPeriod, jitter, minInterArrivalTime, resetTime)
-    
+
     ## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex
     ##
     ## The events occur in a periodic pattern, but less strict than in EventTriggeringConstraint.PeriodicEventTriggering defined.
@@ -103,8 +103,8 @@ module AUTOSAR_TIMEX {
     def sporadicEventTriggering[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
             patternPeriod: Int):=
         TADL2.sporadicConstraint (events, patternPeriod, maxInterArrivalTime, jitter, minInterArrivalTime)
-	
-	## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex 
+
+	## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex
 	## a negative output is resetted after resetTime
     ##
 	## See sporadicEventTriggering for more information
@@ -167,8 +167,8 @@ module AUTOSAR_TIMEX {
     ## 57: constraint.value = true
     ## 57: constraint.final = false
     ## ~~~
-    def ConcretePatternEventTriggering[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
-            patternPeriod: Int, patternJitter: Int):= 
+    def ConcretePatternEventTriggering[A](events: Events[A], patternLength: Int, offset: Map[Int, Int],
+            patternPeriod: Int, patternJitter: Int):=
 		ConcretePatternEventTriggeringReset(events, patternLength, offset, patternPeriod, patternJitter, TADL2.pseudoInfty)
 
 	## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex
@@ -176,7 +176,7 @@ module AUTOSAR_TIMEX {
 	## resets a negative output after resetTime
 	##
 	## see [`ConcretePatternEventTriggering`](AUTOSAR_TIMEX#ConcretePatternEventTriggering) for more information.
-	def ConcretePatternEventTriggeringReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
+	def ConcretePatternEventTriggeringReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int],
             patternPeriod: Int, patternJitter: Int, resetTime: Int):= {
 		liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
             if b == 1 then 1 else a % b;
@@ -197,10 +197,10 @@ module AUTOSAR_TIMEX {
 										(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter),
 					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) - patternJitter)
         # lower bound for latest x
-        def upperBoundX: Events[Int] := 
+        def upperBoundX: Events[Int] :=
 			if (last(res, events).final) then
 				on(events, TADL2.pseudoInfty)
-			else	
+			else
 				merge (
 					# increase by period and adjust by offset and jitter
 					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events))  then
@@ -233,7 +233,7 @@ module AUTOSAR_TIMEX {
 			{final= false, value = true}), resetTime)
 		res
 	}
-    
+
     ## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex, without the use the parameter patternPeriod.
     ##
     ## The events for the must occur in a concretely given pattern given by offset, but a deviation is allowed, specified by the patternJitter attribute
@@ -249,10 +249,10 @@ module AUTOSAR_TIMEX {
 	## resets a negative output after resetTime
 	##
 	## see [`ConcretePatternEventTriggering`](AUTOSAR_TIMEX#ConcretePatternEventTriggering) for more information.
-    def ConcretePatternEventTriggeringNoPeriodReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
+    def ConcretePatternEventTriggeringNoPeriodReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int],
 			resetTime: Int):=
         ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.pseudoInfty)
-    
+
     ## Checks the ArbitraryEventTriggering defined in TADL2.
     ##
     ## The ArbitraryEventTriggering describes the time distances between several subsequent events
@@ -330,7 +330,15 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def ArbitraryEventTriggering[A](events: Events[A], minDist: List[Int], maxDist: List[Int]):=
         TADL2.arbitraryConstraint(events, minDist, maxDist)
-    
+
+    ## Checks the ArbitraryEventTriggering defined in TADL2.
+	##
+	## resets a negative output after resetTime
+	##
+	## see [`ArbitraryEventTriggeringReset`](AUTOSAR_TIMEX#ArbitraryEventTriggeringReset) for more information.
+	def ArbitraryEventTriggeringReset[A](events: Events[A], minDist: List[Int], maxDist: List[Int], resetTime: Int):=
+        TADL2.arbitraryConstraintReset(events, minDist, maxDist, resetTime)
+
     ## Checks the LatencyTimingConstraint defined in the Autosar Timing Extensions.
     ##
     ## The LatencyConstraintType if set by isLatencyTypeAge (true-> LatencyConstraintType=age, false LatencyConstraintType->reaction)
@@ -384,7 +392,19 @@ module AUTOSAR_TIMEX {
     ## 18: constraint.value = true
     ## 18: constraint.final = false
     ## ~~~
-    def LatencyTimingConstraint(stimulus: Events[Int], response: Events[Int], isLatencyTypeAge: Bool,
+	def LatencyTimingConstraint(stimulus: Events[Int], response: Events[Int], isLatencyTypeAge: Bool,
+            maximum: Int, minimum: Int, nominal: Int):=
+        if (isLatencyTypeAge) then
+            TADL2.ageConstraint(stimulus, response, minimum, maximum)
+        else
+            TADL2.reactionConstraint(stimulus, response, minimum, maximum)
+
+	## Checks the LatencyTimingConstraint on individual events defined  in the Autosar Timing Extensions.
+	##
+	## resets a negative output after resetTime.
+	##
+	## see [`LatencyTimingConstraint`](AUTOSAR_TIMEX#LatencyTimingConstraint) for more information.
+    def LatencyTimingConstraintReset(stimulus: Events[Int], response: Events[Int], isLatencyTypeAge: Bool,
             maximum: Int, minimum: Int, nominal: Int, resetTime: Int):=
         if (isLatencyTypeAge) then
             TADL2.ageConstraintReset(stimulus, response, minimum, maximum, resetTime)
@@ -392,7 +412,7 @@ module AUTOSAR_TIMEX {
             TADL2.reactionConstraintReset(stimulus, response, minimum, maximum, resetTime)
 
     ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
-    ## 
+    ##
     ## The SynchronizationTimingConstraint on events describes groups of streams, which events occur in common clusters.
     ## If the parameter multipleOccurrences is true, each of these streams must have at least one event in each of these intervals.
     ## If the parameter multipleOccurrences is false, each of these streams must have exactly one event in each of these intervals.
@@ -409,19 +429,19 @@ module AUTOSAR_TIMEX {
     ## in event3: Events[Unit]
     ##
     ## def timeNow: Events[Int] := time(mergeUnit(mergeUnit(events1, events2), events3))
-    ## def eventList3:= 
+    ## def eventList3:=
     ##     if (defaultTime(events3) >= timeNow) then
     ##        List.prepend(3, List.empty[Int])
     ##     else
     ##        List.empty[Int]
-    ##        
-    ## def eventList2:= 
+    ##
+    ## def eventList2:=
     ##    if (defaultTime(events2) >= timeNow) then
     ##        List.prepend(2, eventList3)
     ##    else
     ##        eventList3
-    ##            
-    ## def eventList:= 
+    ##
+    ## def eventList:=
     ##    if (defaultTime(events1) >= timeNow) then
     ##        List.prepend(1, eventList2)
     ##    else
@@ -467,13 +487,25 @@ module AUTOSAR_TIMEX {
     ## 36: constraint.value = true
     ## 36: constraint.final = false
     ## ~~~
-    def SynchronizationTimingConstraintEvents[A](eventIndices: Events[List[Int]], streamCount: Int, 
+    def SynchronizationTimingConstraintEvents[A](eventIndices: Events[List[Int]], streamCount: Int,
             tolerance : Int, multipleOccurrences: Bool):=
         if (multipleOccurrences) then
             TADL2.synchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
         else
             TADL2.StrongSynchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
-    
+
+	## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
+	##
+	## resets a negative output after resetTime.
+	##
+	## see [`SynchronizationTimingConstraintEvents`](AUTOSAR_TIMEX#SynchronizationTimingConstraintEvents) for more information.
+	def SynchronizationTimingConstraintEventsReset[A](eventIndices: Events[List[Int]], streamCount: Int,
+            tolerance : Int, multipleOccurrences: Bool, resetTime: Int):=
+        if (multipleOccurrences) then
+            TADL2.synchronizationConstraintReset(eventIndices, streamCount, tolerance, resetTime)
+        else
+            TADL2.StrongSynchronizationConstraintReset(eventIndices, streamCount, tolerance, resetTime)
+
     ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType responseSynchronization as defined in the Autosar Timing Extensions.
     ##
     ## The SynchronizationTimingConstraint on event chains for the synchronizationConstraintType responseSynchronization describes groups of streams, which response events occur in common clusters.
@@ -490,7 +522,7 @@ module AUTOSAR_TIMEX {
     ## in response3: Events[Int]
     ##
     ## def tolerance = 2
-    ## def timeNow = 
+    ## def timeNow =
     ##    merge(time(stimulus),
     ##    merge(time(response1),
     ##    merge(time(response2),
@@ -500,7 +532,7 @@ module AUTOSAR_TIMEX {
     ## def eventResponse1:= if (defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
     ## def eventResponse2:= if (defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
     ## def eventResponse3:= if (defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
-    ##    
+    ##
     ## def responseStreamCount = 3
     ## def multipleOccurrences = false
     ##
@@ -543,9 +575,28 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def SynchronizationTimingConstraintResponseSynchronization(eventIndices: Events[Map[Int, Int]],
             responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
-        slift(TADL2.outputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance, TADL2.pseudoInfty),
-            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance, TADL2.pseudoInfty),
-            TADL2.fourValuedConjunction)
+		TADL2.fourValuedConjunction(TADL2.outputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance,
+				TADL2.pseudoInfty),
+			if (multipleOccurrences) then
+				{value = true, final: false}
+			else
+				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
+					tolerance, TADL2.pseudoInfty))
+
+	## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType responseSynchronization as defined in the Autosar Timing Extensions.
+	##
+	## resets a negative output after resetTime
+	##
+	## see [`SynchronizationTimingConstraintResponseSynchronization`](AUTOSAR_TIMEX#SynchronizationTimingConstraintResponseSynchronization) for more information.
+	def SynchronizationTimingConstraintResponseSynchronizationReset(eventIndices: Events[Map[Int, Int]],
+            responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool, resetTime: Int):=
+		TADL2.fourValuedConjunction(TADL2.outputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance,
+				resetTime),
+			if (multipleOccurrences) then
+				{value = true, final: false}
+			else
+				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
+					tolerance, resetTime))
 
     ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions.
     ##
@@ -563,7 +614,7 @@ module AUTOSAR_TIMEX {
     ## in stimulus3: Events[Int]
     ##
     ## def tolerance = 2
-    ##    def timeNow = 
+    ##    def timeNow =
     ##        merge(time(stimulus1),
     ##        merge(time(stimulus2),
     ##        merge(time(stimulus3),
@@ -573,7 +624,7 @@ module AUTOSAR_TIMEX {
     ##    def eventResponse1:= if (defaultTime(stimulus1)  >= timeNow) then Map.add(eventStimulus, 1, default(stimulus1, -1)) else eventStimulus
     ##    def eventResponse2:= if (defaultTime(stimulus2)  >= timeNow) then Map.add(eventResponse1, 2, default(stimulus2, -1)) else eventResponse1
     ##    def eventResponse3:= if (defaultTime(stimulus3)  >= timeNow) then Map.add(eventResponse2, 3, default(stimulus3, -1)) else eventResponse2
-    ##    
+    ##
     ## def responseStreamCount = 3
     ## def multipleOccurrences = false
     ##
@@ -613,7 +664,26 @@ module AUTOSAR_TIMEX {
     ## ~~~
     def SynchronizationTimingConstraintStimulusSynchronization(eventIndices: Events[Map[Int, Int]],
             responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
-        slift(TADL2.inputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance, TADL2.pseudoInfty),
-            if (multipleOccurrences) then {value = true, final: false} else TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount, tolerance, TADL2.pseudoInfty),
-            TADL2.fourValuedConjunction)
+		TADL2.fourValuedConjunction(TADL2.inputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance,
+				TADL2.pseudoInfty),
+			if (multipleOccurrences) then
+				{value = true, final: false}
+			else
+				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
+					tolerance, TADL2.pseudoInfty))
+
+	## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions.
+	##
+	## resets a negative output after resetTime
+	##
+	## see [`SynchronizationTimingConstraintStimulusSynchronization`](AUTOSAR_TIMEX#SynchronizationTimingConstraintStimulusSynchronization) for more information.
+	def SynchronizationTimingConstraintStimulusSynchronizationReset(eventIndices: Events[Map[Int, Int]],
+            responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool, resetTime: Int):=
+		TADL2.fourValuedConjunction(TADL2.inputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance,
+				resetTime),
+			if (multipleOccurrences) then
+				{value = true, final: false}
+			else
+				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
+					tolerance, resetTime))
 }

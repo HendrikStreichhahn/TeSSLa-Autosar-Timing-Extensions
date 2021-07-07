@@ -1,0 +1,45 @@
+10: stimulus = 1
+15: stimulus = 2
+20: stimulus = 3
+25: stimulus = 4
+30: stimulus = 5
+35: stimulus = 6
+40: stimulus = 7
+40: response = 1
+45: response = 2
+50: response = 3
+55: response = 4
+60: response = 5
+65: response = 6
+70: response = 7
+
+80: stimulus = 8
+
+110: stimulus = 11
+#fail here
+111: response = 8
+
+115: stimulus = 12
+120: stimulus = 13
+125: stimulus = 14
+130: stimulus = 15
+135: stimulus = 16
+140: stimulus = 17
+140: response = 11
+145: response = 12
+150: response = 13
+155: response = 14
+160: response = 15
+165: response = 16
+170: response = 17
+175: stimulus = 18
+185: stimulus = 19
+190: response = 18
+195: stimulus = 20
+196: stimulus = 21
+197: stimulus = 22
+200: response = 19
+210: response = 20
+211: response = 21
+#reset expected here
+212: response = 22
