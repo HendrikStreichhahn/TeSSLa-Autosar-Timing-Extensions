@@ -2,6 +2,12 @@ include "t2uConstraints.tessla"
 
 module AUTOSAR_TIMEX {
 
+	## Four valued logic value
+    ##
+    ##  * fourValuedLogicValue.value: current logical value
+    ##  * fourValuedLogicValue.final: is the current value final? -> will not change in future
+    type fourValuedLogicValue = {value: Bool, final: Bool}
+
     ## checks the EventTriggeringConstraint.PeriodicEventTriggering defined in AUTOSAR Timex
     ##
     ## The events occur in a periodic pattern with an allowed deviation of jitter and a minimal distance of minInterArrivalTime. 
@@ -162,86 +168,70 @@ module AUTOSAR_TIMEX {
     ## 57: constraint.final = false
     ## ~~~
     def ConcretePatternEventTriggering[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
-            patternPeriod: Int, patternJitter: Int):= {
-        liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
-            if b == 1 then 1 else a % b;
-        # lower bound for pattern starting point
-        def lowerBoundX: Events[Int] :=  merge (
-            # increase by period and adjust by offset
-            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events)) then
-                max(last(lowerBoundX, events) + patternPeriod - patternJitter,
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
-            #adjust by offset
-            else
-                max(last(lowerBoundX, events),
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
-            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
-        # upper bound for pattern starting point
-        def upperBoundX: Events[Int] :=  merge (
-            # increase by period + jitter and adjust by offset
-            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events))  then
-                min(last(upperBoundX, events) + patternPeriod + patternJitter,
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
-            else
-            # adjust by offset
-                min(last(upperBoundX, events),
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
-            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
-        # timestamps, in which the evaluation occurs
-        def evaluateTimes= mergeUnit(events, 
-            TADL2.safeDelay(upperBoundX + (if count(events) % Map.size(offset) == 0 then patternPeriod + patternJitter else 0) +
-                Map.get(offset, count(events) % Map.size(offset)), events))
+            patternPeriod: Int, patternJitter: Int):= 
+		ConcretePatternEventTriggeringReset(events, patternLength, offset, patternPeriod, patternJitter, TADL2.pseudoInfty)
 
-        #evaluation
-        # distance to x is correct-> current true, false otherwise
-        TADL2.stillFulfillable(
-            if (lowerBoundX + Map.get(offset, (count(events)-1) % Map.size(offset)) <= time(evaluateTimes) &&
-                    time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(events)-1) % Map.size(offset))) then
-                {value= true, final= false}
-            else
-                {value= false, final= true})
-    }
-	
+	## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex
+	##
+	## resets a negative output after resetTime
+	##
+	## see [`ConcretePatternEventTriggering`](AUTOSAR_TIMEX#ConcretePatternEventTriggering) for more information.
 	def ConcretePatternEventTriggeringReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
             patternPeriod: Int, patternJitter: Int, resetTime: Int):= {
 		liftable def aModuloBOr1if1(a: Int, b: Int): Int:=
             if b == 1 then 1 else a % b;
-        # lower bound for pattern starting point
-        def lowerBoundX: Events[Int] :=  merge (
-            # increase by period and adjust by offset
-            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events)) then
-                max(last(lowerBoundX, events) + patternPeriod - patternJitter,
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
-            #adjust by offset
-            else
-                max(last(lowerBoundX, events),
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
-            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
-        # upper bound for pattern starting point
-        def upperBoundX: Events[Int] :=  merge (
-            # increase by period + jitter and adjust by offset
-            if (aModuloBOr1if1(count(events), Map.size(offset))== 1 && !isFirst(events))  then
-                min(last(upperBoundX, events) + patternPeriod + patternJitter,
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))) 
-            else
-            # adjust by offset
-                min(last(upperBoundX, events),
-                    time(events) - Map.get(offset, (count(events)-1) % Map.size(offset))),
-            time(events) - Map.get(offset, (count(events)-1) % Map.size(offset)))
+                def lowerBoundX: Events[Int] :=
+			if (last(res, events).final) then
+				on(events, 0)
+			else
+				merge (
+					# increase by period and adjust by offset and jitter
+					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events)) then
+						max(last(lowerBoundX, events) + patternPeriod,
+							time(events) - Map.get(offset,
+									(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter)
+					#adjust by offset and jitter
+					else
+						max(last(lowerBoundX, events),
+							time(events) - Map.get(offset,
+										(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter),
+					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) - patternJitter)
+        # lower bound for latest x
+        def upperBoundX: Events[Int] := 
+			if (last(res, events).final) then
+				on(events, TADL2.pseudoInfty)
+			else	
+				merge (
+					# increase by period and adjust by offset and jitter
+					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events))  then
+						min(last(upperBoundX, events) + patternPeriod,
+							time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
+					else
+					# adjust by offset and jitter
+						min(last(upperBoundX, events),
+							time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))),
+					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
         # timestamps, in which the evaluation occurs
-        def evaluateTimes= mergeUnit(events, 
-            TADL2.safeDelay(upperBoundX + (if count(events) % Map.size(offset) == 0 then patternPeriod + patternJitter else 0) +
-                Map.get(offset, count(events) % Map.size(offset)), events))
-
+        def evaluateTimes=
+			mergeUnit(events,
+				TADL2.safeDelay(upperBoundX + (if resetCount(events, filter(events, last(res, events).final)) % Map.size(offset) == 0 then
+													patternPeriod
+												else
+													0) +
+					Map.get(offset, resetCount(events, filter(events, last(res, events).final)) % Map.size(offset)) + patternJitter - time(events) + 1, events))
         #evaluation
-        # distance to x is correct-> current true, false otherwise
-        TADL2.stillFulfillableReset(
-            if (lowerBoundX + Map.get(offset, (count(events)-1) % Map.size(offset)) <= time(evaluateTimes) &&
-                    time(evaluateTimes) <= upperBoundX + Map.get(offset, (count(events)-1) % Map.size(offset))) then
-                {value= true, final= false}
-            else
-                {value= false, final= true},
-			resetTime)
+		def res: Events[fourValuedLogicValue]= TADL2.stillFulfillableReset(merge(
+				# distance to x is correct-> current true, false otherwise
+				if (lowerBoundX +
+						Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) <=
+					time(evaluateTimes) &&
+						time(evaluateTimes) <= upperBoundX +
+						Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) + patternJitter) then
+					{value= true, final= false}
+				else
+					{value= false, final= true},
+			{final= false, value = true}), resetTime)
+		res
 	}
     
     ## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex, without the use the parameter patternPeriod.
@@ -250,8 +240,17 @@ module AUTOSAR_TIMEX {
     ## The entries of offset must be in ascending order (in keys and values) and the keys must start by 0.
     ## The patterns are repeating after patternPeriod.
     ##
-    ## See ConcretePatternEventTriggering for more information.
+	## see [`ConcretePatternEventTriggering`](AUTOSAR_TIMEX#ConcretePatternEventTriggering) for more information.
     def ConcretePatternEventTriggeringNoPeriod[A](events: Events[A], patternLength: Int, offset: Map[Int, Int]):=
+        ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.pseudoInfty)
+
+	## checks the EventTriggeringConstraint.ConcretePatternEventTriggering defined in AUTOSAR Timex, without the use the parameter patternPeriod.
+	##
+	## resets a negative output after resetTime
+	##
+	## see [`ConcretePatternEventTriggering`](AUTOSAR_TIMEX#ConcretePatternEventTriggering) for more information.
+    def ConcretePatternEventTriggeringNoPeriodReset[A](events: Events[A], patternLength: Int, offset: Map[Int, Int], 
+			resetTime: Int):=
         ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.pseudoInfty)
     
     ## Checks the ArbitraryEventTriggering defined in TADL2.
