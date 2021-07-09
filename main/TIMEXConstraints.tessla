@@ -411,6 +411,88 @@ module AUTOSAR_TIMEX {
         else
             TADL2.reactionConstraintReset(stimulus, response, minimum, maximum, resetTime)
 
+	## Checks the AgeConstraint as defined in the AUTOSAR Timing Extensions.
+	##
+	## The events in the events streams must carry the age of the data, which is typically the point in time, when they were physically created.
+	##
+	## **Usage Example**
+    ##
+    ## ~~~tessla
+	## in events: Events[Int]
+	## 
+	## def minimum: Int = 500
+	## def maximum: Int = 900
+	## 
+	## def resetTime= 100
+	## 
+	## def constraint= AUTOSAR_TIMEX.ageConstraintReset(events, maximum, minimum, resetTime)
+	## out constraint.value
+	## out constraint.final
+	## ~~~
+	## 
+	## **Trace Example**
+	## ~~~trace
+	## 610: events = 100
+	## 610: constraint.value = true
+	## 610: constraint.final = false
+	## 620: events = 110
+	## 620: constraint.value = true
+	## 620: constraint.final = false
+	## 630: events = 120
+	## 630: constraint.value = true
+	## 630: constraint.final = false
+	## 640: events = 130
+	## 640: constraint.value = true
+	## 640: constraint.final = false
+	## 650: events = 140
+	## 650: constraint.value = true
+	## 650: constraint.final = false
+	## 660: events = 150
+	## 660: constraint.value = true
+	## 660: constraint.final = false
+	## 670: events = 160
+	## 670: constraint.value = true
+	## 670: constraint.final = false
+	## 680: events = 170
+	## 680: constraint.value = true
+	## 680: constraint.final = false
+	## 690: events = 180
+	## 690: constraint.value = true
+	## 690: constraint.final = false
+	## 700: events = 205
+	## 700: constraint.value = false
+	## 700: constraint.final = true
+	## 710: events = 200
+	## 710: constraint.value = false
+	## 710: constraint.final = true
+	## 720: events = 210
+	## 720: constraint.value = false
+	## 720: constraint.final = true
+	## 730: events = 220
+	## 730: constraint.value = false
+	## 730: constraint.final = true
+	## ~~~
+	def AgeConstraint(events: Events[Int], maximum: Int, minimum: Int):=
+		AgeConstraintReset(events, maximum, minimum, resetTime)
+
+	## Checks the AgeConstraint as defined in the AUTOSAR Timing Extensions.
+	##
+	## The events in the events streams must carry the age of the data, which is typically the point in time, when they were physically created.
+	##
+	## A negative output is reset after resetTime.
+	##
+	## see [`ageConstraint`](AUTOSAR_TIMEX#ageConstraint) for a trace example.
+	def AgeConstraintReset(events: Events[Int], maximum: Int, minimum: Int, resetTime: Int): Events[fourValuedLogicValue]= {
+		def currentlyFulfilled(event: Events[Int], maximum: Int, minimum: Int): Events[Bool] =
+			events + minimum <= time(events) && events + maximum >= time(events)
+		TADL2.stillFulfillableReset(
+			if (currentlyFulfilled(events, maximum, minimum)) then
+				on(events, {value= true, final= false})
+			else
+				on(events, {value= false, final= true}),
+			resetTime)
+	}
+
     ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
     ##
     ## The SynchronizationTimingConstraint on events describes groups of streams, which events occur in common clusters.
