@@ -473,7 +473,7 @@ module AUTOSAR_TIMEX {
 	## 730: constraint.final = true
 	## ~~~
 	def AgeConstraint(events: Events[Int], maximum: Int, minimum: Int):=
-		AgeConstraintReset(events, maximum, minimum, resetTime)
+		AgeConstraintReset(events, maximum, minimum, TADL2.pseudoInfty)
 
 	## Checks the AgeConstraint as defined in the AUTOSAR Timing Extensions.
 	##
