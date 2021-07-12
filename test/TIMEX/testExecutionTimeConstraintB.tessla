@@ -1,0 +1,11 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in start: Events[Unit]
+in end: Events[Unit]
+
+def minimum: Int = 20
+def maximum: Int = 25
+
+def resetTime= 100
+
+out AUTOSAR_TIMEX.ExecutionTimeConstraintGross(start, end, maximum, minimum)

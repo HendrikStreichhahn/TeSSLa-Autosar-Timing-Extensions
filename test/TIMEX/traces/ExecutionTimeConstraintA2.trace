@@ -1,0 +1,19 @@
+5: start
+25: end
+
+100: start
+115: end
+
+200:start
+220: end
+
+300: start
+301: preempt
+302: resume
+# violation here
+315: end
+
+400: start
+401: preempt
+402: resume
+421: end

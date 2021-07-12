@@ -865,4 +865,85 @@ module AUTOSAR_TIMEX {
 			else
 				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
 					tolerance, resetTime))
+	
+	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = net as defined in the AUTOSAR Timing Extensions.
+    ##
+    ## Checks, if the time between one start event and the next end event, minus the preemptions, is between minimum and maximum.
+    ## The events are expected to be in a logical order (start before end, preempt before resume, ...)
+	##
+    ## **Usage Example**
+    ##
+    ## ~~~tessla
+    ##  in start: Events[Unit]
+    ##  in end: Events[Unit]
+    ##  in preempt: Events[Unit]
+    ##  in resume: Events[Unit]
+    ##
+    ##  def lower = 10
+    ##  def upper = 12
+    ##
+    ##  def constraint= TADL2.executionTimeConstraint(start, end, preempt, resume, 10, 12)
+    ##  out constraint.value
+    ##  out constraint.final
+    ## ~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+    ## 5: start = ()
+    ## 5: constraint.value = true
+    ## 5: constraint.final = false
+    ## 10: preempt = ()
+    ## 10: constraint.value = true
+    ## 10: constraint.final = false
+    ## 12: resume = ()
+    ## 12: constraint.value = true
+    ## 12: constraint.final = false
+    ## 15: preempt = ()
+    ## 15: constraint.value = true
+    ## 15: constraint.final = false
+    ## 17: resume = ()
+    ## 17: constraint.value = true
+    ## 17: constraint.final = false
+    ## 20: end = ()
+    ## 20: constraint.value = true
+    ## 20: constraint.final = false
+    ## ~~~
+	def ExecutionTimeConstraintNet[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
+            maximum: Int, minimum: Int): Events[fourValuedLogicValue] :=
+		TADL2.executionTimeConstraint(start, end, preempt, resume, minimum, maximum)
+	
+	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = net as defined in the AUTOSAR Timing Extensions.
+    ##
+    ## Checks, if the time between one start event and the next end event, minus the preemptions, is between minimum and maximum.
+    ## The events are expected to be in a logical order (start before end, preempt before resume, ...)
+	##
+	## A negative output is reset after resetTime.
+	##
+	## see [`ExecutionTimeConstraintNet`](AUTOSAR_TIMEX#ExecutionTimeConstraintNet) for a trace example.
+	def ExecutionTimeConstraintNetReset[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
+            maximum: Int, minimum: Int, resetTime: Int): Events[fourValuedLogicValue] :=
+		TADL2.executionTimeConstraintReset(start, end, preempt, resume, minimum, maximum, resetTime)
+	
+	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = gross as defined in the AUTOSAR Timing Extensions.
+    ##
+    ## Checks, if the time between one start event and the next end event is between minimum and maximum.
+    ## The events are expected to be in a logical order (start before end, ...)
+	##
+	## see [`ExecutionTimeConstraintNet`](AUTOSAR_TIMEX#ExecutionTimeConstraintNet) for a trace example.
+	def ExecutionTimeConstraintGross[A, B](start: Events[A], end: Events[B], maximum: Int, minimum: Int):
+			Events[fourValuedLogicValue] :=
+		TADL2.executionTimeConstraint(start, end, 0, 0, minimum, maximum)
+
+	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = gross as defined in the AUTOSAR Timing Extensions.
+    ##
+    ## Checks, if the time between one start event and the next end event is between minimum and maximum.
+    ## The events are expected to be in a logical order (start before end, ...)
+	##
+	## A negative output is reset after resetTime.
+	##
+	## see [`ExecutionTimeConstraintNet`](AUTOSAR_TIMEX#ExecutionTimeConstraintNet) for a trace example.
+	def ExecutionTimeConstraintGrossReset[A, B](start: Events[A], end: Events[B], maximum: Int, minimum: Int, resetTime: Int):
+			Events[fourValuedLogicValue] :=
+		TADL2.executionTimeConstraintReset(start, end, 0, 0, minimum, maximum, resetTime)
 }
