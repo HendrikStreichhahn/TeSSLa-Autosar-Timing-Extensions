@@ -1,0 +1,11 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in source: Events[Unit]
+in target: Events[Unit]
+
+def minimum = 1
+def maximum = 1
+
+def resetTime = 100
+
+out AUTOSAR_TIMEX.OffsetTimingConstraintReset(source, target, maximum, minimum, resetTime)

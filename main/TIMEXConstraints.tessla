@@ -492,6 +492,103 @@ module AUTOSAR_TIMEX {
 				on(events, {value= false, final= true}),
 			resetTime)
 	}
+	
+	## Checks the OffsetTimingConstraint as defined in the AUTOSAR Timing Extensions.
+	## 
+	## Each target event must be preceeded by a source event. The allowed time distance is defined by the maximum and the minimum parameter.
+	##
+	## **Usage Example**
+	##
+	## ~~~tessla
+	## in source: Events[Unit]
+	## in target: Events[Unit]
+	## 
+	## def minimum = 15
+	## def maximum = 25
+	## 
+	## def resetTime = 100
+	## 
+	## def constraint= AUTOSAR_TIMEX.OffsetTimingConstraint(source, target, maximum, minimum)
+	## out constraint.value
+	## out constraint.final
+	##
+	## ~~~
+	##
+	## **Trace Example**
+	## ~~~trace
+	## 5: source
+	## 5: constraint.value = true
+	## 5: constraint.final = false
+	## 10: source
+	## 10: constraint.value = true
+	## 10: constraint.final = false
+	## 15: source
+	## 15: constraint.value = true
+	## 15: constraint.final = false
+	## 20: source
+	## 20: target
+	## 20: constraint.value = true
+	## 20: constraint.final = false
+	## 25: source
+	## 25: target
+	## 25: constraint.value = true
+	## 25: constraint.final = false
+	## 30: source
+	## 30: target
+	## 30: constraint.value = true
+	## 30: constraint.final = false
+	## 35: source
+	## 35: target
+	## 35: constraint.value = true
+	## 35: constraint.final = false
+	## 40: source
+	## 40: target
+	## 40: constraint.value = true
+	## 40: constraint.final = false
+	## ~~~
+	def OffsetTimingConstraint[A, B](source: Events[A], target: Events[B], maximum: Int, minimum: Int):=
+		OffsetTimingConstraintReset(source, target, maximum, minimum, TADL2.pseudoInfty)
+	
+	## Checks the OffsetTimingConstraint as defined in the AUTOSAR Timing Extensions.
+	## 
+	## Each target event must be preceeded by a source event. The allowed time distance is defined by the maximum and the minimum parameter.
+	##
+	## A negative Output is reset after resetTime.
+	##
+	## see [`OffsetTimingConstraint`](AUTOSAR_TIMEX#OffsetTimingConstraint) for a trace example.
+	def OffsetTimingConstraintReset[A, B](source: Events[A], target: Events[B], maximum: Int, minimum: Int, resetTime: Int):= {
+		# remove all entries that are smaller than minVal from minVal
+		liftable def list_removeSmaller(list: List[Int], minVal: Int): List[Int]=
+			if (List.size(list) == 0) then
+				list
+			else
+				if (List.head(list) < minVal) then
+					list_removeSmaller(List.tail(list), minVal)
+				else
+					List.prepend(List.head(list), list_removeSmaller(List.tail(list), minVal))
+		# timestamps of stimulus events between now and maximum before that
+		def stimulusTimeStamps: Events[List[Int]]:= list_removeSmaller(
+			List.append(default(last(stimulusTimeStamps, source), List.empty[Int]), time(source)),
+			time(mergeUnit(source, target)) - maximum)
+		
+		liftable def existsValidEvent(list: List[Int], absMin: Int, absMax: Int): Bool:=
+			if (List.size(list) == 0) then
+				false
+			else
+				(List.head(list) >= absMin && List.head(list) <= absMax) || existsValidEvent(List.tail(list), absMin, absMax)
+		
+		def validTarget: Events[Bool]:= on(target, existsValidEvent(stimulusTimeStamps, 
+				time(target) - maximum, time(target) - minimum))
+		
+		def validSource: Events[Bool]:= on(source, true)
+		
+		TADL2.stillFulfillableReset(
+			if merge(validTarget, validSource) then
+				{value= true, final= false}
+			else
+				{value= false, final= true},
+			resetTime)
+	}
 
     ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
     ##
