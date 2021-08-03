@@ -109,10 +109,12 @@ module TADL2{
 					last(finalFalseSince, isFinalFalse),
 				pseudoInfty)
 		def isFinalFalseReset: Events[Bool] =
-			if (finalFalseSince + resetTime < time (events)) then
-				false
-			else
-				isFinalFalse
+			merge(
+				if (finalFalseSince + resetTime < time (events)) then
+					false
+				else
+					isFinalFalse,
+			isFinalFalse)
 		#output
 		if (isFinalFalseReset) then
 			{value= false, final= true}
