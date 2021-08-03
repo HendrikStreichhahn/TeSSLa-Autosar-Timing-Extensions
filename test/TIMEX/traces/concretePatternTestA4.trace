@@ -1,4 +1,5 @@
 2: events = ()
+2: expected = {final= false, value= true}
 3: events = ()
 
 12: events = ()
@@ -11,6 +12,7 @@
 33: events = ()
 #fail-> too many events
 34: events = ()
+34: expected = {final= true, value= false}
 
 42: events = ()
 43: events = ()

@@ -1,4 +1,6 @@
 10: stimulus = 1
+10: expected = {final= false, value= true}
 15: stimulus = 1
 26: response = 1
+26: expected = {final= true, value= false}
 30: response = 1

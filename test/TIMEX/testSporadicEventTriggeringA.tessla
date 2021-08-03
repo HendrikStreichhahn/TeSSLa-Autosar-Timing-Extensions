@@ -2,9 +2,13 @@ include "../../main/TIMEXConstraints.tessla"
 
 in events: Events[Unit]
 
+in expected: Events[{final: Bool, value: Bool}]
+
 def period : Int := 10
 def jitter: Int = 3
 def minimumInterArrivalTime : Int = 8
 def maximumInterArrivalTime : Int = 12
 
-out AUTOSAR_TIMEX.sporadicEventTriggering(events, jitter, maximumInterArrivalTime, minimumInterArrivalTime, period)
+def isExpected:= expected == AUTOSAR_TIMEX.sporadicEventTriggering(events, jitter, maximumInterArrivalTime, minimumInterArrivalTime, period)
+
+out isExpected

@@ -1,5 +1,6 @@
 # no violation
 5: source
+5: expected = {final= false, value= true}
 
 30: target
 35: source

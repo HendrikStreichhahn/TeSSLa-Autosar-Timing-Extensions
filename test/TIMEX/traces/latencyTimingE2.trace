@@ -1,4 +1,5 @@
 10: stimulus = 1
+10: expected = {final= false, value= true}
 15: stimulus = 2
 20: stimulus = 3
 25: stimulus = 4
@@ -15,9 +16,13 @@
 
 80: stimulus = 8
 
+
 110: stimulus = 11
+
 #fail here
 111: response = 8
+
+111: expected = {final= true, value= false}
 
 115: stimulus = 12
 120: stimulus = 13
@@ -43,3 +48,4 @@
 211: response = 21
 #reset expected here
 212: response = 22
+212: expected = {final= false, value= true}

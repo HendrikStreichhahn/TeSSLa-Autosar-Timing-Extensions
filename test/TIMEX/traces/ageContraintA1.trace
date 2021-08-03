@@ -1,5 +1,6 @@
 # no error
 610: events = 100
+610: expected = {final= false, value= true}
 620: events = 110
 630: events = 120
 640: events = 130

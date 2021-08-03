@@ -1,5 +1,6 @@
 # no violation
 0: events = 0
+0: expected = {final= false, value= true}
 1: events = 0
 2: events = 1
 3: events = 2

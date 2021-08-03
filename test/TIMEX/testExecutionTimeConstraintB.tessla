@@ -3,9 +3,13 @@ include "../../main/TIMEXConstraints.tessla"
 in start: Events[Unit]
 in end: Events[Unit]
 
+in expected: Events[{final: Bool, value: Bool}]
+
 def minimum: Int = 20
 def maximum: Int = 25
 
 def resetTime= 100
 
-out AUTOSAR_TIMEX.ExecutionTimeConstraintGross(start, end, maximum, minimum)
+def isExpected:= expected ==  AUTOSAR_TIMEX.ExecutionTimeConstraintGross(start, end, maximum, minimum)
+
+out isExpected

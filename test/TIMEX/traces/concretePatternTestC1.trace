@@ -1,5 +1,6 @@
 # no fail
 0: events = ()
+0: expected = {final= false, value= true}
 1: events = ()
 2: events = ()
 4: events = ()

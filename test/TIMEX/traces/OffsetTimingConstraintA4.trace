@@ -1,6 +1,8 @@
 4: source
+4: expected = {final= false, value= true}
 # violation here-> distance is 26
 30: target
+30: expected = {final= true, value= false}
 35: source
 45: source
 50: target
@@ -22,6 +24,7 @@
 130: target
 # reset expected here
 135: source
+135: expected = {final= false, value= true}
 140: target
 145: source
 150: target

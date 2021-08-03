@@ -3,8 +3,12 @@ include "../../main/TIMEXConstraints.tessla"
 in stimulus: Events[Int]
 in response: Events[Int]
 
+in expected: Events[{final: Bool, value: Bool}]
+
 def minVal = 15
 def maxVal = 30
 def resetTime= 100
 
-out AUTOSAR_TIMEX.LatencyTimingConstraintReset(stimulus, response, true, maxVal, minVal, minVal, resetTime)
+def isExpected:= expected == AUTOSAR_TIMEX.LatencyTimingConstraintReset(stimulus, response, true, maxVal, minVal, minVal, resetTime)
+
+out isExpected

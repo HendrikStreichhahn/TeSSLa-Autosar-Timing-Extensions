@@ -1,4 +1,5 @@
 610: events = 100
+610: expected = {final= false, value= true}
 620: events = 110
 630: events = 120
 640: events = 130
@@ -12,6 +13,7 @@
 718: events = 210
 # fail-> too early
 719: events = 220
+719: expected = {final= true, value= false}
 
 740: events = 240
 750: events = 250
@@ -23,6 +25,7 @@
 810: events = 310
 # reset expected at 820
 820: events = 320
+820: expected = {final= false, value= true}
 830: events = 330
 840: events = 340
 850: events = 350

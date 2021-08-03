@@ -1,10 +1,13 @@
 include "../../main/TIMEXConstraints.tessla"
 
 in events: Events[Int]
+in expected: Events[{final: Bool, value: Bool}]
 
 def minimum: Int = 500
 def maximum: Int = 900
 
 def resetTime= 100
 
-out AUTOSAR_TIMEX.AgeConstraintReset(events, maximum, minimum, resetTime)
+def isExpected:= expected ==  AUTOSAR_TIMEX.AgeConstraintReset(events, maximum, minimum, resetTime)
+
+out isExpected

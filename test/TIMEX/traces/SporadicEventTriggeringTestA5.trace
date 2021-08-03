@@ -1,8 +1,10 @@
 # testing lower bound for jitter and min inter arrival time
+5: expected = {final= false, value= true}
 5: events = ()
 15: events = ()
 
 23: events = ()
 35: events = ()
 # fail here
+42: expected = {final= true, value= false}
 42: events = ()

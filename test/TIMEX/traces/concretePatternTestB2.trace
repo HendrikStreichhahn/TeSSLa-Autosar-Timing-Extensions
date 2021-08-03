@@ -1,5 +1,6 @@
 # should not fail
 2: events = ()
+2: expected = {final= false, value= true}
 3: events = ()
 
 12: events = ()
@@ -7,7 +8,6 @@
 
 22: events = ()
 23: events = ()
-
 # forward jitter-> should not fail
 
 35: events = ()

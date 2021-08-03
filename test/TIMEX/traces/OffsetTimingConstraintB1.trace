@@ -1,4 +1,5 @@
 1: source
+1: expected = {final= false, value= true}
 2: source
 2: target
 3: source
@@ -36,7 +37,9 @@
 19: source
 19: target
 20: target
+
 # fail here
+21: expected = {final= true, value= false}
 21: target
 21: source
 22: source
@@ -75,5 +78,7 @@
 120: source
 121: target
 121: source
+
 # reset expected
+122: expected = {final= false, value= true}
 122: target

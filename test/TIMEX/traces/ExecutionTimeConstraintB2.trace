@@ -1,4 +1,5 @@
 5: start
+5: expected = {final= false, value= true}
 25: end
 
 100: start
@@ -7,3 +8,4 @@
 200:start
 #violation here
 219: end
+219: expected = {final= true, value= false}

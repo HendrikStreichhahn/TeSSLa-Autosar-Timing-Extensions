@@ -1,12 +1,7 @@
 1: event = 1
 1: expected = {final= false, value= true}
 2: event = 2
-2: expected = {final= false, value= true}
 3: event = 3
-3: expected = {final= false, value= true}
 4: event = 5
-4: expected = {final= false, value= true}
 5: event = 4
-5: expected = {final= false, value= true}
 6: event = 6
-6: expected = {final= false, value= true}

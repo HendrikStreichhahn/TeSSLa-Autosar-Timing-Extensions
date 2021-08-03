@@ -1,3 +1,5 @@
+
+5: expected = {final= false, value= true}
 5: source
 5: target
 10: source
@@ -6,6 +8,7 @@
 15: target
 19: source
 # violation here
+20: expected = {final= true, value= false}
 20: target
 25: source
 25: target
@@ -48,6 +51,7 @@
 120: source
 120: target
 # reset expected here
+125: expected = {final= false, value= true}
 125: source
 125: target
 130: source

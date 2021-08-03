@@ -1,4 +1,6 @@
 # testing lower bound for jitter
+
+5: expected = {final= false, value= true}
 5: events = ()
 15: events = ()
 
@@ -11,6 +13,7 @@
 72: events = ()
 
 #fail-> too early
+81: expected = {final= true, value= false}
 
 81: events = ()
 91: events = ()

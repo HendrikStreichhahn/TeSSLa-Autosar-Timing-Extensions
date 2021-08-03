@@ -1,29 +1,16 @@
 1: event = 1
 1: expected = {final= false, value= true}
 2: event = 2
-2: expected = {final= false, value= true}
 3: event = 4
-3: expected = {final= false, value= true}
 4: event = 5
-4: expected = {final= false, value= true}
 5: event = 3
-5: expected = {final= false, value= true}
 6: event = 6
-6: expected = {final= false, value= true}
 7: event = 7
-7: expected = {final= false, value= true}
 
 11: event = 8
-11: expected = {final= false, value= true}
 12: event = 9
-12: expected = {final= false, value= true}
 13: event = 11
-13: expected = {final= false, value= true}
 14: event = 12
-14: expected = {final= false, value= true}
 15: event = 10
-15: expected = {final= false, value= true}
 16: event = 13
-16: expected = {final= false, value= true}
 17: event = 14
-17: expected = {final= false, value= true}

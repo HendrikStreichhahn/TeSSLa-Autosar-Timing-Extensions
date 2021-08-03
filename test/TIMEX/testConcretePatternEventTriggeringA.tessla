@@ -1,10 +1,13 @@
 include "../../main/TIMEXConstraints.tessla"
 
 in events: Events[Unit]
+in expected: Events[{final: Bool, value: Bool}]
 
 def period : Int := 10
 def offset: Map[Int, Int] := Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 1)
 def jitter: Int = 0
 def patternLength: Int = 10
 
-out AUTOSAR_TIMEX.ConcretePatternEventTriggering(events, patternLength, offset, period, jitter)
+def isExpected:= expected == AUTOSAR_TIMEX.ConcretePatternEventTriggering(events, patternLength, offset, period, jitter)
+
+out isExpected

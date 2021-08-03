@@ -1,4 +1,5 @@
 2: events = ()
+2: expected = {final= false, value= true}
 3: events = ()
 
 12: events = ()
@@ -10,11 +11,13 @@
 32: events = ()
 #fail
 34: events = ()
+34: expected = {final= true, value= false}
 
 43: events = ()
 
 # fail reset expected at 134
 135: events = ()
+135: expected = {final= false, value= true}
 136: events = ()
 
 145: events = ()

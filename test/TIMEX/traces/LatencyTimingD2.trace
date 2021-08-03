@@ -1,5 +1,6 @@
 1: stimulus = 1
 1: response = 1
+1: expected = {final= false, value= true}
 
 2: stimulus = 2
 2: response = 2
@@ -9,7 +10,9 @@
 
 #fail-> too late
 8: stimulus = 4
+8: expected = {final= false, value= false}
 9: response = 4
+9: expected = {final= true, value= false}
 
 16: stimulus = 5
 16: response = 5

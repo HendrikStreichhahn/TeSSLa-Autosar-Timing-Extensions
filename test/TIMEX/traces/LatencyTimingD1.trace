@@ -1,5 +1,6 @@
 1: stimulus = 1
 1: response = 1
+1: expected = {final= false, value= true}
 
 2: stimulus = 2
 2: response = 2

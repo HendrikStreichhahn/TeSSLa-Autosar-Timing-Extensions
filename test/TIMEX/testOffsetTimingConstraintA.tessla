@@ -3,9 +3,13 @@ include "../../main/TIMEXConstraints.tessla"
 in source: Events[Unit]
 in target: Events[Unit]
 
+in expected: Events[{final: Bool, value: Bool}]
+
 def minimum = 15
 def maximum = 25
 
 def resetTime = 100
 
-out AUTOSAR_TIMEX.OffsetTimingConstraintReset(source, target, maximum, minimum, resetTime)
+def isExpected:= expected == AUTOSAR_TIMEX.OffsetTimingConstraintReset(source, target, maximum, minimum, resetTime)
+
+out isExpected

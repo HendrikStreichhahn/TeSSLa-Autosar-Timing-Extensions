@@ -1,4 +1,5 @@
 610: events = 100
+610: expected = {final= false, value= true}
 620: events = 110
 630: events = 120
 640: events = 130
@@ -28,8 +29,11 @@
 880: events = 380
 890: events = 390
 900: events = 400
+
 # error expected here
+
 910: events = 1
+910: expected = {final= true, value= false}
 920: events = 420
 930: events = 430
 940: events = 440
@@ -39,8 +43,10 @@
 980: events = 480
 990: events = 490
 1000: events = 500
+
 #reset expected here
-1010: events = 510
+1011: events = 510
+1011: expected = {final= false, value= true}
 1020: events = 520
 1030: events = 530
 1040: events = 540
