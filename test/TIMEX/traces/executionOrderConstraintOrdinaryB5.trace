@@ -1,0 +1,6 @@
+5: event = 5
+5: expected = {final= true, value= false}
+10: event = 3
+10: expected = {final= true, value= false}
+15: event = 7
+15: expected = {final= true, value= false}

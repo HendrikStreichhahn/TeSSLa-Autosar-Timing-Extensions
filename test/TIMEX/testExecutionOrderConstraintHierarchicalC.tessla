@@ -1,0 +1,29 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in event: Events[Int]
+in expected: Events[{final: Bool, value: Bool}]
+
+def resetTime= 100
+
+def Map_merge[K, V](MapA: Map[K, V], MapB: Map[K, V]):=
+	Map_mergeRec(MapA, Map.keys(MapA), MapB)
+
+def Map_mergeRec[K, V](MapA: Map[K, V], remainingKeysA: List[K], MapB: Map[K, V]): Map[K, V]=
+	if (List.size(remainingKeysA) == 0) then
+		MapB
+	else
+		Map.add(Map_mergeRec(MapA, List.tail(remainingKeysA), MapB),
+			List.head(remainingKeysA), Map.get(MapA, List.head(remainingKeysA)))
+
+#		1				8
+#	  /   \			  /   \
+#	2		3  		 9	   10
+#  / \	   / \		/ \	   / \
+# 4   5	  6   7	   11  12 13 14
+def hierachicalOrder: Map[Int, List[Int]] =
+	Map_merge(AUTOSAR_TIMEX.map3(1, AUTOSAR_TIMEX.list2(2, 3), 2, AUTOSAR_TIMEX.list2(4, 5), 3, AUTOSAR_TIMEX.list2(6,7)),
+			AUTOSAR_TIMEX.map3(8, AUTOSAR_TIMEX.list2(9, 10), 9, AUTOSAR_TIMEX.list2(11, 12), 10, AUTOSAR_TIMEX.list2(13,14)))
+
+def isExpected:= expected == AUTOSAR_TIMEX.ExecutionOrderConstraintHierarchical(event, hierachicalOrder, resetTime)
+
+out isExpected

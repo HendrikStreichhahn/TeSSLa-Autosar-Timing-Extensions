@@ -1,0 +1,20 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in event: Events[Int]
+in expected: Events[{final: Bool, value: Bool}]
+
+def resetTime= 100
+
+#	1
+#	|
+#	2
+#	|
+#	3
+#  /|\
+# 4 5 6
+def hierachicalOrder: Map[Int, List[Int]] =
+	AUTOSAR_TIMEX.map3(1, AUTOSAR_TIMEX.list1(2), 2, AUTOSAR_TIMEX.list1(3), 3, AUTOSAR_TIMEX.list3(4,5,6))
+
+def isExpected:= expected == AUTOSAR_TIMEX.ExecutionOrderConstraintHierarchical(event, hierachicalOrder, resetTime)
+
+out isExpected

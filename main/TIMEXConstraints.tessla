@@ -8,6 +8,55 @@ module AUTOSAR_TIMEX {
     ##  * fourValuedLogicValue.final: is the current value final? -> will not change in future
     type fourValuedLogicValue = {value: Bool, final: Bool}
 
+	# removes the given list of elements from a the set
+	## nodoc
+	liftable def removeListFromSet[A](aSet: Set[A], aList: List[A]): Set[A]=
+		if (List.size(aList) == 0) then
+			aSet
+		else
+			removeListFromSet(
+				if (Set.contains(aSet, List.head(aList))) then
+					Set.remove(aSet, List.head(aList))
+				else
+					aSet,
+				List.tail(aList))
+
+	# removes the head of the list if is empty
+	## nodoc
+	liftable def deleteEmptyHead[A](aList: List[Set[A]]):=
+		if List.size(aList) == 0 then
+			aList
+		else
+			if Set.size(List.head(aList)) == 0 then
+				List.tail(aList)
+			else
+				aList
+
+	# creates a set with all the elements of the list
+	## nodoc
+	liftable def listToSet[A](aList: List[A]): Set[A]=
+		if (List.size(aList) == 0) then
+			Set.empty[A]
+		else
+			Set.add(listToSet(List.tail(aList)), List.head(aList))
+
+
+	# builds maps consisting of one, two or three entries
+	## nodoc
+	def map1[K, V](key: K, val: V): Map [K, V]:= Map.add(Map.empty[K, V], key, val)
+	## nodoc
+	def map2[K, V](key1: K, val1: V, key2: K, val2: V): Map [K, V]:= Map.add(map1(key1, val1), key2, val2)
+	## nodoc
+	def map3[K, V](key1: K, val1: V, key2: K, val2: V, key3: K, val3: V): Map [K, V]:= Map.add(map2(key1, val1, key2, val2), key3, val3)
+
+	# builds lists consisting of one, two or three elements
+	## nodoc
+	def list1[A](val: A): List[A]:= List.append(List.empty[A], val)
+	## nodoc
+	def list2[A](val1: A, val2: A): List[A]:= List.append(List.append(List.empty[A], val1), val2)
+	## nodoc
+	def list3[A](val1: A, val2: A, val3: A): List[A]:= List.append(List.append(List.append(List.empty[A], val1), val2), val3)
+
     ## checks the EventTriggeringConstraint.PeriodicEventTriggering defined in AUTOSAR Timex
     ##
     ## The events occur in a periodic pattern with an allowed deviation of jitter and a minimal distance of minInterArrivalTime.
@@ -419,17 +468,17 @@ module AUTOSAR_TIMEX {
     ##
     ## ~~~tessla
 	## in events: Events[Int]
-	## 
+	##
 	## def minimum: Int = 500
 	## def maximum: Int = 900
-	## 
+	##
 	## def resetTime= 100
-	## 
+	##
 	## def constraint= AUTOSAR_TIMEX.ageConstraintReset(events, maximum, minimum, resetTime)
 	## out constraint.value
 	## out constraint.final
 	## ~~~
-	## 
+	##
 	## **Trace Example**
 	## ~~~trace
 	## 610: events = 100
@@ -492,9 +541,9 @@ module AUTOSAR_TIMEX {
 				on(events, {value= false, final= true}),
 			resetTime)
 	}
-	
+
 	## Checks the OffsetTimingConstraint as defined in the AUTOSAR Timing Extensions.
-	## 
+	##
 	## Each target event must be preceeded by a source event. The allowed time distance is defined by the maximum and the minimum parameter.
 	##
 	## **Usage Example**
@@ -502,12 +551,12 @@ module AUTOSAR_TIMEX {
 	## ~~~tessla
 	## in source: Events[Unit]
 	## in target: Events[Unit]
-	## 
+	##
 	## def minimum = 15
 	## def maximum = 25
-	## 
+	##
 	## def resetTime = 100
-	## 
+	##
 	## def constraint= AUTOSAR_TIMEX.OffsetTimingConstraint(source, target, maximum, minimum)
 	## out constraint.value
 	## out constraint.final
@@ -548,9 +597,9 @@ module AUTOSAR_TIMEX {
 	## ~~~
 	def OffsetTimingConstraint[A, B](source: Events[A], target: Events[B], maximum: Int, minimum: Int):=
 		OffsetTimingConstraintReset(source, target, maximum, minimum, TADL2.pseudoInfty)
-	
+
 	## Checks the OffsetTimingConstraint as defined in the AUTOSAR Timing Extensions.
-	## 
+	##
 	## Each target event must be preceeded by a source event. The allowed time distance is defined by the maximum and the minimum parameter.
 	##
 	## A negative Output is reset after resetTime.
@@ -570,18 +619,18 @@ module AUTOSAR_TIMEX {
 		def stimulusTimeStamps: Events[List[Int]]:= list_removeSmaller(
 			List.append(default(last(stimulusTimeStamps, source), List.empty[Int]), time(source)),
 			time(mergeUnit(source, target)) - maximum)
-		
+
 		liftable def existsValidEvent(list: List[Int], absMin: Int, absMax: Int): Bool:=
 			if (List.size(list) == 0) then
 				false
 			else
 				(List.head(list) >= absMin && List.head(list) <= absMax) || existsValidEvent(List.tail(list), absMin, absMax)
-		
-		def validTarget: Events[Bool]:= on(target, existsValidEvent(stimulusTimeStamps, 
+
+		def validTarget: Events[Bool]:= on(target, existsValidEvent(stimulusTimeStamps,
 				time(target) - maximum, time(target) - minimum))
-		
+
 		def validSource: Events[Bool]:= on(source, true)
-		
+
 		TADL2.stillFulfillableReset(
 			if merge(validTarget, validSource) then
 				{value= true, final= false}
@@ -590,6 +639,141 @@ module AUTOSAR_TIMEX {
 			resetTime)
 	}
 
+	## Checks the ExecutionOrderConstraint with ExecutionOrderConstraintType=hierachicalEOC as defined in the AUTOSAR-Timex Constraints
+	##
+	## The events are identified by an unique identifier int-value, which must be given by the events-stream.
+	## The hierachical order is defined by the parameter hierachicalOrder.
+	## The keys of this map define the nodes in the hierachy-tree and the Values define childs of that.
+	##
+	## **Usage Example**
+	##
+	## ~~~tessla
+	## in event: Events[Int]
+	##
+	## def resetTime = 100
+	##
+	## def hierachicalOrder: Map[Int, List[Int]] =
+	## Map.add(Map.add(Map.add(Map.empty[Int, List[Int]], 1, List.append(List.append(List.empty[Int], 2), 3)), 2, List.append(List.append(List.empty[Int], 4), 5)), 3, List.append(List.append(List.empty[Int], 6), 7))
+	##
+	## def constraint = ExecutionOrderConstraintHierarchical(event, hierachicalOrder, resetTime)
+	## out constraint.value
+	## out constraint.final
+	##
+	## ~~~
+	##
+	## **Trace Example**
+	## ~~~trace
+	## 5: event = 1
+	## 5: constraint.final= false
+	## 5: constraint.value= true
+	## 10: event = 2
+	## 10: constraint.final= false
+	## 10: constraint.value= true
+	## 15: event = 4
+	## 15: constraint.final= false
+	## 15: constraint.value= true
+	## 20: event = 5
+	## 20: constraint.final= false
+	## 20: constraint.value= true
+	## 25: event = 3
+	## 25: constraint.final= false
+	## 25: constraint.value= true
+	## 30: event = 6
+	## 30: constraint.final= false
+	## 30: constraint.value= true
+	## 35: event = 7
+	## 35: constraint.final= true
+	## 35: constraint.value= true
+	## ~~~
+	def ExecutionOrderConstraintHierarchical(events: Events[Int], hierachicalOrder: Map[Int, List[Int]], resetTime: Int):
+			Events[fourValuedLogicValue]= {
+		# returns all event IDs, which are expected in hierachicalOrder
+		def allEvents(order: Map[Int, List[Int]], remainingKeys: List[Int]): Set[Int]:=
+			if (List.size(remainingKeys) == 0) then
+				Set.empty[Int]
+			else
+				# add element from directSuccesor-list
+				if List.size(Map.get(order, List.head(remainingKeys))) != 0 then
+					Set.add(allEvents(Map.add(order, List.head(remainingKeys),
+							List.tail(Map.get(order, List.head(remainingKeys)))), remainingKeys),
+						List.head(Map.get(order, List.head(remainingKeys))))
+				# direct successor list is empty-> use next event ID
+				else
+					Set.add(allEvents(order, List.tail(remainingKeys)), List.head(remainingKeys))
+
+		# determines those event IDs, which do not have a precondition (in general the root of the hierachical order tree (there can be multiple trees for this implementation))
+		def unboundedIDs(hierachicalOrder: Map[Int, List[Int]], remainingKeys: List[Int]): Set[Int]=
+			if (List.size(remainingKeys) == 0) then
+				allEvents(hierachicalOrder, Map.keys(hierachicalOrder))
+			else
+				removeListFromSet(unboundedIDs(hierachicalOrder, List.tail(remainingKeys)),
+					Map.get(hierachicalOrder, List.head(remainingKeys)))
+
+		# removes the current event from the expected events
+		liftable def removeCurrentEvent(expectedEvents: List[Set[Int]], events: Int):=
+			# current event not expected-> do nothing
+			if (List.size(expectedEvents) == 0 || !Set.contains(List.head(expectedEvents), events)) then
+				expectedEvents
+			else
+				deleteEmptyHead(List.prepend(Set.remove(List.head(expectedEvents), events), List.tail(expectedEvents)))
+
+		# List of sets of the expected events. The set in the head states, which events IDs are allowed for the next event
+		def nextEvents: Events[List[Set[Int]]]:= merge(list1(unboundedIDs(hierachicalOrder, Map.keys(hierachicalOrder))),
+			if (Map.contains(hierachicalOrder, events)) then
+				List.prepend(listToSet(Map.get(hierachicalOrder, events)), removeCurrentEvent(last(nextEvents, events), events))
+			else
+				removeCurrentEvent(last(nextEvents, events), events))
+
+		TADL2.stillFulfillableReset(
+			if List.size(last(nextEvents, events)) != 0 && Set.contains(List.head(last(nextEvents, events)), events) then
+				{final = false, value = true}
+			else
+				{final = true, value = false},
+			resetTime)
+	}
+
+	## Checks the ExecutionOrderConstraint with ExecutionOrderConstraintType=ordinarEOC as defined in the AUTOSAR-Timex Constraints
+	##
+	## The events are identified by an unique identifier int-value, which must be given by the events-stream.
+	## The order of the events is given by the list linear order.
+	##
+	## **Usage Example**
+	##
+	## ~~~tessla
+	## in event: Events[Int]
+	##
+	## def resetTime = 100
+	##
+	## def linearOrder: List[Int]=  List.append(List.append(List.append(List.empty[Int], 7), 3), 5)
+	##
+	## def constraint = ExecutionOrderConstraintLinear(event, linearOrder, resetTime)
+	## out constraint.value
+	## out constraint.final
+	## ~~~
+	##
+	## **Trace Example**
+	## ~~~trace
+	## 5: event = 7
+	## 5: constraint.final= false
+	## 5: constraint.value= true
+	## 10: event = 3
+	## 10: constraint.final= false
+	## 10: constraint.value= true
+	## 15: event = 5
+	## 15: constraint.final= false
+	## 15: constraint.value= true
+	## ~~~
+	def ExecutionOrderConstraintOrdinary(events: Events[Int], linearOrder: List[Int], resetTime: Int):
+			Events[fourValuedLogicValue]= {
+		def hierarchicalFromLinearOrder(linOrder: List[Int]): Map[Int, List[Int]]:=
+			if (List.size(linOrder) == 0 || List.size(linOrder) == 1) then
+				Map.empty[Int, List[Int]]
+			else
+				Map.add(hierarchicalFromLinearOrder(List.tail(linOrder)),
+					List.head(linOrder), AUTOSAR_TIMEX.list1(List.head(List.tail(linOrder))))
+
+		ExecutionOrderConstraintHierarchical(events, hierarchicalFromLinearOrder(linearOrder), resetTime)
+	}
     ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
     ##
     ## The SynchronizationTimingConstraint on events describes groups of streams, which events occur in common clusters.
@@ -865,7 +1049,7 @@ module AUTOSAR_TIMEX {
 			else
 				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
 					tolerance, resetTime))
-	
+
 	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = net as defined in the AUTOSAR Timing Extensions.
     ##
     ## Checks, if the time between one start event and the next end event, minus the preemptions, is between minimum and maximum.
@@ -912,7 +1096,7 @@ module AUTOSAR_TIMEX {
 	def ExecutionTimeConstraintNet[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
             maximum: Int, minimum: Int): Events[fourValuedLogicValue] :=
 		TADL2.executionTimeConstraint(start, end, preempt, resume, minimum, maximum)
-	
+
 	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = net as defined in the AUTOSAR Timing Extensions.
     ##
     ## Checks, if the time between one start event and the next end event, minus the preemptions, is between minimum and maximum.
@@ -924,7 +1108,7 @@ module AUTOSAR_TIMEX {
 	def ExecutionTimeConstraintNetReset[A, B, C, D](start: Events[A], end: Events[B], preempt: Events[C], resume: Events[D],
             maximum: Int, minimum: Int, resetTime: Int): Events[fourValuedLogicValue] :=
 		TADL2.executionTimeConstraintReset(start, end, preempt, resume, minimum, maximum, resetTime)
-	
+
 	## Checks the ExecutionTimeConstraint with the parameter executionTimeType = gross as defined in the AUTOSAR Timing Extensions.
     ##
     ## Checks, if the time between one start event and the next end event is between minimum and maximum.

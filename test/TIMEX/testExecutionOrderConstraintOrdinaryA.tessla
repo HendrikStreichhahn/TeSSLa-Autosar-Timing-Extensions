@@ -1,0 +1,13 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in event: Events[Int]
+in expected: Events[{final: Bool, value: Bool}]
+
+def resetTime= 100
+
+def linearOrder: List[Int]= 
+	List.append(List.append(List.append(List.append(List.append(List.append(List.append(List.empty[Int], 1), 2), 3), 4), 5), 6), 7)
+
+def isExpected:= expected == AUTOSAR_TIMEX.ExecutionOrderConstraintOrdinary(event, linearOrder, resetTime)
+
+out isExpected

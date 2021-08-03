@@ -1,0 +1,29 @@
+1: event = 1
+1: expected = {final= false, value= true}
+2: event = 2
+2: expected = {final= false, value= true}
+3: event = 3
+3: expected = {final= true, value= false}
+4: event = 4
+4: expected = {final= true, value= false}
+5: event = 5
+5: expected = {final= true, value= false}
+6: event = 6
+6: expected = {final= true, value= false}
+7: event = 7
+7: expected = {final= true, value= false}
+
+11: event = 8
+11: expected = {final= true, value= false}
+12: event = 9
+12: expected = {final= true, value= false}
+13: event = 11
+13: expected = {final= true, value= false}
+14: event = 12
+14: expected = {final= true, value= false}
+15: event = 10
+15: expected = {final= true, value= false}
+16: event = 13
+16: expected = {final= true, value= false}
+17: event = 14
+17: expected = {final= true, value= false}
