@@ -235,16 +235,16 @@ module AUTOSAR_TIMEX {
 			else
 				merge (
 					# increase by period and adjust by offset and jitter
-					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events)) then
+					if (aModuloBOr1if1(TADL2.resetCount2(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events)) then
 						max(last(lowerBoundX, events) + patternPeriod,
 							time(events) - Map.get(offset,
-									(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter)
+									(TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter)
 					#adjust by offset and jitter
 					else
 						max(last(lowerBoundX, events),
 							time(events) - Map.get(offset,
-										(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter),
-					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) - patternJitter)
+										(TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter),
+					time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)) - patternJitter)
         # lower bound for latest x
         def upperBoundX: Events[Int] :=
 			if (last(res, events).final) then
@@ -252,30 +252,30 @@ module AUTOSAR_TIMEX {
 			else
 				merge (
 					# increase by period and adjust by offset and jitter
-					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events))  then
+					if (aModuloBOr1if1(TADL2.resetCount2(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events))  then
 						min(last(upperBoundX, events) + patternPeriod,
-							time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
+							time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
 					else
 					# adjust by offset and jitter
 						min(last(upperBoundX, events),
-							time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))),
-					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
+							time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset))),
+					time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
         # timestamps, in which the evaluation occurs
         def evaluateTimes=
 			mergeUnit(events,
-				TADL2.safeDelay(upperBoundX + (if resetCount(events, filter(events, last(res, events).final)) % Map.size(offset) == 0 then
+				TADL2.safeDelay(upperBoundX + (if TADL2.resetCount2(events, filter(events, last(res, events).final)) % Map.size(offset) == 0 then
 													patternPeriod
 												else
 													0) +
-					Map.get(offset, resetCount(events, filter(events, last(res, events).final)) % Map.size(offset)) + patternJitter - time(events) + 1, events))
+					Map.get(offset, TADL2.resetCount2(events, filter(events, last(res, events).final)) % Map.size(offset)) + patternJitter - time(events) + 1, events))
         #evaluation
 		def res: Events[fourValuedLogicValue]= TADL2.stillFulfillableReset(merge(
 				# distance to x is correct-> current true, false otherwise
 				if (lowerBoundX +
-						Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) <=
+						Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)) <=
 					time(evaluateTimes) &&
 						time(evaluateTimes) <= upperBoundX +
-						Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) + patternJitter) then
+						Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)) + patternJitter) then
 					{value= true, final= false}
 				else
 					{value= false, final= true},
