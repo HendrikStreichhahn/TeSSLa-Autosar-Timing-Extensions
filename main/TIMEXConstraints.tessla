@@ -156,7 +156,7 @@ module AUTOSAR_TIMEX {
 	## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex
 	## a negative output is resetted after resetTime
     ##
-	## See sporadicEventTriggering for more information
+	## See [`sporadicEventTriggering`](AUTOSAR_TIMEX#sporadicEventTriggering) for more information
 	def sporadicEventTriggeringReset[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
             patternPeriod: Int, resetTime: Int):=
         TADL2.sporadicConstraintReset(events, patternPeriod, maxInterArrivalTime, jitter, minInterArrivalTime, resetTime)
@@ -774,7 +774,8 @@ module AUTOSAR_TIMEX {
 
 		ExecutionOrderConstraintHierarchical(events, hierarchicalFromLinearOrder(linearOrder), resetTime)
 	}
-    ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
+
+    ## Checks the SynchronizationTimingConstraint on individual events defined in the Autosar Timing Extensions.
     ##
     ## The SynchronizationTimingConstraint on events describes groups of streams, which events occur in common clusters.
     ## If the parameter multipleOccurrences is true, each of these streams must have at least one event in each of these intervals.
@@ -992,7 +993,7 @@ module AUTOSAR_TIMEX {
     ## def multipleOccurrences = false
     ##
     ##
-    ## def constraint= AUTOSAR_TIMEX.SynchronizationTimingConstraintResponseSynchronization(eventResponse3, responseStreamCount, tolerance, multipleOccurrences)
+    ## def constraint= AUTOSAR_TIMEX.SynchronizationTimingConstraintStimulusSynchronization(eventResponse3, responseStreamCount, tolerance, multipleOccurrences)
     ## out constraint.value
     ## out constraint.final
     ##~~~

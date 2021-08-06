@@ -147,7 +147,8 @@ module TADL2{
             else
                 list
 
-	#returns the head of the given list, or the given value, if the map is empty
+	# returns the head of the given list, or the given value, if the map is empty
+	## nodoc
 	liftable def listHeadOr[A](aList: List[A], valIfEmpty: A): A =
 		if (List.size(aList) == 0) then
 			valIfEmpty
@@ -355,7 +356,7 @@ module TADL2{
 	def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :=
 		strongDelayConstraintReset(source, target, lower, upper, pseudoInfty)
 
-	## checks the StrongDelayConstraint defined in TADL2, resets a negative outout after resetTime
+	## checks the StrongDelayConstraint defined in TADL2, resets a negative output after resetTime
 	##
 	## See [`strongDelayConstraint`](tadl2#strongDelayConstraint) for more information.
     def strongDelayConstraintReset[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int,
@@ -801,7 +802,6 @@ module TADL2{
 		#output
 		result
 	}
-
 
     ## Checks the SporadicConstraint defined in TADL2.
     ##
