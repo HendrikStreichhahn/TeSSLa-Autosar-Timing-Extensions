@@ -850,19 +850,33 @@ module AUTOSAR_TIMEX {
     ## 36: constraint.value = true
     ## 36: constraint.final = false
     ## ~~~
-    def SynchronizationTimingConstraintEvents[A](eventIndices: Events[List[Int]], streamCount: Int,
+    def SynchronizationTimingConstraintEvents(eventIndices: Events[List[Int]], streamCount: Int,
             tolerance : Int, multipleOccurrences: Bool):=
         if (multipleOccurrences) then
             TADL2.synchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
         else
             TADL2.StrongSynchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
 
+    ## Checks the SynchronizationTimingConstraint on individual events defined in the Autosar Timing Extensions with EventOccurrenceKind = MultipleOccurrences
+    ##
+	## see [`SynchronizationTimingConstraintEvents`](AUTOSAR_TIMEX#SynchronizationTimingConstraintEvents) for more information.
+    def SynchronizationTimingConstraintEventsMultiple(eventIndices: Events[List[Int]], streamCount: Int,
+            tolerance : Int):=
+        TADL2.synchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
+
+    ## Checks the SynchronizationTimingConstraint on individual events defined in the Autosar Timing Extensions with EventOccurrenceKind = SingleOccurrences
+    ##
+	## see [`SynchronizationTimingConstraintEvents`](AUTOSAR_TIMEX#SynchronizationTimingConstraintEvents) for more information.
+    def SynchronizationTimingConstraintEventsSingle(eventIndices: Events[List[Int]], streamCount: Int,
+            tolerance : Int):=
+        TADL2.StrongSynchronizationConstraintReset(eventIndices, streamCount, tolerance, TADL2.pseudoInfty)
+
 	## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
 	##
 	## resets a negative output after resetTime.
 	##
 	## see [`SynchronizationTimingConstraintEvents`](AUTOSAR_TIMEX#SynchronizationTimingConstraintEvents) for more information.
-	def SynchronizationTimingConstraintEventsReset[A](eventIndices: Events[List[Int]], streamCount: Int,
+	def SynchronizationTimingConstraintEventsReset(eventIndices: Events[List[Int]], streamCount: Int,
             tolerance : Int, multipleOccurrences: Bool, resetTime: Int):=
         if (multipleOccurrences) then
             TADL2.synchronizationConstraintReset(eventIndices, streamCount, tolerance, resetTime)
@@ -1034,6 +1048,22 @@ module AUTOSAR_TIMEX {
 			else
 				TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
 					tolerance, TADL2.pseudoInfty))
+
+    ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions
+    ## with parameter EventOccurrenceType = SingleOccurrences
+    def SynchronizationTimingConstraintStimulusSynchronizationSingle(eventIndices: Events[Map[Int, Int]],
+            responseStreamCount: Int, tolerance: Int):=
+		TADL2.fourValuedConjunction(TADL2.inputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance,
+				TADL2.pseudoInfty),
+            TADL2.StrongSynchronizationConstraintReset(Map.keys(Map.remove(eventIndices, 0)), responseStreamCount,
+                tolerance, TADL2.pseudoInfty))
+
+    ## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions
+    ## with parameter EventOccurrenceType = MultipleOccurrences
+    def SynchronizationTimingConstraintStimulusSynchronizationMultiple(eventIndices: Events[Map[Int, Int]],
+            responseStreamCount: Int, tolerance: Int, multipleOccurrences: Bool):=
+		TADL2.inputSynchronizationConstraintReset(eventIndices, responseStreamCount, tolerance,
+				TADL2.pseudoInfty)
 
 	## Checks the SynchronizationTimingConstraint on event chains and for the synchronizationConstraintType stimulusSynchronization as defined in the Autosar Timing Extensions.
 	##
