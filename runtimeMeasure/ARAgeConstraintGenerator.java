@@ -8,23 +8,23 @@ public class ARAgeConstraintGenerator extends TraceSet{
 	}
 
 	public boolean generateTestTrace(int eventCount, int minimum, int maximum, int distMin, int distMax){
-        Random rand = new Random();
-        
-        int diffMinMax = maximum - minimum;
-        
-        int timeNow= maximum + rand.nextInt(diffMinMax);
-        
-        while(eventCount > 0){
-            
-            boolean inserted = false;
-            
-            while(!inserted) {
-                inserted = traces[0].insertEvent(new Event(timeNow, timeNow - (minimum + rand.nextInt(diffMinMax))));
-            }
-            timeNow += distMin + rand.nextInt(distMax - distMin);
-            eventCount--;
-        }
-        return true;
-        
+		Random rand = new Random();
+
+		int diffMinMax = maximum - minimum;
+
+		int timeNow= maximum + rand.nextInt(diffMinMax);
+
+		while(eventCount > 0){
+
+			boolean inserted = false;
+
+			while(!inserted) {
+				inserted = traces[0].insertEvent(new Event(timeNow, timeNow - (minimum + rand.nextInt(diffMinMax))));
+			}
+			timeNow += distMin + rand.nextInt(distMax - distMin);
+			eventCount--;
+		}
+		return true;
+
 	}
 }
