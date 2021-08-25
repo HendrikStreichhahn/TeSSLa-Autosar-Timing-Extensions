@@ -9,29 +9,29 @@ public class ReactionConstraintGenerator extends TraceSet{
 	}
 
 	public boolean generateTestTrace(int eventCount, int minStimulusDistace, int maxStimulusDistace,
-            int minimum, int maximum){
-        Random rand = new Random();
-        int timeNow= rand.nextInt(maxStimulusDistace);
-        int clr = 0;
-        
-        while(eventCount > 0){
-            // stimulus event
-            timeNow+= minStimulusDistace + rand.nextInt(maxStimulusDistace - minStimulusDistace+1);
-            traces[0].insertEvent(new Event(timeNow, clr));
-            // response event
-            int i = 10;
-            boolean inserted = false;
-            while(i > 0 && !inserted) {
-                inserted = traces[1].insertEvent(new Event(timeNow + minimum + rand.nextInt(maximum - minimum+1)
-                    , clr));
-                i--;
-            }
-            if (!inserted){
-                return false;
-            }
-            eventCount-= 2;
-            clr++;
-        }
-        return true;
+			int minimum, int maximum){
+		Random rand = new Random();
+		int timeNow= rand.nextInt(maxStimulusDistace);
+		int clr = 0;
+
+		while(eventCount > 0){
+			// stimulus event
+			timeNow+= minStimulusDistace + rand.nextInt(maxStimulusDistace - minStimulusDistace+1);
+			traces[0].insertEvent(new Event(timeNow, clr));
+			// response event
+			int i = 10;
+			boolean inserted = false;
+			while(i > 0 && !inserted) {
+				inserted = traces[1].insertEvent(new Event(timeNow + minimum + rand.nextInt(maximum - minimum+1)
+					, clr));
+				i--;
+			}
+			if (!inserted){
+				return false;
+			}
+			eventCount-= 2;
+			clr++;
+		}
+		return true;
 	}
 }

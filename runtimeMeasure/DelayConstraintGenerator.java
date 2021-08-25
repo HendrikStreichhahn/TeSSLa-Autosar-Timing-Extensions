@@ -16,27 +16,27 @@ public class DelayConstraintGenerator extends TraceSet{
 		while (eventCount < sourceEventCount){
 			// increase time
 			timeNow+= minDistanceSource + rand.nextInt(maxDistanceSource - minDistanceSource+1);
-			
+
 			// insert events
 			boolean inserted = true;
-            //insert source
+			//insert source
 			inserted&= traces[0].insertEvent(new Event(timeNow, 0));
-            //insert target
-            boolean insertedTarget = false;
-            int targetTime= timeNow + lower;
-            for (int i = 0; i < rand.nextInt(3) + 1; i++)
-                while (!insertedTarget && targetTime <= timeNow + upper){
-                    boolean currentInserted = traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
-                    insertedTarget|= currentInserted;
-                    if (currentInserted)
-                        eventCount++;
-                }
-                    
+			//insert target
+			boolean insertedTarget = false;
+			int targetTime= timeNow + lower;
+			for (int i = 0; i < rand.nextInt(3) + 1; i++)
+				while (!insertedTarget && targetTime <= timeNow + upper){
+					boolean currentInserted = traces[1].insertEvent(new Event(timeNow + lower + rand.nextInt(upper - lower+1), 0));
+					insertedTarget|= currentInserted;
+					if (currentInserted)
+						eventCount++;
+				}
+
 			if (!inserted || !insertedTarget){
-                return false;
-            }
+				return false;
+			}
 			eventCount++;
 		}
-        return true;
+		return true;
 	}
 }
