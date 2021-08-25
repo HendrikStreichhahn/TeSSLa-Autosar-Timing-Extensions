@@ -1,5 +1,9 @@
 public class testTraceGenerator{
-
+    
+    /**
+    * Creates test traces for all TADL2 Timing Constraints.
+    * @param args args[0] ConstraintName, args[1] output file name, args[2,...] parameters for the constraint.
+    */
 	public static void main(String [] args){
 		if (args.length == 0){
 			System.out.println("invalid parameters!");

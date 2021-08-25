@@ -14,10 +14,13 @@ public class TimeMeasureProcessInstance {
     BufferedReader stderrReader = null;
     
     boolean debugOutput = false;
+    boolean hadErrorStreamContent = false;
     
+    /**
+    * Starts a process by the given command line argument
+    * @command the command to start the process. Can be absolute or relative to this program.
+    */
     public TimeMeasureProcessInstance(String command) throws IOException {
-        //System.out.println("Command: " + command);
-        
         Process process = Runtime.getRuntime ().exec (command);
         
         stdin = process.getOutputStream ();  
@@ -28,65 +31,80 @@ public class TimeMeasureProcessInstance {
         stderrReader = new BufferedReader(new InputStreamReader(stderr));
     }
     
+    /**
+    * Closes all streams to the program. Does not necessarily end the other program, but will lead to Exceptions in it.
+    */
     public void close() throws IOException{
         stdoutReader.close();
         stderrReader.close();
         stdin.close();
     }
     
+    /**
+    * Activates or deactives the debug output. If activated, all strings of stdout from the other program is printed.
+    * @param nVal if false, the debug ouput is deactivated. Otherwise, it is activated.
+    */
     public void setDebugOutput(boolean nVal){
         debugOutput = nVal;
     }
 
+    /**
+    * Measures the time, that the other program took to answer to a string on the standard input stream.
+    * @param stdinString the string to send to the program
+    * @return the time the program took to respond in microseconds.
+    */
     public long timeToAnswer(String stdinString) throws IOException{
-        //System.out.println("TimeMeasureProcessInstance.timeToAnswer(" + stdinString + ")");
         byte[] byteArr = stdinString.getBytes();
         //time measure start
         long time1 = System.nanoTime();
         // write to stdin
         stdin.write(byteArr);
         stdin.flush();
-        //System.out.println("TimeMeasureProcessInstance.timeToAnswer b");
-            
-            
         int availableErr = 0;
         int availableOut = 0;
 
         //wait, until something is in stoud or stdin
         do {
-            //System.out.println("TimeMeasureProcessInstance.timeToAnswer c");
             availableErr = stderr.available();
-            //System.out.println("TimeMeasureProcessInstance.timeToAnswer d");
             availableOut = stdout.available();
         } while(availableErr == 0 && availableOut == 0);
-        //System.out.println("TimeMeasureProcessInstance.timeToAnswer f");
-        //System.out.println("got answer");
         // time measure end
         long time2 = System.nanoTime();
         
         // read bytes from streams, output errors if existent 
-        //System.out.println("TimeMeasureProcessInstance.timeToAnswer h");
-        if (availableErr != 0)
-            System.out.println(stderrReader.readLine());
-        //System.out.println("TimeMeasureProcessInstance.timeToAnswer i");
+        if (availableErr != 0){
+            hadErrorStreamContent = true;
+            System.out.println("stderr of TeSSLa has Content:");
+        }
+        while (stderr.available() != 0){
+            String line = stderrReader.readLine();
+            System.out.println("e: " + line);
+        }
         if (availableOut != 0){
             String answer = stdoutReader.readLine();
-            //System.out.println(stdinString.replace('\n', ' ') + "=>" + answer);
             if (debugOutput || answer.contains("{final = true, value = false}")){
                 System.out.println(answer);
-                System.exit(-1);
             }
-                
         }
-            
-                
 
         return time2-time1;
 
     }
     
+    /**
+    * Writes a string to the standard input stream, but doesn't wait for a response.
+    * @param stdinString the string to write
+    */
     public void writeNoWait(String stdinString) throws IOException{
         stdin.write(stdinString.getBytes());
         stdin.flush();
+    }
+    
+    /**
+    * Checks, if there was any content on the standard error stream of the other program.
+    * @return true, if there was any content on the standard error stream of the other program. Otherwise false.
+    */
+    public boolean getHadErrorStreamContent(){
+        return hadErrorStreamContent;
     }
 }

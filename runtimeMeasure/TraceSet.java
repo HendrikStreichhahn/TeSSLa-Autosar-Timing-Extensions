@@ -2,10 +2,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Random;
 
+/**
+* The class TraceSet represents a set of traces, which should be contained in a .trace file for TeSSLa.
+*/
 public abstract class TraceSet{
 	
+    /**
+    * An array containing the traces of this trace set, which represents .trace file.
+    */
 	protected Trace[] traces;
 	
+    /**
+    * Checks, if the writing of the trace set into a file is finished.
+    * @return true, if all traces do not any events anymore. Otherwise false.
+    */
 	private boolean finishedWriting(){
 		for (int i = 0; i < traces.length; i++)
 			if (traces[i].getNextEvent() != null)
@@ -13,6 +23,10 @@ public abstract class TraceSet{
 		return true;
 	}
 	
+    /**
+    * Gets the time value of the earliest event in all of the Traces in this TraceSet.
+    * @return The timestamp of the earliest event. If no events are available, the result is Integer.MAX_VALUE.
+    */
 	private int nextTimeStamp(){
 		int min = Integer.MAX_VALUE;
 		for (int i = 0; i < traces.length; i++)
@@ -21,6 +35,10 @@ public abstract class TraceSet{
 		return min;
 	}
     
+    /**
+    * Creates a string, which consists of the lines, that creates the events in the earliest available timestamp.
+    * @return see avove.
+    */
     public String getNextTimestampsEvents(){
         String result = "";
         // find 'next' timeStamp
@@ -33,11 +51,19 @@ public abstract class TraceSet{
         return result;
     }
     
+    /**
+    * Activates output mode for all traces.
+    */
     public void initOutput(){
         for (int i = 0; i < traces.length; i++)
 			traces[i].initOutput();
     }
 	
+    /**
+    * Saves the TraceSet into a .trace file, which is readable by TeSSLa.
+    * @param path the path to the file, which should be written to.
+    * @return false, if there was an IOException. Otherwise true.
+    */
 	public boolean saveToFile(String path){
 		initOutput();
 		

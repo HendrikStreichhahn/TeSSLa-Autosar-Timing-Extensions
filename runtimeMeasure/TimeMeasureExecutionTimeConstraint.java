@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.lang.UnsupportedOperationException;
 
 public class TimeMeasureExecutionTimeConstraint extends TimeMeasureConstraint{
-    int lower, upper, span;
+    int lower, upper;
     
     public TimeMeasureExecutionTimeConstraint(int lower, int upper){
         this.lower = lower;
