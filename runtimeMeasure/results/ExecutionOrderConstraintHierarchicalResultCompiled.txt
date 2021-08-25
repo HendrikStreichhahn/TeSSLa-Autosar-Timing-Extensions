@@ -1,0 +1,11 @@
+average: Minimum: 0.406512ms Maximum: 3.381325ms Complete: 2.4901ms Average: 0.630676 ms
+minimum: Minimum: 0.1141ms Maximum: 2.1322ms Complete: 2.3196ms Average: 0.208906 ms
+maximum: Minimum: 2.3453ms Maximum: 2.7801ms Complete: 6.4761ms Average: 1.17265 ms
+height = 2 width: 1 => Minimum: 2.3453ms Maximum: 2.3453ms Complete: 2.3453ms Average: 1.17265 ms
+height = 2 width: 2 => Minimum: 0.1554ms Maximum: 2.7469ms Complete: 2.9023ms Average: 0.967433 ms
+height = 3 width: 1 => Minimum: 0.1375ms Maximum: 2.1821ms Complete: 2.3196ms Average: 0.7732 ms
+height = 3 width: 2 => Minimum: 0.1249ms Maximum: 2.7678ms Complete: 3.5086ms Average: 0.501228 ms
+height = 4 width: 1 => Minimum: 0.1262ms Maximum: 2.1322ms Complete: 2.4064ms Average: 0.6016 ms
+height = 4 width: 2 => Minimum: 0.1145ms Maximum: 2.7801ms Complete: 4.4855ms Average: 0.299033 ms
+height = 5 width: 1 => Minimum: 0.1342ms Maximum: 2.1869ms Complete: 2.6068ms Average: 0.52136 ms
+height = 5 width: 2 => Minimum: 0.1141ms Maximum: 2.7795ms Complete: 6.4761ms Average: 0.208906 ms

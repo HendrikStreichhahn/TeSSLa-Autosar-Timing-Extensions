@@ -1,0 +1,19 @@
+average: Minimum: 0.384243ms Maximum: 2291.276ms Complete: 45.109238ms Average: 1.240444 ms
+minimum: Minimum: 0.2171ms Maximum: 39.2249ms Complete: 1824.8818ms Average: 0.364682 ms
+maximum: Minimum: 0.5948ms Maximum: 49.9807ms Complete: 3037.4392ms Average: 2.171972 ms
+|event| = 2 tolerance = 2 clusterDistance = 64 => Minimum: 0.2171ms Maximum: 39.2249ms Complete: 3037.4392ms Average: 0.364682 ms
+|event| = 4 tolerance = 2 clusterDistance = 64 => Minimum: 0.2346ms Maximum: 40.6186ms Complete: 2773.737ms Average: 0.46083 ms
+|event| = 6 tolerance = 2 clusterDistance = 64 => Minimum: 0.2531ms Maximum: 40.5931ms Complete: 2510.7195ms Average: 0.547116 ms
+|event| = 8 tolerance = 2 clusterDistance = 64 => Minimum: 0.2679ms Maximum: 45.0295ms Complete: 2274.117ms Average: 0.630822 ms
+|event| = 10 tolerance = 2 clusterDistance = 64 => Minimum: 0.2916ms Maximum: 43.2842ms Complete: 2693.1536ms Average: 0.913862 ms
+|event| = 12 tolerance = 2 clusterDistance = 64 => Minimum: 0.2971ms Maximum: 44.8413ms Complete: 2438.0115ms Average: 0.982276 ms
+|event| = 14 tolerance = 2 clusterDistance = 64 => Minimum: 0.3082ms Maximum: 44.616ms Complete: 2152.8699ms Average: 1.007897 ms
+|event| = 16 tolerance = 2 clusterDistance = 64 => Minimum: 0.3317ms Maximum: 45.1633ms Complete: 2042.7327ms Average: 1.09237 ms
+|event| = 18 tolerance = 2 clusterDistance = 64 => Minimum: 0.3351ms Maximum: 47.645ms Complete: 1967.7231ms Average: 1.180397 ms
+|event| = 20 tolerance = 2 clusterDistance = 64 => Minimum: 0.4119ms Maximum: 45.2939ms Complete: 2385.0186ms Average: 1.591073 ms
+|event| = 22 tolerance = 2 clusterDistance = 64 => Minimum: 0.4227ms Maximum: 47.7979ms Complete: 1914.6683ms Average: 1.402687 ms
+|event| = 24 tolerance = 2 clusterDistance = 64 => Minimum: 0.5677ms Maximum: 48.91ms Complete: 2459.3145ms Average: 1.965878 ms
+|event| = 26 tolerance = 2 clusterDistance = 64 => Minimum: 0.5426ms Maximum: 46.1721ms Complete: 2301.0042ms Average: 1.992211 ms
+|event| = 28 tolerance = 2 clusterDistance = 64 => Minimum: 0.5299ms Maximum: 45.8408ms Complete: 1845.5385ms Average: 1.719979 ms
+|event| = 30 tolerance = 2 clusterDistance = 64 => Minimum: 0.5419ms Maximum: 49.9807ms Complete: 1824.8818ms Average: 1.823058 ms
+|event| = 32 tolerance = 2 clusterDistance = 64 => Minimum: 0.5948ms Maximum: 46.7365ms Complete: 2039.4823ms Average: 2.171972 ms

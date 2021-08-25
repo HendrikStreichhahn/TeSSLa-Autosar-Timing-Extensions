@@ -1,19 +1,19 @@
-average: Minimum: 0.108118ms Maximum: 355.27026ms Complete: 78.03023ms Average: 0.266721 ms
-minimum: Minimum: 0.059ms Maximum: 66.4434ms Complete: 263.8748ms Average: 0.084653 ms
-maximum: Minimum: 0.166ms Maximum: 91.071106ms Complete: 638.0359ms Average: 0.437713 ms
-|event| = 2 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.059ms Maximum: 66.4434ms Complete: 638.0359ms Average: 0.084653 ms
-|event| = 4 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0675ms Maximum: 67.1064ms Complete: 487.0974ms Average: 0.104281 ms
-|event| = 6 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0787ms Maximum: 72.997696ms Complete: 448.60568ms Average: 0.136188 ms
-|event| = 8 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0807ms Maximum: 73.7899ms Complete: 420.782ms Average: 0.169124 ms
-|event| = 10 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0877ms Maximum: 73.533905ms Complete: 366.1658ms Average: 0.1829 ms
-|event| = 12 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0895ms Maximum: 76.1262ms Complete: 333.04922ms Average: 0.200029 ms
-|event| = 14 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0978ms Maximum: 73.9614ms Complete: 312.9814ms Average: 0.219636 ms
-|event| = 16 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1063ms Maximum: 76.57729ms Complete: 320.7998ms Average: 0.257257 ms
-|event| = 18 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.108ms Maximum: 75.8445ms Complete: 293.14142ms Average: 0.264091 ms
-|event| = 20 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1107ms Maximum: 78.1088ms Complete: 340.4689ms Average: 0.339789 ms
-|event| = 22 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1187ms Maximum: 75.853294ms Complete: 303.5023ms Average: 0.331696 ms
-|event| = 24 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1261ms Maximum: 75.9434ms Complete: 303.21512ms Average: 0.364879 ms
-|event| = 26 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1384ms Maximum: 90.41791ms Complete: 288.34747ms Average: 0.372541 ms
-|event| = 28 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.147ms Maximum: 90.1926ms Complete: 263.8748ms Average: 0.369572 ms
-|event| = 30 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1478ms Maximum: 90.5158ms Complete: 289.8111ms Average: 0.4332 ms
-|event| = 32 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.166ms Maximum: 91.071106ms Complete: 274.4463ms Average: 0.437713 ms
+average: Minimum: 0.114312ms Maximum: 377.41882ms Complete: 77.87837ms Average: 0.280296 ms
+minimum: Minimum: 0.0619ms Maximum: 65.521ms Complete: 284.0237ms Average: 0.09423 ms
+maximum: Minimum: 0.1805ms Maximum: 91.97111ms Complete: 707.29565ms Average: 0.486181 ms
+|event| = 2 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0619ms Maximum: 65.521ms Complete: 707.29565ms Average: 0.09423 ms
+|event| = 4 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0704ms Maximum: 67.71831ms Complete: 551.452ms Average: 0.118642 ms
+|event| = 6 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0817ms Maximum: 73.0548ms Complete: 509.0791ms Average: 0.155159 ms
+|event| = 8 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0898ms Maximum: 71.1942ms Complete: 416.2353ms Average: 0.167701 ms
+|event| = 10 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0914ms Maximum: 72.8336ms Complete: 383.46942ms Average: 0.193086 ms
+|event| = 12 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.0993ms Maximum: 73.156ms Complete: 356.6496ms Average: 0.214719 ms
+|event| = 14 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1013ms Maximum: 74.3786ms Complete: 329.5701ms Average: 0.231277 ms
+|event| = 16 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1091ms Maximum: 74.1359ms Complete: 317.2682ms Average: 0.252401 ms
+|event| = 18 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1099ms Maximum: 78.4504ms Complete: 340.78918ms Average: 0.305366 ms
+|event| = 20 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1005ms Maximum: 81.2899ms Complete: 310.6804ms Average: 0.31006 ms
+|event| = 22 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1285ms Maximum: 76.317ms Complete: 331.558ms Average: 0.362358 ms
+|event| = 24 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1392ms Maximum: 76.3522ms Complete: 295.425ms Average: 0.352956 ms
+|event| = 26 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.154ms Maximum: 91.97111ms Complete: 291.49698ms Average: 0.379553 ms
+|event| = 28 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1503ms Maximum: 88.822495ms Complete: 284.0237ms Average: 0.39947 ms
+|event| = 30 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1612ms Maximum: 90.2233ms Complete: 307.41412ms Average: 0.461582 ms
+|event| = 32 tolerance = 2 maxEventsPerCluster = 2 clusterDistance = 64 => Minimum: 0.1805ms Maximum: 90.6352ms Complete: 306.2945ms Average: 0.486181 ms
