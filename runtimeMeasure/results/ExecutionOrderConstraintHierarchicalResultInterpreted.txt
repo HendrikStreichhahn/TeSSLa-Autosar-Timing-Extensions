@@ -1,11 +1,11 @@
-average: Minimum: 5.9193ms Maximum: 48.259224ms Complete: 36.212612ms Average: 9.277361 ms
-minimum: Minimum: 0.9785ms Maximum: 32.7743ms Complete: 32.7743ms Average: 2.6708 ms
-maximum: Minimum: 32.7743ms Maximum: 44.6614ms Complete: 82.7948ms Average: 16.38715 ms
-height = 2 width: 1 => Minimum: 32.7743ms Maximum: 32.7743ms Complete: 32.7743ms Average: 16.38715 ms
-height = 2 width: 2 => Minimum: 3.0738ms Maximum: 34.9244ms Complete: 37.9982ms Average: 12.666066 ms
-height = 3 width: 1 => Minimum: 2.8982ms Maximum: 35.9621ms Complete: 38.8603ms Average: 12.953433 ms
-height = 3 width: 2 => Minimum: 1.692801ms Maximum: 34.434ms Complete: 44.9924ms Average: 6.427485 ms
-height = 4 width: 1 => Minimum: 2.780001ms Maximum: 35.1782ms Complete: 40.9087ms Average: 10.227175 ms
-height = 4 width: 2 => Minimum: 1.097701ms Maximum: 44.6614ms Complete: 64.9668ms Average: 4.331119 ms
-height = 5 width: 1 => Minimum: 2.059101ms Maximum: 35.392ms Complete: 42.778305ms Average: 8.55566 ms
-height = 5 width: 2 => Minimum: 0.9785ms Maximum: 36.3745ms Complete: 82.7948ms Average: 2.6708 ms
+average: Minimum: 6.316687ms Maximum: 52.7252ms Complete: 39.9574ms Average: 10.285359 ms
+minimum: Minimum: 0.9621ms Maximum: 35.1055ms Complete: 35.7053ms Average: 2.414048 ms
+maximum: Minimum: 35.7053ms Maximum: 53.3929ms Complete: 87.1723ms Average: 17.85265 ms
+height = 2 width: 1 => Minimum: 35.7053ms Maximum: 35.7053ms Complete: 35.7053ms Average: 17.85265 ms
+height = 2 width: 2 => Minimum: 2.9263ms Maximum: 35.1055ms Complete: 38.0318ms Average: 12.677266 ms
+height = 3 width: 1 => Minimum: 2.5997ms Maximum: 48.5686ms Complete: 51.1683ms Average: 17.0561 ms
+height = 3 width: 2 => Minimum: 1.639ms Maximum: 35.3303ms Complete: 44.9577ms Average: 6.422528 ms
+height = 4 width: 1 => Minimum: 2.6691ms Maximum: 35.2319ms Complete: 41.2531ms Average: 10.313275 ms
+height = 4 width: 2 => Minimum: 1.4646ms Maximum: 53.3929ms Complete: 87.1723ms Average: 5.811486 ms
+height = 5 width: 1 => Minimum: 2.5674ms Maximum: 40.2022ms Complete: 48.6776ms Average: 9.73552 ms
+height = 5 width: 2 => Minimum: 0.9621ms Maximum: 36.1225ms Complete: 74.8355ms Average: 2.414048 ms
