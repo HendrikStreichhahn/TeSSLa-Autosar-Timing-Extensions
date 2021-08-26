@@ -5,7 +5,7 @@ in expected: Events[{final: Bool, value: Bool}]
 
 def patternPeriod : Int := 10
 def offset: Map[Int, Int] := Map.add(Map.add(Map.add(Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 0), 1, 1), 2, 2), 3, 4), 4, 5), 5, 6)
-def patternJitter: Int = 2
+def patternJitter: Int = 0
 def patternLength: Int = 6
 
 def resetTime= TADL2.pseudoInfty

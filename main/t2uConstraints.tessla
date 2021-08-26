@@ -147,12 +147,29 @@ module TADL2{
             else
                 list
 
-	#returns the head of the given list, or the given value, if the map is empty
+	# returns the head of the given list, or the given value, if the map is empty
+	## nodoc
 	liftable def listHeadOr[A](aList: List[A], valIfEmpty: A): A =
 		if (List.size(aList) == 0) then
 			valIfEmpty
 		else
 			List.head(aList)
+
+	## See [`resetCount`](streamFunctions#resetCount) for more informations.
+	## This implementations also works with events in timestamp 0.
+	def resetCount2[A, B](events: Events[A], reset: Events[B]): Events[Int] = {
+		def minusStream: Events[Int]=
+			merge(
+				if default((time(reset) >= time(events)), false) then
+					if default((time(reset) == time(events)), false) then
+						count(events)-1
+					else
+						count(events)
+				else
+					last(minusStream, mergeUnit(events, reset)),
+				0)
+		count(events) - minusStream
+	}
 
     ## Checks the DelayConstraint defined in TADL2.
     ##
@@ -339,7 +356,7 @@ module TADL2{
 	def strongDelayConstraint[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int) :=
 		strongDelayConstraintReset(source, target, lower, upper, pseudoInfty)
 
-	## checks the StrongDelayConstraint defined in TADL2, resets a negative outout after resetTime
+	## checks the StrongDelayConstraint defined in TADL2, resets a negative output after resetTime
 	##
 	## See [`strongDelayConstraint`](tadl2#strongDelayConstraint) for more information.
     def strongDelayConstraintReset[A, B](source: Events[A], target: Events[B], lower: Int, upper: Int,
@@ -764,8 +781,8 @@ module TADL2{
 				failingTimeStamps)
 	
 		#reset count for both streams
-		def sourceCount: Events[Int] = resetCount(source, resets)
-		def targetCount: Events[Int] = resetCount(target, resets)
+		def sourceCount: Events[Int] = resetCount2(source, resets)
+		def targetCount: Events[Int] = resetCount2(target, resets)
 
         def result := stillFulfillableReset(
             #number of events on both streams equal-> currently true
@@ -785,7 +802,6 @@ module TADL2{
 		#output
 		result
 	}
-
 
     ## Checks the SporadicConstraint defined in TADL2.
     ##
@@ -1132,16 +1148,16 @@ module TADL2{
 			else
 				merge (
 					# increase by period and adjust by offset and jitter
-					if (aModuloBOr1if1(resetCount(e, filter(e, last(res, e).final)), Map.size(offset))== 1 && !isFirst(e)) then
+					if (aModuloBOr1if1(resetCount2(e, filter(e, last(res, e).final)), Map.size(offset))== 1 && !isFirst(e)) then
 						max(last(lowerBoundX, e) + periodX,
 							time(e) - Map.get(offset,
-											(resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))-jitter)
+											(resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset))-jitter)
 					#adjust by offset and jitter
 					else
 						max(last(lowerBoundX, e),
 							time(e) - Map.get(offset,
-										(resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))-jitter),
-					time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)) - jitter)
+										(resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset))-jitter),
+					time(e) - Map.get(offset, (resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset)) - jitter)
         # lower bound for latest x
         def upperBoundX: Events[Int] := 
 			if (last(res, e).final) then
@@ -1149,30 +1165,30 @@ module TADL2{
 			else	
 				merge (
 					# increase by period and adjust by offset and jitter
-					if (aModuloBOr1if1(resetCount(e, filter(e, last(res, e).final)), Map.size(offset))== 1 && !isFirst(e))  then
+					if (aModuloBOr1if1(resetCount2(e, filter(e, last(res, e).final)), Map.size(offset))== 1 && !isFirst(e))  then
 						min(last(upperBoundX, e) + periodX,
-							time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)))
+							time(e) - Map.get(offset, (resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset)))
 					else
 					# adjust by offset and jitter
 						min(last(upperBoundX, e),
-							time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset))),
-					time(e) - Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)))
+							time(e) - Map.get(offset, (resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset))),
+					time(e) - Map.get(offset, (resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset)))
         # timestamps, in which the evaluation occurs
         def evaluateTimes=
 			mergeUnit(e,
-				TADL2.safeDelay(upperBoundX + (if resetCount(e, filter(e, last(res, e).final)) % Map.size(offset) == 0 then
+				TADL2.safeDelay(upperBoundX + (if resetCount2(e, filter(e, last(res, e).final)) % Map.size(offset) == 0 then
 													periodX
 												else
 													0) +
-					Map.get(offset, resetCount(e, filter(e, last(res, e).final)) % Map.size(offset)) + jitter - time(e) + 1, e))
+					Map.get(offset, resetCount2(e, filter(e, last(res, e).final)) % Map.size(offset)) + jitter - time(e) + 1, e))
         #evaluation
 		def res: Events[fourValuedLogicValue]= TADL2.stillFulfillableReset(default(TADL2.fourValuedConjunction(
 				# distance to x is correct-> current true, false otherwise
 				if (lowerBoundX +
-						Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)) <=
+						Map.get(offset, (resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset)) <=
 					time(evaluateTimes) &&
 						time(evaluateTimes) <= upperBoundX +
-						Map.get(offset, (resetCount(e, filter(e, last(res, e).final))-1) % Map.size(offset)) + jitter) then
+						Map.get(offset, (resetCount2(e, filter(e, last(res, e).final))-1) % Map.size(offset)) + jitter) then
 					{value= true, final= false}
 				else
 					{value= false, final= true},

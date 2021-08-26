@@ -156,7 +156,7 @@ module AUTOSAR_TIMEX {
 	## checks the EventTriggeringConstraint.sporadicEventTriggering defined in AUTOSAR Timex
 	## a negative output is resetted after resetTime
     ##
-	## See sporadicEventTriggering for more information
+	## See [`sporadicEventTriggering`](AUTOSAR_TIMEX#sporadicEventTriggering) for more information
 	def sporadicEventTriggeringReset[A](events: Events[A], jitter: Int, maxInterArrivalTime: Int, minInterArrivalTime: Int,
             patternPeriod: Int, resetTime: Int):=
         TADL2.sporadicConstraintReset(events, patternPeriod, maxInterArrivalTime, jitter, minInterArrivalTime, resetTime)
@@ -235,16 +235,16 @@ module AUTOSAR_TIMEX {
 			else
 				merge (
 					# increase by period and adjust by offset and jitter
-					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events)) then
+					if (aModuloBOr1if1(TADL2.resetCount2(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events)) then
 						max(last(lowerBoundX, events) + patternPeriod,
 							time(events) - Map.get(offset,
-									(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter)
+									(TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter)
 					#adjust by offset and jitter
 					else
 						max(last(lowerBoundX, events),
 							time(events) - Map.get(offset,
-										(resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter),
-					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) - patternJitter)
+										(TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset))-patternJitter),
+					time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)) - patternJitter)
         # lower bound for latest x
         def upperBoundX: Events[Int] :=
 			if (last(res, events).final) then
@@ -252,30 +252,30 @@ module AUTOSAR_TIMEX {
 			else
 				merge (
 					# increase by period and adjust by offset and jitter
-					if (aModuloBOr1if1(resetCount(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events))  then
+					if (aModuloBOr1if1(TADL2.resetCount2(events, filter(events, last(res, events).final)), Map.size(offset))== 1 && !isFirst(events))  then
 						min(last(upperBoundX, events) + patternPeriod,
-							time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
+							time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
 					else
 					# adjust by offset and jitter
 						min(last(upperBoundX, events),
-							time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset))),
-					time(events) - Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
+							time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset))),
+					time(events) - Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)))
         # timestamps, in which the evaluation occurs
         def evaluateTimes=
 			mergeUnit(events,
-				TADL2.safeDelay(upperBoundX + (if resetCount(events, filter(events, last(res, events).final)) % Map.size(offset) == 0 then
+				TADL2.safeDelay(upperBoundX + (if TADL2.resetCount2(events, filter(events, last(res, events).final)) % Map.size(offset) == 0 then
 													patternPeriod
 												else
 													0) +
-					Map.get(offset, resetCount(events, filter(events, last(res, events).final)) % Map.size(offset)) + patternJitter - time(events) + 1, events))
+					Map.get(offset, TADL2.resetCount2(events, filter(events, last(res, events).final)) % Map.size(offset)) + patternJitter - time(events) + 1, events))
         #evaluation
 		def res: Events[fourValuedLogicValue]= TADL2.stillFulfillableReset(merge(
 				# distance to x is correct-> current true, false otherwise
 				if (lowerBoundX +
-						Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) <=
+						Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)) <=
 					time(evaluateTimes) &&
 						time(evaluateTimes) <= upperBoundX +
-						Map.get(offset, (resetCount(events, filter(events, last(res, events).final))-1) % Map.size(offset)) + patternJitter) then
+						Map.get(offset, (TADL2.resetCount2(events, filter(events, last(res, events).final))-1) % Map.size(offset)) + patternJitter) then
 					{value= true, final= false}
 				else
 					{value= false, final= true},
@@ -774,7 +774,8 @@ module AUTOSAR_TIMEX {
 
 		ExecutionOrderConstraintHierarchical(events, hierarchicalFromLinearOrder(linearOrder), resetTime)
 	}
-    ## Checks the SynchronizationTimingConstraint on individual events defined  in the Autosar Timing Extensions.
+
+    ## Checks the SynchronizationTimingConstraint on individual events defined in the Autosar Timing Extensions.
     ##
     ## The SynchronizationTimingConstraint on events describes groups of streams, which events occur in common clusters.
     ## If the parameter multipleOccurrences is true, each of these streams must have at least one event in each of these intervals.
@@ -1006,7 +1007,7 @@ module AUTOSAR_TIMEX {
     ## def multipleOccurrences = false
     ##
     ##
-    ## def constraint= AUTOSAR_TIMEX.SynchronizationTimingConstraintResponseSynchronization(eventResponse3, responseStreamCount, tolerance, multipleOccurrences)
+    ## def constraint= AUTOSAR_TIMEX.SynchronizationTimingConstraintStimulusSynchronization(eventResponse3, responseStreamCount, tolerance, multipleOccurrences)
     ## out constraint.value
     ## out constraint.final
     ##~~~
