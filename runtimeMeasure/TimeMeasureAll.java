@@ -1475,18 +1475,19 @@ public class TimeMeasureAll{
 	*/
 	private static void measureReactionConstraint(String outputFileName, int traceSize, boolean compiled){
 		final String TESSLAFILEPATH = "tmp/ReactionConstraintTimeMeasure.tessla";
-		final int traceCount = 102;
+		final int traceCount = 107;
 		SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
 		String[] params = new String[traceCount];
 		int i = 0;
 		boolean recompile = true;
-		for (int minimum = 100; minimum <= 1000; minimum += 100)
+		for (int minimum = 100; minimum <= 600; minimum += 50)
 		{
 			recompile = true;
 			for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
 				int maximum = minimum;
 				System.out.println("ReactionConstraint Trace " + (i+1) + " of " + traceCount);
 				params[i] = "stimulusDistance: " + stimulusDistance + " minimum: " + minimum + " maximum: " + maximum;
+                System.out.println("Params: " + params[i]);
 				TimeMeasureReactionConstraint constraint = new TimeMeasureReactionConstraint(minimum,
 					maximum, stimulusDistance, stimulusDistance);
 				TraceSet trace = constraint.generateTrace(traceSize);
@@ -1534,12 +1535,12 @@ public class TimeMeasureAll{
 	*/
 	private static void measureAgeConstraint(String outputFileName, int traceSize, boolean compiled){
 		final String TESSLAFILEPATH = "tmp/AgeConstraintTimeMeasure.tessla";
-		final int traceCount = 102;
+		final int traceCount = 107;
 		SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
 		String[] params = new String[traceCount];
 		int i = 0;
 		boolean recompile = true;
-		for (int minimum = 100; minimum <= 1000; minimum += 100){
+		for (int minimum = 100; minimum <= 600; minimum += 50){
 			recompile = true;
 			for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
 				int maximum = minimum;
@@ -1782,7 +1783,7 @@ public class TimeMeasureAll{
 		int clusterDistance = 128;
 		int tolerance = 2;
 		for (int streamCount = 2; streamCount <= 64; streamCount+=1){
-			System.out.println("InputSynchronizationConstraint Trace " + (i+1) + " of "
+			System.out.println("InputSynchronizationConstraint2 Trace " + (i+1) + " of "
 				+ traceCount);
 			params[i] = "stimulusCount: " + streamCount + " tolerance: " + tolerance +
 				" clusterDistance: " + clusterDistance;
