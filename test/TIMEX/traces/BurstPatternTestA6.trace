@@ -1,0 +1,27 @@
+# too few events
+3: expected = {final= false, value= false}
+3: events = ()
+5: events = ()
+7: expected = {final= false, value= true}
+7: events = ()
+
+23: expected = {final= false, value= false}
+23: events = ()
+27: events = ()
+33: expected = {final= true, value= false}
+
+43: events = ()
+45: events = ()
+47: events = ()
+
+63: events = ()
+65: events = ()
+67: events = ()
+
+83: events = ()
+85: events = ()
+87: events = ()
+
+103: events = ()
+105: events = ()
+107: events = ()

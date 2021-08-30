@@ -1,0 +1,28 @@
+0: expected = {final= false, value= false}
+5: events = ()
+6: events = ()
+7: expected = {final= false, value= true}
+7: events = ()
+
+55: expected = {final= false, value= false}
+55: events = ()
+60: events = ()
+65: expected = {final= false, value= true}
+65: events = ()
+
+105: expected = {final= false, value= false}
+105: events = ()
+110: events = ()
+115: expected = {final= false, value= true}
+115: events = ()
+
+155: expected = {final= false, value= false}
+160: events = ()
+164: events = ()
+165: expected = {final= false, value= true}
+165: events = ()
+
+205: expected = {final= false, value= false}
+215: expected = {final= true, value= false}
+
+1000000000: a

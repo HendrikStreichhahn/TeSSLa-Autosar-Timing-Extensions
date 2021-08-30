@@ -1,0 +1,36 @@
+# Jitter backward
+3: expected = {final= false, value= false}
+3: events = ()
+5: events = ()
+7: expected = {final= false, value= true}
+7: events = ()
+
+20: expected = {final= false, value= false}
+20: events = ()
+22: events = ()
+25: expected = {final= false, value= true}
+25: events = ()
+
+37: expected = {final= false, value= false}
+37: events = ()
+39: events = ()
+41: expected = {final= false, value= true}
+41: events = ()
+
+54: expected = {final= false, value= false}
+54: events = ()
+56: events = ()
+58: expected = {final= false, value= true}
+58: events = ()
+
+71: expected = {final= false, value= false}
+71: events = ()
+73: events = ()
+75: expected = {final= false, value= true}
+75: events = ()
+
+88: expected = {final= false, value= false}
+88: events = ()
+90: events = ()
+92: expected = {final= false, value= true}
+92: events = ()

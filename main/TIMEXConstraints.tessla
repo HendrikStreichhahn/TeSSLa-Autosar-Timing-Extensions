@@ -302,6 +302,140 @@ module AUTOSAR_TIMEX {
 			resetTime: Int):=
         ConcretePatternEventTriggering(events, patternLength, offset, patternLength, TADL2.pseudoInfty)
 
+# TODO ResetTime
+# TODO Ohne patternPeriod
+	# it's expected that the first Burst must always with an event.
+	## Checks the BurstPatternEventTriggering defined in the AUTOSAR TIMEX Constraints.
+	## The events occur in Bursts with the length of patternLength, which are periodicly repeating.
+	##
+	## It is assumed that the first Burst is started by an event.
+	##
+	## **Usage Example**
+    ##
+    ## ~~~tessla
+	##
+	## in events: Events[Unit]
+	##
+	## def maxNumberOfOccurrences = 3
+	## def minNumberOfOccurrences = 3
+	## def minInterArrivalTime = 2
+	## def patternJitter = 3
+	## def patternLength = 10
+	## def patternPeriod = 20
+	##
+	## def constraint:= AUTOSAR.BurstPatternEventTriggering(events, maxNumberOfOccurrences, minNumberOfOccurrences,
+	##                      minInterArrivalTime, patternLength, patternPeriod, patternJitter)
+	##
+	## out constraint.value
+	## out constraint.final
+	##
+    ##~~~
+    ##
+    ## **Trace Example**
+    ##
+    ## ~~~trace
+	##
+    ## 3: events = ()
+    ## 3: constraint.value = false
+    ## 3: constraint.final = false
+    ## 5: events = ()
+    ## 5: constraint.value = false
+    ## 5: constraint.final = false
+    ## 7: events = ()
+    ## 7: constraint.value = true
+    ## 7: constraint.final = false
+	##
+    ## 26: events = ()
+    ## 26: constraint.value = false
+    ## 26: constraint.final = false
+    ## 28: events = ()
+    ## 28: constraint.value = false
+    ## 28: constraint.final = false
+    ## 30: events = ()
+    ## 30: constraint.value = true
+    ## 30: constraint.final = false
+	##
+    ## 49: events = ()
+    ## 49: constraint.value = false
+    ## 49: constraint.final = false
+    ## 51: events = ()
+    ## 51: constraint.value = false
+    ## 51: constraint.final = false
+    ## 53: events = ()
+    ## 53: constraint.value = true
+    ## 53: constraint.final = false
+	##
+    ## 66: events = ()
+    ## 66: constraint.value = false
+    ## 66: constraint.final = false
+    ## 68: events = ()
+    ## 68: constraint.value = false
+    ## 68: constraint.final = false
+    ## 70: events = ()
+    ## 70: constraint.value = true
+    ## 70: constraint.final = false
+	## ~~~
+	def BurstPatternEventTriggering[A](events: Events[A], maxNumberOfOccurrences: Int, minNumberOfOccurrences: Int,
+			minInterArrivalTime: Int, patternLength: Int, patternPeriod: Int, patternJitter: Int): Events[fourValuedLogicValue]= {
+		#checks, whether an event is in a given Burst
+		liftable def eventInCurrentBurst(startTimeBurst: Int, patternLength: Int, eventTime: Int): Bool=
+			eventTime >= startTimeBurst && eventTime <= startTimeBurst + patternLength
+
+		# delay that starts the Burst, only depending on the last burst and period+jitter, independly of the input events
+		def burstStartDelayed=
+			TADL2.safeDelay(on(events, startTimeCurrentBurst + patternPeriod + patternJitter - time(events)),
+				events)
+		# start time of the current Burst
+		def startTimeCurrentBurst : Events[Int] =
+			default(
+				merge(
+					if (eventInCurrentBurst(last(startTimeCurrentBurst, events), patternLength, time(events))) then
+						last(startTimeCurrentBurst, events)
+					else
+						time(events),
+					time(burstStartDelayed)),
+				-TADL2.pseudoInfty)
+		# events in which the bursts must have finished
+		def delayBurstsFinished = TADL2.safeDelay(on(startTimeCurrentBurst, patternLength), pure(startTimeCurrentBurst))
+
+		# number of events since startTimeCurrentBurst
+		def eventsInBurst: Events[Int]=
+			TADL2.resetCount2(events, filter(startTimeCurrentBurst, startTimeCurrentBurst != prev(startTimeCurrentBurst)))
+
+		# Booleans, whether the single parts of the constraints are fulfilled
+		# maximum number of events not succeeded
+		def maxNumberValid = eventsInBurst <= maxNumberOfOccurrences
+		# delays for minNumberValid
+		def delayNewBurst= filter(TADL2.safeDelay(startTimeCurrentBurst + patternLength - time(events), events), eventsInBurst < minNumberOfOccurrences)
+		def delayBurstsFinishedFiltered = filter(delayBurstsFinished, eventsInBurst < minNumberOfOccurrences &&
+				count(events) != 0 &&
+				(count(events) != 1 || time(events) != time(delayBurstsFinished)))
+		# minimum number events is reached
+			# stays true until end of Burst, turns false, when the minimum number is not reached in the end of the burst
+		def minNumberValid = merge(on(mergeUnit(delayNewBurst, delayBurstsFinishedFiltered), false),
+				merge(filter(on(events, true), isFirst(events)), filter(prev(eventsInBurst >= minNumberOfOccurrences), startTimeCurrentBurst != prev(startTimeCurrentBurst))))
+		# minimal distance between subsequent events is valid
+		def minInterArrivalTimeValid = default((time(events) - prev(time(events))) >= minInterArrivalTime, true)
+		# distance between subsequent bursts is valid
+		def patternPeriodValid =
+			if (prev(isFirst(pure(startTimeCurrentBurst)))) then
+				true
+			else
+				startTimeCurrentBurst >= (prev(pure(startTimeCurrentBurst)) + patternPeriod - patternJitter) && startTimeCurrentBurst <= (prev(pure(startTimeCurrentBurst)) + patternPeriod + patternJitter)
+		# all parts of the constraint are valid
+		def patternValid = merge(on(delayBurstsFinished, minNumberValid && maxNumberValid && minInterArrivalTimeValid && patternPeriodValid),
+			minNumberValid && maxNumberValid && minInterArrivalTimeValid && patternPeriodValid)
+
+		TADL2.stillFulfillable(
+			if (patternValid) then
+				if (eventsInBurst >= minNumberOfOccurrences) then
+					{value= true, final= false}
+				else
+					{value= false, final= false}
+			else
+				{value= false, final= true})
+	}
+
     ## Checks the ArbitraryEventTriggering defined in TADL2.
     ##
     ## The ArbitraryEventTriggering describes the time distances between several subsequent events

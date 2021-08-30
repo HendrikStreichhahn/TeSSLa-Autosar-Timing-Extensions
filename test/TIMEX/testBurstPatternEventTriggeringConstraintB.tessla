@@ -1,0 +1,17 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in events: Events[Unit]
+in expected: Events[{final: Bool, value: Bool}]
+
+def maxNumberOfOccurrences = 3
+def minNumberOfOccurrences = 3
+def minInterArrivalTime = 0
+def patternJitter = 0
+def patternLength = 10
+def patternPeriod = 50
+
+def resetTime = 100
+
+def isExpected:= expected == AUTOSAR_TIMEX.BurstPatternEventTriggering(events, maxNumberOfOccurrences, minNumberOfOccurrences, minInterArrivalTime, patternLength, patternPeriod, patternJitter)
+
+out isExpected
