@@ -229,7 +229,7 @@ module TADL2{
     ##
     ## def lower = 15
     ## def upper = 25
-    ## def resetTime
+    ## def resetTime = 100
     ##
     ## def constraint:= TADL2.delayConstraintReset(source, target, lower, upper, resetTime)
     ## out constraint.value
