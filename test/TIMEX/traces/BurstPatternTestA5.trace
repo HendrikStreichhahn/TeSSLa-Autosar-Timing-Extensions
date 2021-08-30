@@ -24,9 +24,9 @@
 77: events = ()
 
 95: expected = {final= false, value= false}
-102: events = ()
-104: events = ()
-105: expected = {final= true, value= false}
+101: events = ()
+103: events = ()
+104: expected = {final= true, value= false}
 106: events = ()
 
 118: events = ()

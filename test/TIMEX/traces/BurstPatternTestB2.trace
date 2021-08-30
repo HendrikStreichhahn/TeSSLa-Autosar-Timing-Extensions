@@ -7,13 +7,13 @@
 55: expected = {final= false, value= false}
 55: events = ()
 60: events = ()
-65: expected = {final= false, value= true}
-65: events = ()
+64: expected = {final= false, value= true}
+64: events = ()
 
 105: expected = {final= false, value= false}
 105: events = ()
-115: expected = {final= true, value= false}
-115: events = ()
+114: expected = {final= true, value= false}
+114: events = ()
 
 160: events = ()
 164: events = ()

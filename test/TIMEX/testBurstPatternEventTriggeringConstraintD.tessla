@@ -1,0 +1,19 @@
+include "../../main/TIMEXConstraints.tessla"
+
+# BurstPatternEventTriggering without periodic repetitions
+
+type fourValuedLogicValue = {value: Bool, final: Bool}
+
+in events: Events[Unit]
+in expected: Events[{final: Bool, value: Bool}]
+
+def maxNumberOfOccurrences = 3
+def minNumberOfOccurrences = 3
+def minInterArrivalTime = 2
+def patternLength = 6
+
+def constraint:= AUTOSAR_TIMEX.BurstPatternEventTriggeringNoPeriod(events, maxNumberOfOccurrences, minNumberOfOccurrences, minInterArrivalTime, patternLength)
+
+def isExpected:= expected == constraint
+
+out isExpected

@@ -1,0 +1,37 @@
+0: expected = {final= false, value= false}
+3: events = ()
+4: events = ()
+5: expected = {final= false, value= true}
+5: events = ()
+
+23: expected = {final= false, value= false}
+23: events = ()
+24: events = ()
+25: expected = {final= false, value= true}
+25: events = ()
+
+53: expected = {final= false, value= false}
+53: events = ()
+54: events = ()
+55: expected = {final= false, value= true}
+55: events = ()
+
+60: expected = {final= false, value= false}
+60: events = ()
+64: expected = {final= true, value= false}
+
+73: events = ()
+74: events = ()
+75: events = ()
+
+83: events = ()
+84: events = ()
+85: events = ()
+
+93: events = ()
+94: events = ()
+95: events = ()
+
+103: events = ()
+104: events = ()
+105: events = ()

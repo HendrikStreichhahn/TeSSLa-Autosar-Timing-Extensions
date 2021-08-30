@@ -8,7 +8,7 @@
 23: expected = {final= false, value= false}
 23: events = ()
 27: events = ()
-33: expected = {final= true, value= false}
+32: expected = {final= true, value= false}
 
 43: events = ()
 45: events = ()
