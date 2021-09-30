@@ -1,0 +1,17 @@
+include "../../main/t2uConstraints.tessla"
+in response: Events[Int]
+in endOfStreams: Events[Int]
+in stimulus1: Events[Int]
+in stimulus2: Events[Int]
+in stimulus3: Events[Int]
+def timeNow = merge(time(stimulus3),merge(time(stimulus2),merge(time(stimulus1),time(response))))
+def eventResponse:= if (TADL2.defaultTime(response)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(response, -1)) else Map.empty[Int, Int]
+def eventStimulus1:= if (TADL2.defaultTime(stimulus1)  >= timeNow) then Map.add(eventResponse, 1, default(stimulus1, -1)) else eventResponse
+def eventStimulus2:= if (TADL2.defaultTime(stimulus2)  >= timeNow) then Map.add(eventStimulus1, 2, default(stimulus2, -1)) else eventStimulus1
+def eventStimulus3:= if (TADL2.defaultTime(stimulus3)  >= timeNow) then Map.add(eventStimulus2, 3, default(stimulus3, -1)) else eventStimulus2
+def eventsNow:= eventStimulus3
+def constraint :=  TADL2.inputSynchronizationConstraintReset(eventsNow, 3 ,5, TADL2.pseudoInfty)
+def value = constraint.value
+def final = constraint.final
+out value
+out final

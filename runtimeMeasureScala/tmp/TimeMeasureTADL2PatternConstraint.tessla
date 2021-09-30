@@ -1,0 +1,7 @@
+include "../../main/t2uConstraints.tessla"
+in event: Events[Int]
+def constraint := TADL2.patternConstraint(event, 50, Map.add(Map.add(Map.add(Map.add(Map.add(Map.empty[Int, Int], 0, 1), 1, 2), 2, 3), 3, 4), 4, 5), 0, 1)
+def value:= constraint.value
+def final:= constraint.final
+out value
+out final

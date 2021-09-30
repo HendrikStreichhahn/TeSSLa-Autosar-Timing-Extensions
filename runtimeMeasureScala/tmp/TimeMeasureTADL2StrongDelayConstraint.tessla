@@ -1,0 +1,10 @@
+include "../../main/t2uConstraints.tessla"
+in source: Events[Int]
+in target: Events[Int]
+def lower = 50
+def upper = 50
+def constraint := TADL2.strongDelayConstraint(source , target, 50, 50)
+def final = constraint.final
+def value = constraint.value
+out final
+out value

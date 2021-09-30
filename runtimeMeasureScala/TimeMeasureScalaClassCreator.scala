@@ -1,8 +1,6 @@
 import java.io._
 
 abstract class TimeMeasureScalaClassCreator {
-	//private var className: String = ""
-	//var filePath: String = ""
 
 	protected def generateMainMethod(writer: FileWriter, prevTabCount: Int, repetitionCount: Int, resultFilePath: String): Unit = {
 		writer.write(tabs(prevTabCount) + "def main(args: Array[String]): Unit = {" + "\n")
@@ -14,9 +12,11 @@ abstract class TimeMeasureScalaClassCreator {
 	protected def generateMemberVariableListGeneral(writer: FileWriter, prevTabCount: Int, eventCount: Int) : Unit = {
 		writer.write(tabs(prevTabCount) + "var eventCount: Int = " + eventCount + "\n")
 		writer.write(tabs(prevTabCount) + "var tesslaMonitorInstance : TesslaMonitor = null" + "\n")
+		writer.write(tabs(prevTabCount) + "protected var outputFinal: Boolean = false\n")
+		writer.write(tabs(prevTabCount) + "protected var outputValue: Boolean = false\n")
 	}
 	
-	protected def generateMeasureConstraint(writer: FileWriter, prevTabCount: Int) : Unit = {
+	protected def generateMeasureConstraint(writer: FileWriter, prevTabCount: Int, printInputEvents: Boolean) : Unit = {
 		writer.write(tabs(prevTabCount) + "def measureConstraint() : (Long, Long, Long) = {" + "\n")
 		writer.write(tabs(prevTabCount+1) + "var min = Long.MaxValue" + "\n")
 		writer.write(tabs(prevTabCount+1) + "var max = Long.MinValue" + "\n")
@@ -25,14 +25,29 @@ abstract class TimeMeasureScalaClassCreator {
 		
 		
 		writer.write(tabs(prevTabCount+1) + "tesslaMonitorInstance = new TesslaMonitor()" + "\n")
-		writer.write(tabs(prevTabCount+1) + "tesslaMonitorInstance.out_constraint = outputFunc" + "\n")
+		writer.write(tabs(prevTabCount+1) + "tesslaMonitorInstance.out_final = outputFuncFinal" + "\n")
+		writer.write(tabs(prevTabCount+1) + "tesslaMonitorInstance.out_value = outputFuncValue" + "\n")
 		writer.write(tabs(prevTabCount+1) + "var currentEvents: Array[Event] = traceSet.getNextTimestampsEvents();" + "\n")
 		writer.write(tabs(prevTabCount+1) + "var ctr = 0" + "\n")
-		writer.write(tabs(prevTabCount+1) + "while (currentEvents.length != 0) {" + "\n")
+		writer.write(tabs(prevTabCount+1) + "while (currentEvents.length != 0 && !(outputFinal && ! outputValue)) {" + "\n")
 		generateMeasureConstraintWriteEvents(writer, prevTabCount+2)
+		writer.write(tabs(prevTabCount+1) + "eventCounter = eventCounter+1" + "\n")
 		writer.write(tabs(prevTabCount+2) + "var time1= System.nanoTime()" + "\n")
 		writer.write(tabs(prevTabCount+2) + "tesslaMonitorInstance.flush();" + "\n")
 		writer.write(tabs(prevTabCount+2) + "var time2= System.nanoTime" + "\n")
+		
+		if (printInputEvents)
+			generateMeasureConstraintDebugOutput(writer, prevTabCount+2)
+		
+		writer.write(tabs(prevTabCount+2) + "if (outputFinal && ! outputValue){\n")
+		writer.write(tabs(prevTabCount+3) + "min = -1L\n")
+		writer.write(tabs(prevTabCount+3) + "max = -1L\n")
+		writer.write(tabs(prevTabCount+3) + "avg = 0L\n")
+		writer.write(tabs(prevTabCount+3) + "println(\"Error state reached MeasureConstraint()\")\n")
+		//writer.write(tabs(prevTabCount+3) + "loop.break\n")
+		writer.write(tabs(prevTabCount+2) + "}\n")
+		
+		
 		writer.write(tabs(prevTabCount+2) + "var timeEvent = time2-time1" + "\n")
 		writer.write(tabs(prevTabCount+2) + "min = if (timeEvent < min) timeEvent else min" + "\n")
 		writer.write(tabs(prevTabCount+2) + "max = if (timeEvent > max) timeEvent else max" + "\n")
@@ -41,11 +56,20 @@ abstract class TimeMeasureScalaClassCreator {
 		writer.write(tabs(prevTabCount+2) + "ctr = ctr+1" + "\n")
 		writer.write(tabs(prevTabCount+1) + "}" + "\n")
 		writer.write(tabs(prevTabCount+1) + "traceSet.resetOutputCounter()" + "\n")
-		writer.write(tabs(prevTabCount+1) + "(min, max, avg / eventCounter)" + "\n")
+		writer.write(tabs(prevTabCount+1) + "if (eventCounter == 0)\n")
+		writer.write(tabs(prevTabCount+2) + "(0L, 0L, 0L)\n")
+		writer.write(tabs(prevTabCount+1) + "else\n")
+		writer.write(tabs(prevTabCount+2) + "(min, max, avg / eventCounter)" + "\n")
 		writer.write(tabs(prevTabCount) + "}" + "\n")
 	}
 	
 	protected def generateMeasureConstraintWriteEvents(writer: FileWriter, prevTabCount: Int) : Unit
+	
+	protected def generateMeasureConstraintDebugOutput(writer: FileWriter, prevTabCount: Int) : Unit = {
+		writer.write(tabs(prevTabCount) + "for (i <- 0 to currentEvents.length-1){" + "\n")
+		writer.write(tabs(prevTabCount+1) + "println(currentEvents(i).getOwnerStream().getName()  + \": \"+ currentEvents(i))\n")
+		writer.write(tabs(prevTabCount) + "}\n")
+	}
 	
 	protected def generateMeasureMultiple(writer: FileWriter, prevTabCount: Int): Unit = {
 		writer.write(tabs(prevTabCount) + "def measureMultiple(count: Int, resultFilePath: String) : Unit = {" + "\n")
@@ -66,9 +90,9 @@ abstract class TimeMeasureScalaClassCreator {
 		writer.write(tabs(prevTabCount + 2) + "var fileWriter = new FileWriter(filePath)" + "\n")
 		writer.write(tabs(prevTabCount + 2) + "fileWriter.write(\"(min, max, average) of the run times per event in the individual runs.\\n\")" + "\n")
 		writer.write(tabs(prevTabCount + 2) + "var averageVals = average(measures)" + "\n")
-		writer.write(tabs(prevTabCount + 2) + "fileWriter.write(\"overallAverage: (\" + averageVals._1/1000 + \", \" + averageVals._2/1000 + \", \" + averageVals._3/1000 + \"\\n)\")" + "\n")
+		writer.write(tabs(prevTabCount + 2) + "fileWriter.write(\"overallAverage: (\" + averageVals._1 + \", \" + averageVals._2 + \", \" + averageVals._3 + \")\\n\")" + "\n")
 		writer.write(tabs(prevTabCount + 2) + "for (i <- 0 to measures.length-1) {" + "\n")
-		writer.write(tabs(prevTabCount + 3) + "fileWriter.write(\"measure \" + i+1 + \" of \" + (measures.length) + \": (\" + measures(i)._1/1000 + \", \" + measures(i)._2/1000 + \", \" + measures(i)._3/1000+ \"\\n\")" + "\n")
+		writer.write(tabs(prevTabCount + 3) + "fileWriter.write(\"measure \" + (i+1) + \" of \" + (measures.length) + \": (\" + measures(i)._1 + \", \" + measures(i)._2 + \", \" + measures(i)._3+ \")\\n\")" + "\n")
 		writer.write(tabs(prevTabCount + 2) + "}" + "\n")
 		writer.write(tabs(prevTabCount + 2) + "fileWriter.close()" + "\n")
 		writer.write(tabs(prevTabCount + 1) + "} catch {" + "\n")
@@ -92,12 +116,31 @@ abstract class TimeMeasureScalaClassCreator {
 		writer.write(tabs(prevTabCount) + "}" + "\n")
 	}
 	
-	protected def generateOutputFunc(writer: FileWriter, prevTabCount: Int) : Unit = {
-		writer.write(tabs(prevTabCount) + "def outputFunc(value: (Boolean, Boolean), timestamp: Long, name: String, error: Throwable) : Unit = {" + "\n")
+	protected def generateOutputFuncFinal(writer: FileWriter, prevTabCount: Int, debugOutput: Boolean) : Unit = {
+		writer.write(tabs(prevTabCount) + "def outputFuncFinal(value: Boolean, timestamp: Long, name: String, error: Throwable) : Unit = {" + "\n")
 		writer.write(tabs(prevTabCount+1) + "if (error != null){" + "\n")
 		writer.write(tabs(prevTabCount+2) + "println(\"An Error occurred at timestamp \" + timestamp + \": \" + error.getMessage());" + "\n")
 		writer.write(tabs(prevTabCount+1) + "} else {" + "\n")
-		writer.write(tabs(prevTabCount+2) + "if (value == (true, false))" + "\n")
+		writer.write(tabs(prevTabCount+2) + "outputFinal = value" + "\n")
+		if (debugOutput){
+			writer.write(tabs(prevTabCount+1) + "println(\"\"+timestamp + \":\" + name + \"=\" + value)\n")
+		}
+		writer.write(tabs(prevTabCount+2) + "if (outputFinal && ! outputValue)" + "\n")
+		writer.write(tabs(prevTabCount+3) + "println(\"Error! Invalid Output!\");" + "\n")
+		writer.write(tabs(prevTabCount+1) + "}" + "\n")
+		writer.write(tabs(prevTabCount) + "}" + "\n")
+	}
+	
+	protected def generateOutputFuncValue(writer: FileWriter, prevTabCount: Int, debugOutput: Boolean) : Unit = {
+		writer.write(tabs(prevTabCount) + "def outputFuncValue(value: Boolean, timestamp: Long, name: String, error: Throwable) : Unit = {" + "\n")
+		writer.write(tabs(prevTabCount+1) + "if (error != null){" + "\n")
+		writer.write(tabs(prevTabCount+2) + "println(\"An Error occurred at timestamp \" + timestamp + \": \" + error.getMessage());" + "\n")
+		writer.write(tabs(prevTabCount+1) + "} else {" + "\n")
+		writer.write(tabs(prevTabCount+2) + "outputValue = value" + "\n")
+		if (debugOutput){
+			writer.write(tabs(prevTabCount+1) + "println(\"\"+timestamp + \":\" + name + \"=\" + value)\n")
+		}
+		writer.write(tabs(prevTabCount+2) + "if (outputFinal && ! outputValue)" + "\n")
 		writer.write(tabs(prevTabCount+3) + "println(\"Error! Invalid Output!\");" + "\n")
 		writer.write(tabs(prevTabCount+1) + "}" + "\n")
 		writer.write(tabs(prevTabCount) + "}" + "\n")

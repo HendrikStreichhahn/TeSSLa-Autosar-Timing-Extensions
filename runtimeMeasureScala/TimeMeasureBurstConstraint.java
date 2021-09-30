@@ -29,7 +29,10 @@ public class TimeMeasureBurstConstraint extends TimeMeasureConstraint{
 			fileWriter.write("in event: Events[Int]\n");
 			fileWriter.write("def constraint := TADL2.burstConstraint(event, " + length + ", "
 				+ maxOccurrences + ", 1)\n");
-			fileWriter.write("out constraint\n");
+			fileWriter.write("def final = constraint.final\n");
+			fileWriter.write("def value = constraint.value\n");
+			fileWriter.write("out final\n");
+			fileWriter.write("out value\n");
 			fileWriter.close();
 		} catch (IOException e) {
 			e.printStackTrace();

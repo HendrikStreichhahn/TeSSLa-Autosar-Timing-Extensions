@@ -1,0 +1,8 @@
+include "../../main/t2uConstraints.tessla"
+in source: Events[Int]
+in target: Events[Int]
+def constraint := TADL2.orderConstraint(source, target)
+def final = constraint.final
+def value = constraint.value
+out value
+out final

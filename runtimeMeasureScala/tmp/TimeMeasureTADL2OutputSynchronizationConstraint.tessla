@@ -1,0 +1,16 @@
+include "../../main/t2uConstraints.tessla"
+in stimulus: Events[Int]
+in response1: Events[Int]
+in response2: Events[Int]
+in response3: Events[Int]
+def timeNow = merge(time(response3),merge(time(response2),merge(time(response1),time(stimulus))))
+def eventStimulus:= if (TADL2.defaultTime(stimulus)  >= timeNow) then Map.add(Map.empty[Int, Int], 0, default(stimulus, -1)) else Map.empty[Int, Int]
+def eventResponse1:= if (TADL2.defaultTime(response1)  >= timeNow) then Map.add(eventStimulus, 1, default(response1, -1)) else eventStimulus
+def eventResponse2:= if (TADL2.defaultTime(response2)  >= timeNow) then Map.add(eventResponse1, 2, default(response2, -1)) else eventResponse1
+def eventResponse3:= if (TADL2.defaultTime(response3)  >= timeNow) then Map.add(eventResponse2, 3, default(response3, -1)) else eventResponse2
+def eventsNow:= eventResponse3
+def constraint :=  TADL2.outputSynchronizationConstraintReset(eventsNow, 3 ,5, TADL2.pseudoInfty)
+def value = constraint.value
+def final = constraint.final
+out value
+out final
