@@ -15,7 +15,8 @@ public class SynchronizationConstraintGenerator extends TraceSet{
 
 	public boolean generateTestTrace(int eventCount, int tolerance, int maxEventsPerClusterPerStream,
 			int minClusterDistance, int maxClusterDistance){
-
+		//System.out.println("SynchronizationConstraintGenerator.generateTrace(eventCount=" + eventCount +", tolerance=" + tolerance + ", maxEventsPerClusterPerStream=" + maxEventsPerClusterPerStream + ", minClusterDistance=" + 
+		//		minClusterDistance + ", maxClusterDistance= "  + maxClusterDistance +")");
 		//Random rand = new Random();
 		int timeNow = 0;
 		int counter = 0;
@@ -32,14 +33,16 @@ public class SynchronizationConstraintGenerator extends TraceSet{
 					boolean inserted = false;
 					while(k > 0 && !inserted) {
 						//inserted = traces[i].insertEvent(new Event(timeNow + rand.nextInt(tolerance+1), counter, traces[i]));
-						inserted = traces[i].insertEvent(new Event(timeNow + (tolerance/NumberEventsThisStreamThisCluster), counter, traces[i]));
+						inserted = traces[i].insertEvent(new Event(timeNow + j*(tolerance/NumberEventsThisStreamThisCluster), counter, traces[i]));
 						k--;
 					}
 					eventCount--;
 					if (!inserted){
 						//System.out.println("generateTestTrace trace false");
+						//System.out.println("SynchronizationConstraintGenerator Inserted invalid event");
 						return false;
 					}
+					//System.out.println("SynchronizationConstraintGenerator Inserted event at " + (timeNow + (tolerance/NumberEventsThisStreamThisCluster)));
 				}
 			}
 			counter++;

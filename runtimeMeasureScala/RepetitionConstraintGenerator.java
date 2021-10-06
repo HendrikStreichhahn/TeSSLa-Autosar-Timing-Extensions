@@ -9,6 +9,7 @@ public class RepetitionConstraintGenerator extends TraceSet{
 
 	public boolean generateTestTrace(int eventCount, int lower, int upper, int span, int jitter){
 		// generate x events
+		//System.out.println("RepetitionConstraintGenerator generateTestTrace(eventCount=" + eventCount + ", lower=" + lower + ", upper= " + upper + ", span=" + span + ", jitter=" + jitter + ")");
 		RepeatConstraintGenerator xTimestamps = new RepeatConstraintGenerator();
 		xTimestamps.generateTestTrace(eventCount, lower, upper, span);
 		//generate actual events
@@ -25,6 +26,8 @@ public class RepetitionConstraintGenerator extends TraceSet{
 				if (timeStamp == 0)
 					System.out.println("RepetitionConstraint Event at 0");
 				inserted = traces[0].insertEvent(new Event(timeStamp, 0, traces[0]));
+				//if (inserted)
+				//	System.out.println("RepetitionConstraintGenerator event at " + timeStamp);
 				i--;
 			}
 			if (!inserted){

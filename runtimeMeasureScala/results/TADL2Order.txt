@@ -1,7 +1,0 @@
-(min, max, average) of the run times per event in the individual runs.
-overallAverage: (58882, 9207834, 66765)
-)measure 1 of 5: (60703, 5858783, 67951)
-measure 2 of 5: (60686, 39321613, 67427)
-measure 3 of 5: (60484, 285553, 66372)
-measure 4 of 5: (56247, 306021, 66174)
-measure 5 of 5: (56291, 267201, 65902)

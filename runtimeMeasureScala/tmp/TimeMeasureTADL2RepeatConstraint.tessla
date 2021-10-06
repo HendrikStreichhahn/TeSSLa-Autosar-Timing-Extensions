@@ -1,7 +1,0 @@
-include "../../main/t2uConstraints.tessla"
-in event: Events[Int]
-def constraint := TADL2.repeatConstraint(event, 500, 1000, 50)
-def final = constraint.final
-def value = constraint.value
-out value
-out final

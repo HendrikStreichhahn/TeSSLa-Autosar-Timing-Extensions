@@ -1,7 +1,0 @@
-include "../../main/t2uConstraints.tessla"
-in event: Events[Int]
-def constraint := TADL2.burstConstraint(event, 2000, 50, 1)
-def final = constraint.final
-def value = constraint.value
-out final
-out value

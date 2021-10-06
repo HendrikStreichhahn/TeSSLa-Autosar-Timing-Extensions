@@ -8,10 +8,10 @@ import java.util.concurrent.TimeUnit
 
 object timeMeasureRunner {
 	def main(args: Array[String]) : Unit ={
-		def printInputEvents: Boolean = false
+		def printInputEvents: Boolean = false	
 		
 		def eventCount = 250000
-		def repetitionCount = 20
+		def repetitionCount = 5
 	
 		runTADL2Burst("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Burst.scala", "measureTADL2Burst",
 			"TimeMeasureTADL2BurstConstraint.tessla", "results/TADL2Burst.txt", repetitionCount, eventCount, 2000, 50, printInputEvents)
@@ -43,7 +43,6 @@ object timeMeasureRunner {
 				15, //minClusterDistance
 				15, //maxClusterDistance
 				printInputEvents)
-		//ExecutionTimeConstraint
 		runTADL2ExecutionTime("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2ExecutionTime.scala", "measureTADL2ExecutionTime",
 			"TimeMeasureTADL2ExecutionTimeConstraint.tessla", "results/TADL2ExecutionTime.txt", repetitionCount, eventCount, 100, 200, 50,50, 1, 100, printInputEvents)
 		runTADL2Order("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Order.scala", "measureTADL2Order",
@@ -56,13 +55,10 @@ object timeMeasureRunner {
 			"TimeMeasureTADL2PatternConstraint.tessla", "results/TADL2Pattern.txt", repetitionCount, eventCount, 50, Array(1,2,3,4,5), 0, printInputEvents)
 		runTADL2Arbitrary("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Arbitrary.scala", "measureTADL2Arbitrary",
 			"TimeMeasureTADL2ArbitraryConstraint.tessla", "results/TADL2Arbitrary.txt", repetitionCount, eventCount, Array(1,2,3,4,5), Array(1,2,3,4,5), printInputEvents)
-		
 		runTADL2Reaction("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Reaction.scala", "measureTADL2Reaction",
 			"TimeMeasureTADL2ReactionConstraint.tessla", "results/TADL2Reaction.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
-			
 		runTADL2Age("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Age.scala", "measureTADL2Age",
 			"TimeMeasureTADL2Age.Constraint.tessla", "results/TADL2Age.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
-		
 		runTADL2OutputSynchronization("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2OutputSynchronization.scala", "measureTADL2OutputSynchronization",
 			"TimeMeasureTADL2OutputSynchronizationConstraint.tessla", "results/TADL2OutputSynchronization.txt", 
 				repetitionCount,
@@ -72,7 +68,6 @@ object timeMeasureRunner {
 				1,  //maxEventsPerClusterPerStream
 				15, //ClusterDistance
 				printInputEvents)
-		
 		runTADL2InputSynchronization("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2InputSynchronization.scala", "measureTADL2InputSynchronization",
 			"TimeMeasureTADL2InputSynchronizationConstraint.tessla", "results/TADL2InputSynchronization.txt", 
 				repetitionCount,
@@ -82,6 +77,61 @@ object timeMeasureRunner {
 				1,  //maxEventsPerClusterPerStream
 				15, //ClusterDistance
 				printInputEvents)
+				
+		runARPeriodicEventTriggering("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARPeriodic.scala", "measureARPeriodic",
+			"TimeMeasureARPeriodicConstraint.tessla", "results/ARPeriodic.txt", repetitionCount, eventCount, 25, 0, 1, printInputEvents)
+		runARSporadicEventTriggering("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSporadic.scala", "measureARSporadic",
+			"TimeMeasureARSporadicConstraint.tessla", "results/ARSporadic.txt", repetitionCount, eventCount, 21, 600, 500, printInputEvents)
+		runARConcretePatternEventTriggering("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARConcretePattern.scala", "measureARConcretePattern",
+			"TimeMeasureARConcretePatternConstraint.tessla", "results/ARConcretePattern.txt", repetitionCount, eventCount, Array(1,2,3,4,5), 3, 100, 200, printInputEvents)
+		runARArbitrary("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARArbitrary.scala", "measureARArbitrary",
+			"TimeMeasureARArbitraryConstraint.tessla", "results/ARArbitrary.txt", repetitionCount, eventCount, Array(1,2,3,4,5), Array(1,2,3,4,5), printInputEvents)
+		runARLatencyReaction("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARLatencyReaction.scala", "measureARLatencyReaction",
+			"TimeMeasureARLatencyReaction.tessla", "results/ARLatencyReaction.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
+		runARLatencyAge("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARLatencyAge.scala", "measureARLatencyAge",
+			"TimeMeasureARLatencyAgeConstraint.tessla", "results/ARLatencyAge.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
+		
+		runARAge("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARAge.scala", "measureARAge",
+			"TimeMeasureARAgeConstraint.tessla", "results/ARAge.txt", repetitionCount, eventCount, 100, 200, 64, printInputEvents)
+			
+		measureARSynchronizationConstraintEventsSingle("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroEventsSingle.scala", "measureARSynchroEventsSingle",
+			"TimeMeasureARSynchroEventsSingleConstraint.tessla", "results/ARSynchroEventsSingle.txt", repetitionCount, eventCount, 10, 5, 10,  printInputEvents)
+		
+		measureARSynchronizationConstraintEventsMultiple("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroEventsMultiple.scala", "measureARSynchroEventsMultiple",
+			"TimeMeasureARSynchroEventsMultipleConstraint.tessla", "results/ARSynchroEventsMultiple.txt", repetitionCount, eventCount, 10, 4, 64, 2, printInputEvents)
+			
+		measureARSynchronizationConstraintEventsResponse("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroResponse.scala", "measureARSynchroResponse",
+			"TimeMeasureARSynchroResponse.tessla", "results/ARSynchroResponse.txt", 
+				repetitionCount,
+				eventCount,
+				5,	//tolerance
+				3, 	//streamCount
+				1,  //maxEventsPerClusterPerStream
+				15, //ClusterDistance
+				printInputEvents)
+		measureARSynchronizationConstraintEventsStimulus("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroStimulus.scala", "measureARSynchroStimulus",
+			"TimeMeasureARSynchroStimulus.tessla", "results/ARSynchroStimulus.txt", 
+				repetitionCount,
+				eventCount,
+				5,	//tolerance
+				3, 	//streamCount
+				1,  //maxEventsPerClusterPerStream
+				15, //ClusterDistance
+				printInputEvents)
+		runAROffsetTiming("../../tessla-assembly-1.2.3.jar", "tmp/", "measureAROffsetTiming.scala", "measureAROffsetTiming",
+			"measureAROffsetTimingConstraint.tessla", "results/AROffsetTiming.txt", repetitionCount, eventCount, 1, 50, 50, printInputEvents)
+		
+		runARExecutionOrderConstraintOrdinary("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionOrderConstraintOrdinary.scala", "measureARExecutionOrderConstraintOrdinary",
+			"measureARExecutionOrderConstraintOrdinary.tessla", "results/ARExecutionOrderConstraintOrdinary.txt", repetitionCount, 20, 20, printInputEvents)
+		
+		runARExecutionOrderConstraintHierarchical("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionOrderConstraintHierarchical.scala", "measureARExecutionOrderConstraintHierarchical",
+			"measureARExecutionOrderConstraintHierarchical.tessla", "results/ARExecutionOrderConstraintHierarchical.txt", repetitionCount, 4, 2, 20, printInputEvents)
+			
+		runARExecutionTimeNet("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionTimeNet.scala", "measureARExecutionTimeNet",
+			"TimeMeasureARExecutionTimeNetConstraint.tessla", "results/ARExecutionTimeNet.txt", repetitionCount, eventCount, 100, 200, 50,50, 1, 100, printInputEvents)
+			
+		runARExecutionTimeGross("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionTimeGross.scala", "measureARExecutionTimeGross",
+			"TimeMeasureARExecutionTimeGrossConstraint.tessla", "results/ARExecutionTimeGross.txt", repetitionCount, eventCount, 100, 200, printInputEvents)
 	}
 	
 	def runTADL2Delay(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
@@ -687,6 +737,598 @@ object timeMeasureRunner {
 		println("start measuring TADL2 InputSynchronizationConstraint")
 		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true))
 			return false
+		return true
+	}
+	
+	def runARPeriodicEventTriggering(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, period: Int, jitter: Int,
+			minimum: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing AR PeriodicEventTriggering")
+		var creator: TimeMeasureScalaClassCreatorARPeriodicEventTriggering = new TimeMeasureScalaClassCreatorARPeriodicEventTriggering()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, period, jitter, minimum, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmPeriodicConstraint : TimeMeasureARPeriodicEventTriggering = new TimeMeasureARPeriodicEventTriggering(period, jitter, minimum)
+		tmPeriodicConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring AR PeriodicEventTriggering")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARSporadicEventTriggering(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, jitter: Int,
+			maxInterArrivalTime: Int, period: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing AR SporadicEventTriggering")
+		var creator: TimeMeasureScalaClassCreatorARSporadicEventTriggering =
+			new TimeMeasureScalaClassCreatorARSporadicEventTriggering()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, jitter, maxInterArrivalTime, period, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmSporadicConstraint : TimeMeasureARSporadicEventTriggering = new TimeMeasureARSporadicEventTriggering(jitter,
+				maxInterArrivalTime, period)
+		tmSporadicConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring AR SporadicEventTriggering")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARConcretePatternEventTriggering(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, offset: Array[Int],
+			patternJitter: Int, patternLength: Int, patternPeriod: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing AR ARConcretePatternEventTriggering")
+		var creator: TimeMeasureScalaClassCreatorARConcretePatternEventTriggering =
+			new TimeMeasureScalaClassCreatorARConcretePatternEventTriggering()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, offset, patternJitter, patternLength, patternPeriod, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmConcretePatternConstraint : TimeMeasureARConcretePatternEventTriggering =
+			new TimeMeasureARConcretePatternEventTriggering(patternPeriod, offset, patternJitter)
+		tmConcretePatternConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARConcretePatternEventTriggering")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARArbitrary(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, minimum: Array[Int], 
+			maximum: Array[Int], printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARArbitraryEventTriggeringConstraint")
+		var creator: TimeMeasureScalaClassCreatorARArbitrary = new TimeMeasureScalaClassCreatorARArbitrary()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, minimum, maximum, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmArbitraryConstraint : TimeMeasureArbitraryConstraint = new TimeMeasureArbitraryConstraint(minimum, maximum)
+		tmArbitraryConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring AR ArbitraryEventTriggeringConstraint")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARLatencyReaction(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, minimum: Int, 
+			maximum: Int, stimulusDistance: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARLatency Type Reaction")
+		var creator: TimeMeasureScalaClassCreatorARLatency = new TimeMeasureScalaClassCreatorARLatency()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, false, minimum, maximum, stimulusDistance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmReactionConstraint : TimeMeasureARLatencyTimingConstraint = new TimeMeasureARLatencyTimingConstraint(false,
+			minimum, maximum, stimulusDistance, stimulusDistance)
+		tmReactionConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARLatency Type Reaction")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARLatencyAge(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, minimum: Int, 
+			maximum: Int, stimulusDistance: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARLatency Type  Age")
+		var creator: TimeMeasureScalaClassCreatorARLatency = new TimeMeasureScalaClassCreatorARLatency()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, true, minimum, maximum, stimulusDistance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmAgeConstraint : TimeMeasureARLatencyTimingConstraint = new TimeMeasureARLatencyTimingConstraint(true, minimum,
+			maximum, stimulusDistance, stimulusDistance)
+		tmAgeConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARLatency Type  Age")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARAge(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, minimum: Int, 
+			maximum: Int, distance: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARAgeConstraint")
+		var creator: TimeMeasureScalaClassCreatorARAge = new TimeMeasureScalaClassCreatorARAge()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, minimum, maximum, distance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmAgeConstraint : TimeMeasureARAgeConstraint = new TimeMeasureARAgeConstraint(minimum, maximum,
+			distance, distance)
+		tmAgeConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARAgeConstraint")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def measureARSynchronizationConstraintEventsSingle(tesslaJarFile: String, tmpPath: String, scalaFileName: String,
+			scalaObjectName: String, tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int,
+			numStreams: Int, tolerance: Int, clusterDistance: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARSynchronizationConstraintEventsSingle")
+		var creator: TimeMeasureScalaClassCreatorARSynchronizationEventsSingle =
+			new TimeMeasureScalaClassCreatorARSynchronizationEventsSingle()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount,tolerance, numStreams, clusterDistance, clusterDistance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmSynchroConstraint : TimeMeasureARSynchronizationConstraintEventsSingle =
+			new TimeMeasureARSynchronizationConstraintEventsSingle(tolerance, numStreams, clusterDistance, clusterDistance)
+		tmSynchroConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARSynchronizationConstraintEventsSingle")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def measureARSynchronizationConstraintEventsMultiple(tesslaJarFile: String, tmpPath: String, scalaFileName: String,
+			scalaObjectName: String, tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int,
+			numStreams: Int, tolerance: Int, clusterDistance: Int, maxEventPerClusterPerStream: Int,
+			printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARSynchronizationConstraintEventsMultiple")
+		var creator: TimeMeasureScalaClassCreatorARSynchronizationEventsMultiple =
+			new TimeMeasureScalaClassCreatorARSynchronizationEventsMultiple()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount,tolerance, numStreams, clusterDistance, clusterDistance, maxEventPerClusterPerStream,
+				printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmSynchroConstraint : TimeMeasureARSynchronizationConstraintEventsMultiple =
+			new TimeMeasureARSynchronizationConstraintEventsMultiple(tolerance, numStreams, maxEventPerClusterPerStream,
+				clusterDistance, clusterDistance)
+		tmSynchroConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARSynchronizationConstraintEventsMultiple")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def measureARSynchronizationConstraintEventsResponse(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, tolerance: Int,
+			streamCount: Int, maxEventsPerClusterPerStream: Int, clusterDistance: Int,
+			printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARSynchronizationResponse")
+		var creator: TimeMeasureScalaClassCreatorARSynchronizationResponse = new TimeMeasureScalaClassCreatorARSynchronizationResponse()
+		//creator.setStreamCount(streamCount)
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, tolerance, streamCount, maxEventsPerClusterPerStream, clusterDistance, clusterDistance,
+				printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmOutputSynchronizationConstraint : TimeMeasureARSynchronizationConstraintResponse =
+			new TimeMeasureARSynchronizationConstraintResponse(streamCount, clusterDistance, tolerance)
+		tmOutputSynchronizationConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName))
+			return false
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala"))
+			return false
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName))
+			return false
+		//run the measurements
+		println("start measuring ARSynchronizationResponse")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true))
+			return false
+		return true
+	}
+	
+	def measureARSynchronizationConstraintEventsStimulus(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, tolerance: Int,
+			streamCount: Int, maxEventsPerClusterPerStream: Int, clusterDistance: Int,
+			printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARSynchronizationStimulus")
+		var creator: TimeMeasureScalaClassCreatorARSynchronizationStimulus = new TimeMeasureScalaClassCreatorARSynchronizationStimulus()
+		//creator.setStreamCount(streamCount)
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, tolerance, streamCount, maxEventsPerClusterPerStream, clusterDistance, clusterDistance,
+				printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmOutputSynchronizationConstraint : TimeMeasureARSynchronizationConstraintStimulus =
+			new TimeMeasureARSynchronizationConstraintStimulus(streamCount, clusterDistance, tolerance)
+		tmOutputSynchronizationConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName))
+			return false
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala"))
+			return false
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName))
+			return false
+		//run the measurements
+		println("start measuring ARSynchronizationStimulus")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true))
+			return false
+		return true
+	}
+	
+	def runAROffsetTiming(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, sourceDistance: Int,
+			lower: Int, upper: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing AROffsetTiming")
+		var creator: TimeMeasureScalaClassCreatorAROffsetTimingConstraint = new TimeMeasureScalaClassCreatorAROffsetTimingConstraint()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, lower, upper, sourceDistance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmOffsetTimingConstraint : TimeMeasureOffsetTimingConstraint = new TimeMeasureOffsetTimingConstraint(lower, upper, sourceDistance)
+		tmOffsetTimingConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName))
+			return false
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala"))
+			return false
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName))
+			return false
+		//run the measurements
+		println("start measuring AROffsetTiming")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true))
+			return false
+		return true
+	}
+	
+	def runARExecutionOrderConstraintOrdinary(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, eventDistance: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARExecutionOrderConstraintOrdinary")
+		var creator: TimeMeasureScalaClassCreatorARExecutionOrderConstraintOrdinary = new TimeMeasureScalaClassCreatorARExecutionOrderConstraintOrdinary()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount, eventDistance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmExecOrderConstraint : TimeMeasureARExecutionOrderConstraint = new TimeMeasureARExecutionOrderConstraint(eventCount, eventDistance)
+		tmExecOrderConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName))
+			return false
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala"))
+			return false
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName))
+			return false
+		//run the measurements
+		println("start measuring ARExecutionOrderConstraintOrdinary")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true))
+			return false
+		return true
+	}
+	
+	def runARExecutionOrderConstraintHierarchical(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, height: Int, width: Int, eventDistance: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARExecutionOrderConstraintHierarchical")
+		var creator: TimeMeasureScalaClassCreatorARExecutionOrderConstraintHierarchical = new TimeMeasureScalaClassCreatorARExecutionOrderConstraintHierarchical()
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				height, width, eventDistance, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmExecOrderConstraint : TimeMeasureARExecutionOrderConstraint = new TimeMeasureARExecutionOrderConstraint(eventDistance, height, width)
+		tmExecOrderConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName))
+			return false
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala"))
+			return false
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName))
+			return false
+		//run the measurements
+		println("start measuring ARExecutionOrderConstraintHierarchical")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true))
+			return false
+		return true
+	}
+	
+	def runARExecutionTimeNet(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, lower: Int, upper: Int,
+			minDistance: Int, maxDistance: Int, numPreemptions: Int, preemptLength: Int, printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARExecutionTimeNet")
+		var creator: TimeMeasureScalaClassCreatorARExecutionTimeNet = new TimeMeasureScalaClassCreatorARExecutionTimeNet()
+		//(scalaFilePath: String, scalaObjectName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int,
+		//	lower: Int, upper: Int, minDistance: Int, maxDistance: Int, numPreemptions: Int, preemptLength: Int, printInputEvents: Boolean)
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount,lower, upper, minDistance, maxDistance, numPreemptions, preemptLength, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmExecutionTimeConstraint : TimeMeasureARExecutionTimeConstraintNet = new TimeMeasureARExecutionTimeConstraintNet(lower, upper)
+		tmExecutionTimeConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARExecutionTimeNet")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
+		return true
+	}
+	
+	def runARExecutionTimeGross(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
+			tesslaFileName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int, lower: Int, upper: Int,
+			printInputEvents: Boolean) : Boolean = {
+		// create the scala object
+		println("preparing ARExecutionTimeGross")
+		var creator: TimeMeasureScalaClassCreatorARExecutionTimeGross = new TimeMeasureScalaClassCreatorARExecutionTimeGross()
+		//(scalaFilePath: String, scalaObjectName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int,
+		//	lower: Int, upper: Int, minDistance: Int, maxDistance: Int, numPreemptions: Int, preemptLength: Int, printInputEvents: Boolean)
+		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
+				eventCount,lower, upper, printInputEvents)) {
+			println("Could not create " + tmpPath + scalaFileName)
+			return false
+		}
+		// create and compile the tessla specification
+		var tmExecutionTimeConstraint : TimeMeasureARExecutionTimeConstraintGross = new TimeMeasureARExecutionTimeConstraintGross(lower, upper)
+		tmExecutionTimeConstraint.generateTeSSLaFile(tmpPath + tesslaFileName)
+		if (!runCommand("java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)){
+			println("Command crashed: " + "java -jar " + tesslaJarFile + " compile -n -o " + tmpPath + tesslaFileName + ".scala " + tmpPath + tesslaFileName)
+			return false
+		}
+		if (!modifyTesslaMonitorFile(tmpPath + tesslaFileName + ".scala"))
+			return false
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + "./:" + tmpPath + " " + tmpPath+tesslaFileName + ".scala")
+			return false
+		}
+		//compile the scala files
+		if (!runCommand("scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)){
+			println("Command crashed: " + "scalac " + "-d " + tmpPath + " -cp " + tmpPath + ":./" + " " + tmpPath+scalaFileName)
+			return false
+		}
+		//run the measurements
+		println("start measuring ARExecutionTimeGross")
+		if (!runCommand("scala " + "-d " + tmpPath + " -cp " + tmpPath + ":./ " + scalaObjectName, true)){
+			println("Command crashed: " + "scala " + " -cp " + tmpPath + ":./ " + scalaObjectName)
+			return false
+		}
 		return true
 	}
 	

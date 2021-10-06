@@ -1,8 +1,0 @@
-include "../../main/t2uConstraints.tessla"
-in stimulus: Events[Int]
-in response: Events[Int]
-def constraint := TADL2.reactionConstraint(stimulus, response, 50, 50)
-def value= constraint.value
-def final= constraint.final
-out final
-out value

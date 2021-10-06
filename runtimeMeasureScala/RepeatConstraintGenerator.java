@@ -14,6 +14,7 @@ public class RepeatConstraintGenerator extends TraceSet{
 	}
 
 	public boolean generateTestTrace(int eventCount, int lower, int upper, int span){
+		//System.out.println("RepeatConstraintGenerator generateTestTrace(eventCount=" + eventCount + ", lower=" + lower + ", upper=" + upper + ")");
 		Random rand = new Random();
 
 		int spanDistance = lower/(span);
@@ -29,7 +30,7 @@ public class RepeatConstraintGenerator extends TraceSet{
 			int lowestPossibleTimestamp = minTimestamp(spanLast, lower);
 			int highestPossibleTimestamp = spanLast.getFirst() + upper;
 			if (lowestPossibleTimestamp > highestPossibleTimestamp){
-				//System.out.println("Order is broken as Event " + i + "! Trace is invalid!");
+				System.out.println("RepeatConstraintGenerator Order is broken as Event " + i + "! Trace is invalid!");
 				return false;
 			}
 			int nextEvent = lowestPossibleTimestamp + rand.nextInt(highestPossibleTimestamp - lowestPossibleTimestamp + 1);
@@ -45,13 +46,18 @@ public class RepeatConstraintGenerator extends TraceSet{
 				nextEvent--;
 				inserted = traces[0].insertEvent(new Event(nextEvent, i, traces[0]));
 			}
-			if (!inserted)
+			if (!inserted){
+				System.out.println("RepeatConstraintGenerator generateTestTrace error a");
 				return false;
+			}
 			//System.out.println("" + nextEvent + ": event");
 				//System.out.println("Could not find free matching timestamp for event " + i + "! Trace is invalid!");
-			if (!ascendingListOrder(spanLast))
+			if (!ascendingListOrder(spanLast)){
+				System.out.println("RepeatConstraintGenerator generateTestTrace error b");
 				return false;
-				//System.out.println("Order is broken as Event " + i + "! Trace is invalid!");
+			}
+			//System.out.println("RepeatConstraintGenerator generateTestTrace Event at " + nextEvent);
+			//System.out.println("Order is broken as Event " + i + "! Trace is invalid!");
 			spanLast.add(nextEvent);
 			spanLast.remove();
 		}
