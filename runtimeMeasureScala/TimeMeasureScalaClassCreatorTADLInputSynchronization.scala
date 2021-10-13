@@ -70,10 +70,10 @@ class TimeMeasureScalaClassCreatorTADLInputSynchronization extends TimeMeasureSc
 	
 	protected def generateMeasureConstraintWriteEvents(writer: FileWriter, prevTabCount: Int, locStreamCount: Int) : Unit = {
 		writer.write(tabs(prevTabCount) + "for (i <- 0 to currentEvents.length-1){" + "\n")
-		writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"response \" ))" + "\n")
+		writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"response\" ))" + "\n")
 		writer.write(tabs(prevTabCount+2) + "tesslaMonitorInstance.set_var_response(currentEvents(i).getColor(), currentEvents(i).getTimeStamp())" + "\n")
 		for (i <- 0 to locStreamCount-1){
-			writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"stimulus " + (i+1) + "\" ))" + "\n")
+			writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"stimulus" + (i+1) + "\" ))" + "\n")
 			writer.write(tabs(prevTabCount+2) + "tesslaMonitorInstance.set_var_stimulus" + (i+1) + "(currentEvents(i).getColor(), currentEvents(i).getTimeStamp())" + "\n")
 		}
 		//writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"event\" ))" + "\n")

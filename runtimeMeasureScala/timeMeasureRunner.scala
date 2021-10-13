@@ -16,110 +16,109 @@ object timeMeasureRunner {
 		runTADL2Burst("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Burst.scala", "measureTADL2Burst",
 			"TimeMeasureTADL2BurstConstraint.tessla", "results/TADL2Burst.txt", repetitionCount, eventCount, 2000, 50, printInputEvents)
 		runTADL2Delay("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Delay.scala", "measureTADL2Delay",
-			"TimeMeasureTADL2DelayConstraint.tessla", "results/TADL2Delay.txt", repetitionCount, eventCount, 1, 50, 50, printInputEvents)
+			"TimeMeasureTADL2DelayConstraint.tessla", "results/TADL2Delay.txt", repetitionCount, eventCount, 16, 50, 50, printInputEvents)
 		runTADL2StrongDelay("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2StrongDelay.scala", "measureTADL2StrongDelay",
-			"TimeMeasureTADL2StrongDelayConstraint.tessla", "results/TADL2StrongDelay.txt", repetitionCount, eventCount, 1, 50, 50, printInputEvents)
+			"TimeMeasureTADL2StrongDelayConstraint.tessla", "results/TADL2StrongDelay.txt", repetitionCount, eventCount, 16, 50, 50, printInputEvents)
 		runTADL2Repeat("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Repeat.scala", "measureTADL2Repeat",
 			"TimeMeasureTADL2RepeatConstraint.tessla", "results/TADL2Repeat.txt", repetitionCount, eventCount, 500, 1000, 50, printInputEvents)
 		runTADL2Repetition("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Repetition.scala", "measureTADL2Repetition",
-			"TimeMeasureTADL2RepetitionConstraint.tessla", "results/TADL2Repetition.txt", repetitionCount, eventCount, 10, 10, 1, 0, printInputEvents)
-//Synchronization und Strongsynchronization gefühlt zu schnell
+			"TimeMeasureTADL2RepetitionConstraint.tessla", "results/TADL2Repetition.txt", repetitionCount, eventCount, 500, 900, 1, 250, printInputEvents)
 		runTADL2Synchronization("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Synchronization.scala", "measureTADL2Synchronization",
 			"TimeMeasureTADL2SynchronizationConstraint.tessla", "results/TADL2Synchronization.txt", 
 				repetitionCount,
 				eventCount,
-				5,	//tolerance
-				3, 	//streamCount
-				1,  //maxEventsPerClusterPerStream
-				15, //minClusterDistance
-				16, //maxClusterDistance
+				2,	//tolerance
+				16, 	//streamCount
+				2,  //maxEventsPerClusterPerStream
+				64, //minClusterDistance
+				64, //maxClusterDistance
 				printInputEvents)
 		runTADL2StrongSynchronization("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2StrongSynchronization.scala", "measureTADL2StrongSynchronization",
 			"TimeMeasureTADL2StrongSynchronizationConstraint.tessla", "results/TADL2StrongSynchronization.txt", 
 				repetitionCount,
 				eventCount,
-				5,	//tolerance
-				3, 	//streamCount
-				15, //minClusterDistance
-				15, //maxClusterDistance
+				2,	//tolerance
+				16, 	//streamCount
+				64, //minClusterDistance
+				64, //maxClusterDistance
 				printInputEvents)
 		runTADL2ExecutionTime("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2ExecutionTime.scala", "measureTADL2ExecutionTime",
-			"TimeMeasureTADL2ExecutionTimeConstraint.tessla", "results/TADL2ExecutionTime.txt", repetitionCount, eventCount, 100, 200, 50,50, 1, 100, printInputEvents)
+			"TimeMeasureTADL2ExecutionTimeConstraint.tessla", "results/TADL2ExecutionTime.txt", repetitionCount, eventCount, 500, 600, 50,50, 21, 100, printInputEvents)
 		runTADL2Order("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Order.scala", "measureTADL2Order",
 			"TimeMeasureTADL2OrderConstraint.tessla", "results/TADL2Order.txt", repetitionCount, eventCount, 50, 50, printInputEvents)
 		runTADL2Sporadic("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Sporadic.scala", "measureTADL2Sporadic",
-			"TimeMeasureTADL2SporadicConstraint.tessla", "results/TADL2Sporadic.txt", repetitionCount, eventCount, 500, 600, 1, 1, printInputEvents)
+			"TimeMeasureTADL2SporadicConstraint.tessla", "results/TADL2Sporadic.txt", repetitionCount, eventCount, 500, 600, 11, 1, printInputEvents)
 		runTADL2Periodic("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Periodic.scala", "measureTADL2Periodic",
-			"TimeMeasureTADL2PeriodicConstraint.tessla", "results/TADL2Periodic.txt", repetitionCount, eventCount, 25, 0, 1, printInputEvents)
+			"TimeMeasureTADL2PeriodicConstraint.tessla", "results/TADL2Periodic.txt", repetitionCount, eventCount, 50, 5, 1, printInputEvents)
 		runTADL2Pattern("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Pattern.scala", "measureTADL2Pattern",
-			"TimeMeasureTADL2PatternConstraint.tessla", "results/TADL2Pattern.txt", repetitionCount, eventCount, 50, Array(1,2,3,4,5), 0, printInputEvents)
+			"TimeMeasureTADL2PatternConstraint.tessla", "results/TADL2Pattern.txt", repetitionCount, eventCount, 50, Array(1,2,3), 0, printInputEvents)
 		runTADL2Arbitrary("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Arbitrary.scala", "measureTADL2Arbitrary",
-			"TimeMeasureTADL2ArbitraryConstraint.tessla", "results/TADL2Arbitrary.txt", repetitionCount, eventCount, Array(1,2,3,4,5), Array(1,2,3,4,5), printInputEvents)
+			"TimeMeasureTADL2ArbitraryConstraint.tessla", "results/TADL2Arbitrary.txt", repetitionCount, eventCount, Array(40,80,120), Array(80,160,240), printInputEvents)
 		runTADL2Reaction("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Reaction.scala", "measureTADL2Reaction",
-			"TimeMeasureTADL2ReactionConstraint.tessla", "results/TADL2Reaction.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
+			"TimeMeasureTADL2ReactionConstraint.tessla", "results/TADL2Reaction.txt", repetitionCount, eventCount, 500, 500, 64, printInputEvents)
 		runTADL2Age("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2Age.scala", "measureTADL2Age",
-			"TimeMeasureTADL2Age.Constraint.tessla", "results/TADL2Age.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
+			"TimeMeasureTADL2Age.Constraint.tessla", "results/TADL2Age.txt", repetitionCount, eventCount, 500, 500, 64, printInputEvents)
 		runTADL2OutputSynchronization("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2OutputSynchronization.scala", "measureTADL2OutputSynchronization",
 			"TimeMeasureTADL2OutputSynchronizationConstraint.tessla", "results/TADL2OutputSynchronization.txt", 
 				repetitionCount,
 				eventCount,
-				5,	//tolerance
-				3, 	//streamCount
-				1,  //maxEventsPerClusterPerStream
-				15, //ClusterDistance
+				2,	//tolerance
+				16, 	//streamCount
+				2,  //maxEventsPerClusterPerStream
+				64, //ClusterDistance
 				printInputEvents)
 		runTADL2InputSynchronization("../../tessla-assembly-1.2.3.jar", "tmp/", "measureTADL2InputSynchronization.scala", "measureTADL2InputSynchronization",
 			"TimeMeasureTADL2InputSynchronizationConstraint.tessla", "results/TADL2InputSynchronization.txt", 
 				repetitionCount,
 				eventCount,
-				5,	//tolerance
-				3, 	//streamCount
-				1,  //maxEventsPerClusterPerStream
-				15, //ClusterDistance
+				2,	//tolerance
+				16, 	//streamCount
+				2,  //maxEventsPerClusterPerStream
+				64, //ClusterDistance
 				printInputEvents)
 				
 		runARPeriodicEventTriggering("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARPeriodic.scala", "measureARPeriodic",
-			"TimeMeasureARPeriodicConstraint.tessla", "results/ARPeriodic.txt", repetitionCount, eventCount, 25, 0, 1, printInputEvents)
+			"TimeMeasureARPeriodicConstraint.tessla", "results/ARPeriodic.txt", repetitionCount, eventCount, 50, 5, 1, printInputEvents)
 		runARSporadicEventTriggering("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSporadic.scala", "measureARSporadic",
-			"TimeMeasureARSporadicConstraint.tessla", "results/ARSporadic.txt", repetitionCount, eventCount, 21, 600, 500, printInputEvents)
+			"TimeMeasureARSporadicConstraint.tessla", "results/ARSporadic.txt", repetitionCount, eventCount, 11, 600, 500, printInputEvents)
 		runARConcretePatternEventTriggering("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARConcretePattern.scala", "measureARConcretePattern",
-			"TimeMeasureARConcretePatternConstraint.tessla", "results/ARConcretePattern.txt", repetitionCount, eventCount, Array(1,2,3,4,5), 3, 100, 200, printInputEvents)
+			"TimeMeasureARConcretePatternConstraint.tessla", "results/ARConcretePattern.txt", repetitionCount, eventCount, Array(1,2,3), 1, 50, 50, printInputEvents)
 		runARArbitrary("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARArbitrary.scala", "measureARArbitrary",
-			"TimeMeasureARArbitraryConstraint.tessla", "results/ARArbitrary.txt", repetitionCount, eventCount, Array(1,2,3,4,5), Array(1,2,3,4,5), printInputEvents)
+			"TimeMeasureARArbitraryConstraint.tessla", "results/ARArbitrary.txt", repetitionCount, eventCount, Array(40,80,120), Array(80,160, 240), printInputEvents)
 		runARLatencyReaction("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARLatencyReaction.scala", "measureARLatencyReaction",
-			"TimeMeasureARLatencyReaction.tessla", "results/ARLatencyReaction.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
+			"TimeMeasureARLatencyReaction.tessla", "results/ARLatencyReaction.txt", repetitionCount, eventCount, 500, 500, 64, printInputEvents)
 		runARLatencyAge("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARLatencyAge.scala", "measureARLatencyAge",
-			"TimeMeasureARLatencyAgeConstraint.tessla", "results/ARLatencyAge.txt", repetitionCount, eventCount, 50, 50, 25, printInputEvents)
+			"TimeMeasureARLatencyAgeConstraint.tessla", "results/ARLatencyAge.txt", repetitionCount, eventCount, 500, 500, 64, printInputEvents)
 		
 		runARAge("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARAge.scala", "measureARAge",
 			"TimeMeasureARAgeConstraint.tessla", "results/ARAge.txt", repetitionCount, eventCount, 100, 200, 64, printInputEvents)
 			
 		measureARSynchronizationConstraintEventsSingle("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroEventsSingle.scala", "measureARSynchroEventsSingle",
-			"TimeMeasureARSynchroEventsSingleConstraint.tessla", "results/ARSynchroEventsSingle.txt", repetitionCount, eventCount, 10, 5, 10,  printInputEvents)
+			"TimeMeasureARSynchroEventsSingleConstraint.tessla", "results/ARSynchroEventsSingle.txt", repetitionCount, eventCount, 16, 2, 64,  printInputEvents)
 		
 		measureARSynchronizationConstraintEventsMultiple("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroEventsMultiple.scala", "measureARSynchroEventsMultiple",
-			"TimeMeasureARSynchroEventsMultipleConstraint.tessla", "results/ARSynchroEventsMultiple.txt", repetitionCount, eventCount, 10, 4, 64, 2, printInputEvents)
+			"TimeMeasureARSynchroEventsMultipleConstraint.tessla", "results/ARSynchroEventsMultiple.txt", repetitionCount, eventCount, 16, 2, 64, 2, printInputEvents)
 			
 		measureARSynchronizationConstraintEventsResponse("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroResponse.scala", "measureARSynchroResponse",
 			"TimeMeasureARSynchroResponse.tessla", "results/ARSynchroResponse.txt", 
 				repetitionCount,
 				eventCount,
-				5,	//tolerance
-				3, 	//streamCount
-				1,  //maxEventsPerClusterPerStream
-				15, //ClusterDistance
+				2,	//tolerance
+				16, 	//streamCount
+				2,  //maxEventsPerClusterPerStream
+				64, //ClusterDistance
 				printInputEvents)
 		measureARSynchronizationConstraintEventsStimulus("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARSynchroStimulus.scala", "measureARSynchroStimulus",
 			"TimeMeasureARSynchroStimulus.tessla", "results/ARSynchroStimulus.txt", 
 				repetitionCount,
 				eventCount,
-				5,	//tolerance
-				3, 	//streamCount
-				1,  //maxEventsPerClusterPerStream
-				15, //ClusterDistance
+				2,	//tolerance
+				16, 	//streamCount
+				2,  //maxEventsPerClusterPerStream
+				64, //ClusterDistance
 				printInputEvents)
 		runAROffsetTiming("../../tessla-assembly-1.2.3.jar", "tmp/", "measureAROffsetTiming.scala", "measureAROffsetTiming",
-			"measureAROffsetTimingConstraint.tessla", "results/AROffsetTiming.txt", repetitionCount, eventCount, 1, 50, 50, printInputEvents)
+			"measureAROffsetTimingConstraint.tessla", "results/AROffsetTiming.txt", repetitionCount, eventCount, 16, 50, 50, printInputEvents)
 		
 		runARExecutionOrderConstraintOrdinary("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionOrderConstraintOrdinary.scala", "measureARExecutionOrderConstraintOrdinary",
 			"measureARExecutionOrderConstraintOrdinary.tessla", "results/ARExecutionOrderConstraintOrdinary.txt", repetitionCount, 20, 20, printInputEvents)
@@ -128,10 +127,10 @@ object timeMeasureRunner {
 			"measureARExecutionOrderConstraintHierarchical.tessla", "results/ARExecutionOrderConstraintHierarchical.txt", repetitionCount, 4, 2, 20, printInputEvents)
 			
 		runARExecutionTimeNet("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionTimeNet.scala", "measureARExecutionTimeNet",
-			"TimeMeasureARExecutionTimeNetConstraint.tessla", "results/ARExecutionTimeNet.txt", repetitionCount, eventCount, 100, 200, 50,50, 1, 100, printInputEvents)
+			"TimeMeasureARExecutionTimeNetConstraint.tessla", "results/ARExecutionTimeNet.txt", repetitionCount, eventCount, 500, 600, 50,50, 21, 100, printInputEvents)
 			
 		runARExecutionTimeGross("../../tessla-assembly-1.2.3.jar", "tmp/", "measureARExecutionTimeGross.scala", "measureARExecutionTimeGross",
-			"TimeMeasureARExecutionTimeGrossConstraint.tessla", "results/ARExecutionTimeGross.txt", repetitionCount, eventCount, 100, 200, printInputEvents)
+			"TimeMeasureARExecutionTimeGrossConstraint.tessla", "results/ARExecutionTimeGross.txt", repetitionCount, eventCount, 500, 600, printInputEvents)
 	}
 	
 	def runTADL2Delay(tesslaJarFile: String, tmpPath: String, scalaFileName: String, scalaObjectName: String,
@@ -332,8 +331,6 @@ object timeMeasureRunner {
 		// create the scala object
 		println("preparing TADL2 ExecutionTime")
 		var creator: TimeMeasureScalaClassCreatorTADLExecutionTime = new TimeMeasureScalaClassCreatorTADLExecutionTime()
-		//(scalaFilePath: String, scalaObjectName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int,
-		//	lower: Int, upper: Int, minDistance: Int, maxDistance: Int, numPreemptions: Int, preemptLength: Int, printInputEvents: Boolean)
 		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
 				eventCount,lower, upper, minDistance, maxDistance, numPreemptions, preemptLength, printInputEvents)) {
 			println("Could not create " + tmpPath + scalaFileName)
@@ -1103,7 +1100,6 @@ object timeMeasureRunner {
 		// create the scala object
 		println("preparing ARSynchronizationResponse")
 		var creator: TimeMeasureScalaClassCreatorARSynchronizationResponse = new TimeMeasureScalaClassCreatorARSynchronizationResponse()
-		//creator.setStreamCount(streamCount)
 		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
 				eventCount, tolerance, streamCount, maxEventsPerClusterPerStream, clusterDistance, clusterDistance,
 				printInputEvents)) {
@@ -1258,8 +1254,6 @@ object timeMeasureRunner {
 		// create the scala object
 		println("preparing ARExecutionTimeNet")
 		var creator: TimeMeasureScalaClassCreatorARExecutionTimeNet = new TimeMeasureScalaClassCreatorARExecutionTimeNet()
-		//(scalaFilePath: String, scalaObjectName: String, resultFilePath: String, repetitionCount: Int, eventCount: Int,
-		//	lower: Int, upper: Int, minDistance: Int, maxDistance: Int, numPreemptions: Int, preemptLength: Int, printInputEvents: Boolean)
 		if (!creator.generateEntireObject(tmpPath + scalaFileName, scalaObjectName, resultFilePath, repetitionCount,
 				eventCount,lower, upper, minDistance, maxDistance, numPreemptions, preemptLength, printInputEvents)) {
 			println("Could not create " + tmpPath + scalaFileName)
@@ -1373,7 +1367,6 @@ object timeMeasureRunner {
 		if (debugOutput)
 			println("runCommand(\"" + command + "\")")
 		try {
-			//println("command " + command + " start")
 			var process: Process = Runtime.getRuntime ().exec (command);
 
 			var stdin = process.getOutputStream ();  

@@ -42,10 +42,12 @@ public class TimeMeasureStrongSynchronizationConstraint extends TimeMeasureConst
 
 	private String writeEventsNow(int i){
 		if (i == 0)
-			return "def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",List.empty[Int]) else List.empty[Int]";
+			//return "def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",List.empty[Int]) else List.empty[Int]";
+			return "def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i)+",List.empty[Int]) else List.empty[Int]";
 		else
 			return writeEventsNow(i-1) + "\n" +
-				"def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",eventList"+(i-1)+") else eventList"+(i-1);
+				"def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i)+",eventList"+(i-1)+") else eventList"+(i-1);
+				//"def eventList"+i+":= if (TADL2.defaultTime(event"+i+")  >= timeNow) then List.prepend("+(i+1)+",eventList"+(i-1)+") else eventList"+(i-1);
 	}
 
 	private String writeEventsNow(){

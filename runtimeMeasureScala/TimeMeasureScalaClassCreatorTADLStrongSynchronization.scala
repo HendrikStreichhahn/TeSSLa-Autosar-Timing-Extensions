@@ -67,7 +67,7 @@ class TimeMeasureScalaClassCreatorTADLStrongSynchronization extends TimeMeasureS
 	/*protected def generateMeasureConstraintWriteEvents(writer: FileWriter, prevTabCount: Int) : Unit = {
 		writer.write(tabs(prevTabCount) + "for (i <- 0 to currentEvents.length-1){" + "\n")
 		for (i <- 0 to streamCount){
-			writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"event " + i + "\" ))" + "\n")
+			writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"event" + i + "\" ))" + "\n")
 			writer.write(tabs(prevTabCount+2) + "tesslaMonitorInstance.set_var_event" + i + "(currentEvents(i).getColor(), currentEvents(i).getTimeStamp())" + "\n")
 		}
 		//writer.write(tabs(prevTabCount+1) + "if (currentEvents(i).getOwnerStream().getName().equals(\"event\" ))" + "\n")
