@@ -830,6 +830,73 @@ module AUTOSAR_TIMEX {
 			resetTime)
 	}
 
+	## Checks the SynchronizationPointConstraint defined in the AUTOSAR Timing Extensions.
+	##
+	## The events with the numbers of the first set must occur before the events of the second set.
+	##
+	##
+	## **Usage Example**
+	##
+	## ~~~tessla
+	##
+	## in events: Events[Int]
+	##
+	## def firstEventSet: Set[Int]= Set.add(Set.add(Set.add(Set.empty[Int], 1), 2), 3)
+	## def secondEventSet: Set[Int]= Set.add(Set.add(Set.add(Set.empty[Int], 4), 5), 6)
+	##
+	## def constraint= AUTOSAR_TIMEX.SynchronizationPointConstraint(events, firstEventSet, secondEventSet)
+	## out constraint.value
+	## out constraint.final
+	##
+	## ~~~
+	##
+	## **Trace Example**
+	## ~~~trace
+	##
+	## 5: events = 2
+	## 5: constraint.value = true
+	## 5: constraint.final = false
+	## 6: events = 1
+	## 6: constraint.value = true
+	## 6: constraint.final = false
+	## 7: events = 3
+	## 7: constraint.value = true
+	## 7: constraint.final = false
+	## 10: events = 4
+	## 10: constraint.value = true
+	## 10: constraint.final = false
+	## 11: events = 6
+	## 11: constraint.value = true
+	## 11: constraint.final = false
+	## 12: events = 5
+	## 12: constraint.value = true
+	## 12: constraint.final = false
+	## ~~~
+	def SynchronizationPointConstraint(events: Events[Int], firstEventSet: Set[Int], secondEventSet: Set[Int]) : Events[fourValuedLogicValue]= {
+		on(events,
+			SynchronizationPointConstraintJustFirst(
+				filter(events, Set.contains(Set.union(firstEventSet, secondEventSet), events)),
+				firstEventSet))
+	}
+
+	## nodoc
+	def SynchronizationPointConstraintJustFirst(events: Events[Int], firstEventSet: Set[Int]): Events[fourValuedLogicValue]= {
+		def remainingFirstEvents: Events[Set[Int]] =
+			default(
+				if (Set.contains(last(remainingFirstEvents, events), events)) then
+					Set.remove(last(remainingFirstEvents, events), events)
+				else
+					last(remainingFirstEvents, events),
+				firstEventSet)
+		TADL2.stillFulfillable(
+			default(
+				if (Set.size(remainingFirstEvents)) != 0 && !Set.contains(prev(remainingFirstEvents), events) then
+					on(events, {value= false, final= true})
+				else
+					on(events, {value= true, final= false}),
+				{value= true, final= false}))
+	}
+
 	## Checks the OffsetTimingConstraint as defined in the AUTOSAR Timing Extensions.
 	##
 	## Each target event must be preceeded by a source event. The allowed time distance is defined by the maximum and the minimum parameter.

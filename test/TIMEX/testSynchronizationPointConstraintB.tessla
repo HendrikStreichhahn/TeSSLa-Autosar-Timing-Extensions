@@ -1,0 +1,13 @@
+include "../../main/TIMEXConstraints.tessla"
+
+in events: Events[Int]
+in expected: Events[{final: Bool, value: Bool}]
+
+def firstEventSet : Set[Int] = Set.empty[Int]
+def secondEventSet : Set[Int] = Set.add(Set.add(Set.add(Set.add(Set.add(Set.add(Set.add(Set.add(Set.add(Set.add(Set.empty[Int], 1), 2), 3), 4), 5), 6), 7), 8), 9), 10)
+
+def isExpected:= expected == AUTOSAR_TIMEX.SynchronizationPointConstraint(events, firstEventSet, secondEventSet)
+
+out isExpected
+
+out filter(events, Set.contains(Set.union(firstEventSet, secondEventSet), events))

@@ -1,0 +1,12 @@
+# Jitter backward
+0: expected = {final= false, value= true}
+1: events = 6
+2: events = 5
+3: events = 4
+4: events = 3
+5: events = 2
+6: events = 1
+7: events = 10
+8: events = 9
+9: events = 8
+10: events = 7
