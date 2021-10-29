@@ -1475,7 +1475,7 @@ public class TimeMeasureAll{
 	*/
 	private static void measureReactionConstraint(String outputFileName, int traceSize, boolean compiled){
 		final String TESSLAFILEPATH = "tmp/ReactionConstraintTimeMeasure.tessla";
-		final int traceCount = 102;
+		final int traceCount = 92;
 		SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
 		String[] params = new String[traceCount];
 		int i = 0;
@@ -1483,7 +1483,7 @@ public class TimeMeasureAll{
 		for (int minimum = 100; minimum <= 1000; minimum += 100)
 		{
 			recompile = true;
-			for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
+			for (int stimulusDistance = 2; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
 				int maximum = minimum;
 				System.out.println("ReactionConstraint Trace " + (i+1) + " of " + traceCount);
 				params[i] = "stimulusDistance: " + stimulusDistance + " minimum: " + minimum + " maximum: " + maximum;
@@ -1534,14 +1534,14 @@ public class TimeMeasureAll{
 	*/
 	private static void measureAgeConstraint(String outputFileName, int traceSize, boolean compiled){
 		final String TESSLAFILEPATH = "tmp/AgeConstraintTimeMeasure.tessla";
-		final int traceCount = 102;
+		final int traceCount = 92;
 		SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
 		String[] params = new String[traceCount];
 		int i = 0;
 		boolean recompile = true;
 		for (int minimum = 100; minimum <= 1000; minimum += 100){
 			recompile = true;
-			for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
+			for (int stimulusDistance = 2; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
 				int maximum = minimum;
 				System.out.println("AgeConstraint Trace " + (i+1) + " of " + traceCount);
 				params[i] = "stimulusDistance: " + stimulusDistance+ " minimum: " + minimum +
@@ -2478,16 +2478,15 @@ public class TimeMeasureAll{
 	*/
 	private static void measureLatencyConstraintReaction(String outputFileName, int traceSize, boolean compiled){
 		final String TESSLAFILEPATH = "tmp/LatencyConstraintReactionTimeMeasure.tessla";
-		final int traceCount = 103;
+		final int traceCount = 92;
 		SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
 		String[] params = new String[traceCount];
 		int i = 0;
 		boolean recompile = true;
-		for (int minimum = 50; minimum <= 550; minimum += 50)
+		for (int minimum = 100; minimum <= 1000; minimum += 100)
 		{
 			recompile = true;
-			for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2)
-			{
+			for (int stimulusDistance = 2; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
 				int maximum = minimum;
 				System.out.println("LatencyConstraintReaction Trace " + (i+1) + " of " + traceCount);
 				params[i] = "stimulusDistance: " + stimulusDistance + " minimum: " + minimum + " maximum: " + maximum;
@@ -2539,14 +2538,14 @@ public class TimeMeasureAll{
 	*/
 	private static void measureLatencyConstraintAge(String outputFileName, int traceSize, boolean compiled){
 		final String TESSLAFILEPATH = "tmp/LatencyConstraintAgeTimeMeasure.tessla";
-		final int traceCount = 103;
+		final int traceCount = 92;
 		SingleMeasureResult[] results = new SingleMeasureResult[traceCount];
 		String[] params = new String[traceCount];
 		int i = 0;
 		boolean recompile = true;
-		for (int minimum = 50; minimum <= 550; minimum += 50){
+		for (int minimum = 100; minimum <= 1000; minimum += 100){
 			recompile = true;
-			for (int stimulusDistance = 1; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
+			for (int stimulusDistance = 2; stimulusDistance <= 2*minimum; stimulusDistance*= 2){
 				int maximum = minimum;
 				System.out.println("measureLatencyConstraintAge Trace " + (i+1) + " of " + traceCount);
 				params[i] = "stimulusDistance: " + stimulusDistance+ " minimum: " + minimum +
