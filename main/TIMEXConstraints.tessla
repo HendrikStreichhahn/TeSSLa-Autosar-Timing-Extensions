@@ -75,7 +75,10 @@ module AUTOSAR_TIMEX {
     ## out constraint.final
     ##~~~
     ##
+    ## **Trace Example**
+    ##
     ## ~~~trace
+    ## option timeDomain:[-1,67]
     ## 5: event = ()
     ## 5: constraint.value = true
     ## 5: constraint.final = false
@@ -188,6 +191,7 @@ module AUTOSAR_TIMEX {
     ## **Trace Example**
     ##
     ## ~~~trace
+    ## option timeDomain:[-1,60]
     ## 10: event = ()
     ## 10: constraint.value = true
     ## 10: constraint.final = false
@@ -322,6 +326,7 @@ module AUTOSAR_TIMEX {
     ## **Trace Example**
     ##
     ## ~~~trace
+    ## option timeDomain:[-1,48]
     ## 1: x = ()
     ## 1: constraint.value = true
     ## 1: constraint.final = false
@@ -480,7 +485,9 @@ module AUTOSAR_TIMEX {
 	## ~~~
 	##
 	## **Trace Example**
+	##
 	## ~~~trace
+	## option timeDomain:[600,800]
 	## 610: events = 100
 	## 610: constraint.value = true
 	## 610: constraint.final = false
@@ -564,8 +571,10 @@ module AUTOSAR_TIMEX {
 	## ~~~
 	##
 	## **Trace Example**
+	##
 	## ~~~trace
-	## 5: source
+	## option timeDomain:[-1,42]
+ 	## 5: source
 	## 5: constraint.value = true
 	## 5: constraint.final = false
 	## 10: source
@@ -662,7 +671,9 @@ module AUTOSAR_TIMEX {
 	## ~~~
 	##
 	## **Trace Example**
+	##
 	## ~~~trace
+	## option timeDomain:[-1,37]
 	## 5: event = 1
 	## 5: constraint.final= false
 	## 5: constraint.value= true
@@ -752,7 +763,9 @@ module AUTOSAR_TIMEX {
 	## ~~~
 	##
 	## **Trace Example**
+	##
 	## ~~~trace
+	## option timeDomain:[-1,17]
 	## 5: event = 7
 	## 5: constraint.final= false
 	## 5: constraint.value= true
@@ -818,6 +831,8 @@ module AUTOSAR_TIMEX {
     ## def constraint= SynchronizationTimingConstraintEvents(eventList, streamCount, tolerance, multipleOccurrences)
     ## out constraint.value
     ## out constraint.final
+    ## ~~~
+    ##
     ## **Trace Example**
     ##
     ## ~~~trace
@@ -1105,6 +1120,7 @@ module AUTOSAR_TIMEX {
     ## **Trace Example**
     ##
     ## ~~~trace
+    ## option timeDomain:[-1,22]
     ## 5: start = ()
     ## 5: constraint.value = true
     ## 5: constraint.final = false
